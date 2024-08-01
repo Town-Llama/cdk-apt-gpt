@@ -1,0 +1,16 @@
+{
+  "name": "llm",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "groq": "^3.52.4",
+    "node-fetch": "^3.3.2",
+    "openai": "^4.53.2"
+  }
+}
