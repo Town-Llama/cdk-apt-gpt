@@ -86,7 +86,7 @@ export class LambdizeAptGptStack extends cdk.Stack {
     });
 
     // Lambda functions with environment variables
-    const createLambdaFunction = (name: string, handlerPath: string) =>
+    const createNodeLambdaFunction = (name: string, handlerPath: string) =>
       new lambda.Function(this, name, {
         runtime: lambda.Runtime.NODEJS_20_X,
         handler: 'index.handler',
@@ -110,10 +110,41 @@ export class LambdizeAptGptStack extends cdk.Stack {
         layers: [authLayer, dbLayer, llmLayer] // all of them will have auth protection for now
       });
 
+    const createPythonLambdaFunction = (name: string, handlerPath: string) =>
+      new lambda.Function(this, name, {
+        runtime: lambda.Runtime.PYTHON_3_9,
+        handler: 'index.lambda_handler',
+        code: lambda.Code.fromAsset(`lambda/${handlerPath}`, {
+          bundling: {
+            image: lambda.Runtime.PYTHON_3_9.bundlingImage,
+            command: [
+              'bash', '-c',
+              'pip install -r requirements.txt -t /asset-output && cp index.py /asset-output'
+            ],
+          },
+        }),
+        environment: {
+          "OPEN_AI_KEY": OPEN_AI_KEY,
+          "GOOGLE_API_KEY": GOOGLE_API_KEY,
+          "OUTSCRAPER_API_KEY": OUTSCRAPER_API_KEY
+        },
+      });
+
     // Define Lambda functions
-    const datas_route = createLambdaFunction('Lambda-datas-route', 'route');
-    const datas_neighborhood = createLambdaFunction('Lambda-datas-neighborhood', 'neighborhood');
-    const chat_chats = createLambdaFunction('Lambda-chat-chats', 'chats');
+    const datas_route = createNodeLambdaFunction('Lambda-datas-route', '/datas/route');
+    const datas_neighborhood = createNodeLambdaFunction('Lambda-datas-neighborhood', '/datas/neighborhood');
+    const datas_chats = createNodeLambdaFunction('Lambda-datas-chats', '/datas/chats');
+    const datas_chats_record = createNodeLambdaFunction('Lambda-datas-chats_record', '/datas/chats_record');
+    const datas_cities = createNodeLambdaFunction('Lambda-datas-cities', '/datas/cities');
+    const datas_waitlist = createNodeLambdaFunction('Lambda-datas-waitlist', '/datas/waitlist');
+
+    const chat_reviews = createPythonLambdaFunction("Lambda-chat-reviews", '/chat/reviews');
+    const chat_next = createNodeLambdaFunction("Lambda-chat-next", '/chat/next');
+    const chat_pois = createNodeLambdaFunction("Lambda-chat-pois", '/chat/pois');
+    const chat_suggestion = createNodeLambdaFunction("Lambda-chat-suggestion", '/chat/suggestion');
+    const chat_suggestion_short = createNodeLambdaFunction("Lambda-chat-suggestion_short", '/chat/suggestion_short');
+
+    
 
     // API Gateway setup
     const api = new apigateway.RestApi(this, 'MyApi', {
@@ -125,11 +156,21 @@ export class LambdizeAptGptStack extends cdk.Stack {
     });
 
     const datasResource = api.root.addResource('datas');
+    const datasChatResource = datasResource.addResource('chats');
+    datasChatResource.addMethod('POST', new apigateway.LambdaIntegration(datas_chats));
+    datasChatResource.addResource("record").addMethod('POST', new apigateway.LambdaIntegration(datas_chats_record));
+    datasResource.addResource('cities').addMethod('GET', new apigateway.LambdaIntegration(datas_cities));
+    datasResource.addResource('waitlist').addMethod('POST', new apigateway.LambdaIntegration(datas_waitlist));
     datasResource.addResource('route').addMethod('POST', new apigateway.LambdaIntegration(datas_route));
-    datasResource.addResource('neighborhood').addMethod('GET', new apigateway.LambdaIntegration(datas_neighborhood));
+    datasResource.addResource('neighborhood').addMethod('POST', new apigateway.LambdaIntegration(datas_neighborhood));
 
     const chatResource = api.root.addResource('chat');
-    chatResource.addResource('chats').addMethod('POST', new apigateway.LambdaIntegration(chat_chats));
+    chatResource.addResource('reviews').addMethod('POST', new apigateway.LambdaIntegration(chat_reviews));
+    chatResource.addResource('next').addMethod('POST', new apigateway.LambdaIntegration(chat_next));
+    chatResource.addResource('pois').addMethod('POST', new apigateway.LambdaIntegration(chat_pois));
+    const chatSuggestionResource = chatResource.addResource('suggestion');
+    chatSuggestionResource.addMethod('POST', new apigateway.LambdaIntegration(chat_suggestion));
+    chatSuggestionResource.addResource("short").addMethod('POST', new apigateway.LambdaIntegration(chat_suggestion_short));
 
   }
 }
