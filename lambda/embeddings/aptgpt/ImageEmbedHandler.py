@@ -7,8 +7,8 @@ import shutil
 import traceback
 
 import numpy as np
+from aptgpt.test_image_embed_handler import get_test_data
 from PIL import Image
-from txtai.vectors import VectorsFactory
 
 model = None
 logger = logging.getLogger()
@@ -18,6 +18,8 @@ logger.info("hit")
 def createEmbed(
     is_text: bool, payload
 ):
+    from txtai.vectors import VectorsFactory
+
     global model
     if model is None:
         model = VectorsFactory.create({'path': 'sentence-transformers/clip-ViT-B-32', 'method': 'sentence-transformers', 'content': False})
@@ -35,6 +37,7 @@ def handler(event, context):  # pragma: no cover
         logger.info(context)
         
         # Parse the HTTP event
+        logger.info(event["body"])
         body = json.loads(event["body"])
         is_text = body["isText"]
         payload = body["payload"]
@@ -47,7 +50,18 @@ def handler(event, context):  # pragma: no cover
         }
     except:
         logger.error(traceback.format_exc())
+        assert False, traceback.format_exc()
         return {
             "statusCode": 500,
             "body": json.dumps({"embedding": []})
         }
+
+if __name__ == "__main__":  # pragma: no cover
+    logging.basicConfig(level=10)
+    result = handler(
+            json.loads(
+                get_test_data()
+            ),
+            None,
+        )
+    assert result["statusCode"] == 200, result
