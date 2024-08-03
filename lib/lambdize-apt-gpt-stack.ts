@@ -8,7 +8,6 @@ import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as path from 'path';
 import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
-import * as logs from 'aws-cdk-lib/aws-logs';
 
 export class LambdizeAptGptStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -165,6 +164,8 @@ export class LambdizeAptGptStack extends cdk.Stack {
       code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../lambda/embeddings'), {
         platform: Platform.LINUX_AMD64, // Specify the architecture
       }),
+      timeout: cdk.Duration.seconds(30),
+      memorySize: 3008
     });
     const datas_search = createNodeLambdaFunction('Lambda-datas-search', '/datas/search');
     const invokeLambdaPolicyStatement = new iam.PolicyStatement({
@@ -269,42 +270,6 @@ export class LambdizeAptGptStack extends cdk.Stack {
 
     const chatSuggestionShortResource = chatSuggestionResource.addResource("short")
     createLambdaIntegration(chatSuggestionShortResource, chat_suggestion_short, "POST");
-
-
-
-    // addCorsOptions(chatResource);
-    // chatResource.addResource('reviews').addMethod('POST', new apigateway.LambdaIntegration(chat_reviews, {
-    //   integrationResponses: [integrationResponse],
-    // }), {
-    //   methodResponses: [methodResponse],
-    //   authorizer: authorizer,
-    // });
-    // chatResource.addResource('next').addMethod('POST', new apigateway.LambdaIntegration(chat_next, {
-    //   integrationResponses: [integrationResponse],
-    // }), {
-    //   methodResponses: [methodResponse],
-    //   authorizer: authorizer,
-    // });
-    // chatResource.addResource('pois').addMethod('POST', new apigateway.LambdaIntegration(chat_pois, {
-    //   integrationResponses: [integrationResponse],
-    // }), {
-    //   methodResponses: [methodResponse],
-    //   authorizer: authorizer,
-    // });
-    // const chatSuggestionResource = chatResource.addResource('suggestion');
-    // addCorsOptions(chatSuggestionResource);
-    // chatSuggestionResource.addMethod('POST', new apigateway.LambdaIntegration(chat_suggestion, {
-    //   integrationResponses: [integrationResponse],
-    // }), {
-    //   methodResponses: [methodResponse],
-    //   authorizer: authorizer,
-    // });
-    // chatSuggestionResource.addResource("short").addMethod('POST', new apigateway.LambdaIntegration(chat_suggestion_short, {
-    //   integrationResponses: [integrationResponse],
-    // }), {
-    //   methodResponses: [methodResponse],
-    //   authorizer: authorizer,
-    // });
 
   }
 }

@@ -8,6 +8,10 @@ import base64
 import io
 import traceback
 
+from txtai.vectors import VectorsFactory
+
+model = VectorsFactory.create({'path': 'sentence-transformers/clip-ViT-B-32', 'method': 'sentence-transformers', 'content': False})
+
 logger = logging.getLogger()
 
 def createEmbed(
@@ -18,7 +22,8 @@ def createEmbed(
         image_bytes = base64.b64decode(payload)
         image = Image.open(io.BytesIO(image_bytes))
     # Embed the payload
-    embedding:np.ndarray = np.ones(512, dtype=float)
+    processed_payload = payload if is_text else image
+    embedding = model.encode(processed_payload)
     return embedding
 
 def handler(event, context):  # pragma: no cover
