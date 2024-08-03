@@ -21,38 +21,48 @@ def image_embed(
     return embedding
 
 def image_embed_handler(event, context):  # pragma: no cover
+    logger.info("EVENT")
     logger.info(event)
+    logger.info("CONTEXT")
     logger.info(context)
+    logger.info("KEYS")
     logger.info(event.keys())
     embeddings = []
     for record in event["Records"]:
+        print(record)
+        print("RECORD", record.keys())
 
-        # Unpack S3 event from SQS
-        event = json.loads(record["body"])
-        if "Event" in event and event["Event"] == "s3:TestEvent":
-            return {"statusCode": 200, "body": {}}
-        assert len(event["Records"]) == 1
+        body = json.loads(record["body"])
 
-        s3Event = record["s3"]
-        bucket = s3Event["bucket"]["name"]
-        image_b64_string = s3Event["object"]["image"]
-        image_bytes = base64.b64decode(image_b64_string)
-        image = Image.open(io.BytesIO(image_bytes))
+        for body_record in body["Records"]:
 
-        s3 = boto3.client("s3")
-        s3_resource = boto3.resource("s3")
+            # Unpack S3 event from SQS
+            
+            print("BODY", body_record.keys())
+            if "Event" in body and body["Event"] == "s3:TestEvent":
+                return {"statusCode": 200, "body": {}}
 
-        if context is None:
-            stage = "dev"
-        else:
-            stage = "prod" if "-prod-" in context.function_name else "dev"
+            s3Event = body_record["s3"]
+            bucket = s3Event["bucket"]["name"]
+            image_b64_string = s3Event["object"]["image"]
+            image_bytes = base64.b64decode(image_b64_string)
+            image = Image.open(io.BytesIO(image_bytes))
 
-        embedding = image_embed(s3, s3_resource, bucket, image, stage)
-        embeddings.append(embedding.tolist())
+            s3 = boto3.client("s3")
+            s3_resource = boto3.resource("s3")
+
+            if context is None:
+                stage = "dev"
+            else:
+                stage = "prod" if "-prod-" in context.function_name else "dev"
+
+            embedding = image_embed(s3, s3_resource, bucket, image, stage)
+            embeddings.append(embedding.tolist())
     return {"statusCode": 200, "body": {"embeddings": json.dumps(embeddings)}}
 
 
 if __name__ == "__main__":  # pragma: no cover
+    logging.basicConfig(level=10)
     logger.info(
         image_embed_handler(
             json.loads(
