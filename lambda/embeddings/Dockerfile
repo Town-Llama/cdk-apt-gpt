@@ -1,6 +1,6 @@
-FROM public.ecr.aws/lambda/python:3.9
+FROM --platform=linux/x86_64 public.ecr.aws/lambda/python:3.9
 
-ENV TRANSFORMERS_CACHE="${LAMBDA_TASK_ROOT}/huggingface"
+ENV HF_HOME="/opt/hf_cache"
 
 # Update package lists and install dependencies
 RUN yum update -y && \
