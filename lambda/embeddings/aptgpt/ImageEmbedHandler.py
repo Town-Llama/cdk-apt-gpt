@@ -10,7 +10,7 @@ import traceback
 
 from txtai.vectors import VectorsFactory
 
-model = VectorsFactory.create({'path': 'sentence-transformers/clip-ViT-B-32', 'method': 'sentence-transformers', 'content': False})
+model = None
 
 logger = logging.getLogger()
 
@@ -19,6 +19,8 @@ def createEmbed(
 ):
     # Embed the payload
     global model
+    if model is None:
+        model = VectorsFactory.create({'path': 'sentence-transformers/clip-ViT-B-32', 'method': 'sentence-transformers', 'content': False})
     # Decode the base64 payload
     if not is_text:
         image_bytes = base64.b64decode(payload)
