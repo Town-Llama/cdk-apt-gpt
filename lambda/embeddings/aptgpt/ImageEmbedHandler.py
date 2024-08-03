@@ -10,13 +10,18 @@ import numpy as np
 import base64
 import io
 
+from txtai.vectors import VectorsFactory
+
+model = VectorsFactory.create({'path': 'sentence-transformers/clip-ViT-B-32', 'method': 'sentence-transformers', 'content': False})
+
 logger = logging.getLogger()
 
 def image_embed(
     s3, s3_resource, bucket: str, image: Image, stage: str
 ):
+    global model
     # Embed the image
-    embedding:np.ndarray = np.ones(512, dtype=float)
+    embedding = model.encode(image)
 
     return embedding
 
