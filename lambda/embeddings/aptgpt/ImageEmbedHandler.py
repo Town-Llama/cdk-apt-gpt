@@ -1,14 +1,21 @@
+import base64
+import io
 import json
 import logging
 import os
-
-from PIL import Image
-import numpy as np
-import base64
-import io
+import shutil
 import traceback
 
+import numpy as np
+from PIL import Image
 from txtai.vectors import VectorsFactory
+
+TMP_HF_HOME = "/tmp/hf_cache"
+
+if not os.path.exists(TMP_HF_HOME):
+    shutil.copytree(os.path.expanduser("~/.cache/huggingface"), TMP_HF_HOME)
+
+os.environ["HF_HOME"]=TMP_HF_HOME
 
 model = VectorsFactory.create({'path': 'sentence-transformers/clip-ViT-B-32', 'method': 'sentence-transformers', 'content': False})
 
