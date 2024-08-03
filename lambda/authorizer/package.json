@@ -4,36 +4,37 @@
     "description": "An AWS Lambda function to provide a Custom Authenticator for AWS API Gateway that verifies RS* signed tokens",
     "main": "index.js",
     "scripts": {
-      "test": "lambda-local --timeout 300 --lambda-path index.js --event-path event.json",
-      "bundle": "rm -f custom-authorizer.zip ; zip custom-authorizer.zip -r *.js *.json node_modules/"
+        "test": "lambda-local --timeout 300 --lambda-path index.js --event-path event.json",
+        "bundle": "rm -f custom-authorizer.zip ; zip custom-authorizer.zip -r *.js *.json node_modules/"
     },
     "author": "Jason Haines",
     "license": "Apache-2.0",
     "dependencies": {
-      "auth0": "^2.5.0",
-      "bluebird": "^3.4.6",
-      "dotenv": "^5.0.1",
-      "jsonwebtoken": "^8.2.1",
-      "jwks-rsa": "^1.1.1"
+        "auth0": "^2.5.0",
+        "bluebird": "^3.4.6",
+        "dotenv": "^5.0.1",
+        "jsonwebtoken": "^8.5.1",
+        "jwks-rsa": "^1.12.3",
+        "util": "^0.12.5"
     },
     "devDependencies": {
-      "aws-sdk": "^2.2.48",
-      "lambda-local": "^1.4.8"
+        "aws-sdk": "^2.2.48",
+        "lambda-local": "^1.4.8"
     },
     "repository": {
-      "type": "git",
-      "url": "git+https://github.com/auth0-samples/lambda-jwt-rsa-authorizer.git"
+        "type": "git",
+        "url": "git+https://github.com/auth0-samples/lambda-jwt-rsa-authorizer.git"
     },
     "keywords": [
-      "aws",
-      "api-gateway",
-      "auth0",
-      "custom-authorizer",
-      "authentication",
-      "lambda"
+        "aws",
+        "api-gateway",
+        "auth0",
+        "custom-authorizer",
+        "authentication",
+        "lambda"
     ],
     "bugs": {
-      "url": "https://github.com/auth0-samples/lambda-jwt-rsa-authorizer/issues"
+        "url": "https://github.com/auth0-samples/lambda-jwt-rsa-authorizer/issues"
     },
     "homepage": "https://github.com/auth0-samples/lambda-jwt-rsa-authorizer#readme"
-  }
+}
