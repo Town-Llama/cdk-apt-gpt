@@ -17,6 +17,7 @@ RUN pip3 install --no-cache-dir torch==2.3.1 \
 RUN yum remove -y gcc gcc-c++ && yum clean all && rm -rf /var/cache/yum
 
 # validate installation
+ENV PYTHONPATH="${LAMBDA_TASK_ROOT}:${PYTHONPATH}"
 RUN python3 -c "import sys, importlib.util as util; 1 if util.find_spec('nltk') else sys.exit(); import nltk; nltk.download('punkt')"
 # cache model
 RUN python3 -c "from txtai.vectors import VectorsFactory; model = VectorsFactory.create({'path': 'sentence-transformers/clip-ViT-B-32', 'method': 'sentence-transformers', 'content': False})"
