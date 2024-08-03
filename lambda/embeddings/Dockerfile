@@ -1,5 +1,7 @@
 FROM public.ecr.aws/lambda/python:3.9
 
+ENV TRANSFORMERS_CACHE="${LAMBDA_TASK_ROOT}/huggingface"
+
 # Update package lists and install dependencies
 RUN yum update -y && \
     yum install -y \
