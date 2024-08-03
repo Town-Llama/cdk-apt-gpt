@@ -16,4 +16,4 @@ RUN pip3 install . --target "${LAMBDA_TASK_ROOT}"
 RUN PYTHONPATH="${LAMBDA_TASK_ROOT}" python aptgpt/ImageEmbedHandler.py
 
 # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
-#CMD [ "aquinas.ImageIngest.ImageIngestHandler" ]
+CMD [ "aptgpt.ImageEmbedHandler.handler" ]

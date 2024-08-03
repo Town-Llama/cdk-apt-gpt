@@ -7,6 +7,7 @@ import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as path from 'path';
+import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
 
 export class LambdizeAptGptStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -62,7 +63,6 @@ export class LambdizeAptGptStack extends cdk.Stack {
       distribution,
       distributionPaths: ['/*'],
     });
-
 
     /**
      * lambda layers
@@ -137,6 +137,21 @@ export class LambdizeAptGptStack extends cdk.Stack {
     const datas_chats_record = createNodeLambdaFunction('Lambda-datas-chats_record', '/datas/chats_record');
     const datas_cities = createNodeLambdaFunction('Lambda-datas-cities', '/datas/cities');
     const datas_waitlist = createNodeLambdaFunction('Lambda-datas-waitlist', '/datas/waitlist');
+    const embeddingModel = new lambda.DockerImageFunction(this, 'Lambda-embedding-model', {
+      functionName: 'Lambda-embedding-model',
+      code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../lambda/embeddings'), {
+        platform: Platform.LINUX_AMD64, // Specify the architecture
+      }),
+    });
+    const datas_search = createNodeLambdaFunction('Lambda-datas-search', '/datas/search');
+    const invokeLambdaPolicyStatement = new iam.PolicyStatement({
+      actions: ['lambda:InvokeFunction'],
+      resources: [
+        `arn:aws:lambda:${cdk.Stack.of(this).region}:${cdk.Stack.of(this).account}:function:Lambda-embedding-model`
+      ],
+      effect: iam.Effect.ALLOW,
+    });
+    datas_search.addToRolePolicy(invokeLambdaPolicyStatement);
 
     const chat_reviews = createPythonLambdaFunction("Lambda-chat-reviews", '/chat/reviews');
     const chat_next = createNodeLambdaFunction("Lambda-chat-next", '/chat/next');
@@ -163,6 +178,7 @@ export class LambdizeAptGptStack extends cdk.Stack {
     datasResource.addResource('waitlist').addMethod('POST', new apigateway.LambdaIntegration(datas_waitlist));
     datasResource.addResource('route').addMethod('POST', new apigateway.LambdaIntegration(datas_route));
     datasResource.addResource('neighborhood').addMethod('POST', new apigateway.LambdaIntegration(datas_neighborhood));
+    datasResource.addResource('search').addMethod('POST', new apigateway.LambdaIntegration(datas_search));
 
     const chatResource = api.root.addResource('chat');
     chatResource.addResource('reviews').addMethod('POST', new apigateway.LambdaIntegration(chat_reviews));
