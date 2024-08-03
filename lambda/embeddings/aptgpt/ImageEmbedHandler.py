@@ -10,20 +10,24 @@ import numpy as np
 from PIL import Image
 from txtai.vectors import VectorsFactory
 
-TMP_HF_HOME = "/tmp/hf_cache"
-
-if not os.path.exists(TMP_HF_HOME):
-    shutil.copytree(os.path.expanduser("~/.cache/huggingface"), TMP_HF_HOME)
-
-os.environ["HF_HOME"]=TMP_HF_HOME
-
-model = VectorsFactory.create({'path': 'sentence-transformers/clip-ViT-B-32', 'method': 'sentence-transformers', 'content': False})
+model = None
 
 logger = logging.getLogger()
 
 def createEmbed(
     is_text: bool, payload
 ):
+    global model
+    if model is None:
+        TMP_HF_HOME = "/tmp/hf_cache"
+
+        if not os.path.exists(TMP_HF_HOME):
+            shutil.copytree(os.path.expanduser("~/.cache/huggingface"), TMP_HF_HOME)
+
+        os.environ["HF_HOME"]=TMP_HF_HOME
+
+        model = VectorsFactory.create({'path': 'sentence-transformers/clip-ViT-B-32', 'method': 'sentence-transformers', 'content': False})
+
     # Decode the base64 payload
     if not is_text:
         image_bytes = base64.b64decode(payload)
