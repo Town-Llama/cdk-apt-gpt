@@ -16,17 +16,14 @@ def lambda_handler(event, context):
         if not apt or 'longitude' not in apt or 'latitude' not in apt:
             return {
                 'statusCode': 400,
+                'headers': {
+                    "Content-Type": "application/json",
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+                },
                 'body': json.dumps({'error': 'Apartment longitude and latitude are required'})
             }
-
-        # Make an HTTP request to get the review summary
-        review_summary_response = requests.post(
-            "http://localhost:9001/reviews",
-            json={
-                'longitude': float(apt['longitude']),
-                'latitude': float(apt['latitude'])
-            }
-        )
 
         lng = float(apt['longitude'])
         lat = float(apt['latitude'])
