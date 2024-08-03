@@ -128,7 +128,7 @@ export class LambdizeAptGptStack extends cdk.Stack {
           "OUTSCRAPER_API_KEY": OUTSCRAPER_API_KEY
         },
         layers: [dbLayer, llmLayer], // all of them will have auth protection for now
-        timeout: cdk.Duration.seconds(30)
+        timeout: cdk.Duration.seconds(90)
       });
 
     const createPythonLambdaFunction = (name: string, handlerPath: string) =>
@@ -164,8 +164,8 @@ export class LambdizeAptGptStack extends cdk.Stack {
       code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../lambda/embeddings'), {
         platform: Platform.LINUX_AMD64, // Specify the architecture
       }),
-      timeout: cdk.Duration.seconds(30),
-      memorySize: 3008
+      timeout: cdk.Duration.seconds(90),
+      memorySize: 3008 //once approved go to 10240
     });
     const datas_search = createNodeLambdaFunction('Lambda-datas-search', '/datas/search');
     const invokeLambdaPolicyStatement = new iam.PolicyStatement({

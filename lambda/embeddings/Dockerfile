@@ -1,5 +1,7 @@
 FROM public.ecr.aws/lambda/python:3.9
 
+ENV HF_HOME="/opt/hf_cache"
+
 # Update package lists and install dependencies
 RUN yum update -y && \
     yum install -y \
