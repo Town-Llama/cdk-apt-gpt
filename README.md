@@ -17,3 +17,4 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 - gmail creds to team
 - aws creds to team
 - poulimi
+- github org

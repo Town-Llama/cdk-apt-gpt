@@ -37,7 +37,6 @@ def handler(event, context):  # pragma: no cover
         logger.info(context)
         
         # Parse the HTTP event
-        logger.info(event["body"])
         body = json.loads(event["body"])
         is_text = body["isText"]
         payload = body["payload"]
