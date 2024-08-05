@@ -18,9 +18,9 @@ def lambda_handler(event, context):
                 'statusCode': 400,
                 'headers': {
                     "Content-Type": "application/json",
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                    "Access-Control-Allow-Methods": "*"
                 },
                 'body': json.dumps({'error': 'Apartment longitude and latitude are required'})
             }
@@ -40,6 +40,12 @@ def lambda_handler(event, context):
         # Return the review summary
         return {
             'statusCode': 201,
+            'headers': {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                "Access-Control-Allow-Methods": "*"
+            },
             'body': json.dumps({'data': summary})
         }
     except Exception as e:
@@ -47,6 +53,12 @@ def lambda_handler(event, context):
 
         return {
             'statusCode': 200,
+            'headers': {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                "Access-Control-Allow-Methods": "*"
+            },
             'body': json.dumps({'data': 'Not Enough Information to Summarize Reviews'})
         }
 

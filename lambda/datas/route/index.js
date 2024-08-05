@@ -28,8 +28,9 @@ exports.handler = async (event) => {
                 statusCode: 400,
                 headers: {
                     "Content-Type": "application/json",
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': true,
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                    "Access-Control-Allow-Methods": "*"
                   },
                 body: JSON.stringify({ error: 'Start and end coordinates are required' }),
             };
@@ -58,8 +59,9 @@ exports.handler = async (event) => {
             statusCode: 200,
             headers: {
                 "Content-Type": "application/json",
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': true,
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                "Access-Control-Allow-Methods": "*"
               },
             body: JSON.stringify({ data }),
         };
@@ -70,8 +72,9 @@ exports.handler = async (event) => {
             statusCode: 500,
             headers: {
                 "Content-Type": "application/json",
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': true,
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                "Access-Control-Allow-Methods": "*"
               },
             body: JSON.stringify({ error: 'Internal Server Error' }),
         };

@@ -8,6 +8,8 @@ import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as path from 'path';
 import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
+import * as logs from 'aws-cdk-lib/aws-logs';
+
 
 export class LambdizeAptGptStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -90,19 +92,19 @@ export class LambdizeAptGptStack extends cdk.Stack {
     /*
     * custom authorizer auth0
     */
-    const customAuthorizer = new lambda.Function(this, 'Auth0LambdaAuthorizer', {
-      runtime: lambda.Runtime.NODEJS_20_X,
-      handler: 'index.handler',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/authorizer')),
-      environment: {
-        "AUTH0_JWKS_URI": AUTH0_JWKS_URI,
-        "AUTH0_AUDIENCE": AUTH0_AUDIENCE,
-        "AUTH0_TOKEN_ISSUER": AUTH0_TOKEN_ISSUER
-      },
-    });
-    const authorizer = new apigateway.TokenAuthorizer(this, 'MyCustomAuthorizer', {
-      handler: customAuthorizer,
-    });
+    // const customAuthorizer = new lambda.Function(this, 'Auth0LambdaAuthorizer', {
+    //   runtime: lambda.Runtime.NODEJS_20_X,
+    //   handler: 'index.handler',
+    //   code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/authorizer')),
+    //   environment: {
+    //     "AUTH0_JWKS_URI": AUTH0_JWKS_URI,
+    //     "AUTH0_AUDIENCE": AUTH0_AUDIENCE,
+    //     "AUTH0_TOKEN_ISSUER": AUTH0_TOKEN_ISSUER
+    //   },
+    // });
+    // const authorizer = new apigateway.TokenAuthorizer(this, 'MyCustomAuthorizer', {
+    //   handler: customAuthorizer,
+    // });
 
 
     // Lambda functions with environment variables
@@ -154,7 +156,7 @@ export class LambdizeAptGptStack extends cdk.Stack {
 
     // Define Lambda functions
     const datas_route = createNodeLambdaFunction('Lambda-datas-route', '/datas/route');
-    const datas_neighborhood = createNodeLambdaFunction('Lambda-datas-neighborhood', '/datas/neighborhood');
+    const datas_neighborhoods = createNodeLambdaFunction('Lambda-datas-neighborhoods', '/datas/neighborhood');
     const datas_chats = createNodeLambdaFunction('Lambda-datas-chats', '/datas/chats');
     const datas_chats_record = createNodeLambdaFunction('Lambda-datas-chats_record', '/datas/chats_record');
     const datas_cities = createNodeLambdaFunction('Lambda-datas-cities', '/datas/cities');
@@ -183,12 +185,16 @@ export class LambdizeAptGptStack extends cdk.Stack {
     const chat_suggestion = createNodeLambdaFunction("Lambda-chat-suggestion", '/chat/suggestion');
     const chat_suggestion_short = createNodeLambdaFunction("Lambda-chat-suggestion_short", '/chat/suggestion_short');
 
+    const logGroup = new logs.LogGroup(this, 'ApiGatewayLogGroup', {
+      retention: logs.RetentionDays.ONE_WEEK, // Set retention period as needed
+    });
+
     // API Gateway setup
     const api = new apigateway.RestApi(this, 'MyApi', {
       restApiName: 'My Service',
       description: 'This service serves as an API Gateway example.',
       deployOptions: {
-        stageName: 'prod',
+        stageName: 'prod'
       },
     });
 
@@ -205,20 +211,30 @@ export class LambdizeAptGptStack extends cdk.Stack {
       statusCode: '200',
       responseParameters: {
         'method.response.header.Access-Control-Allow-Origin': "'*'",
-        'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'",
-        'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,POST,GET'",
+        'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        'method.response.header.Access-Control-Allow-Methods': "'*'",
       },
     };
 
     const addCorsOptions = (apiResource: apigateway.IResource) => {
       apiResource.addMethod('OPTIONS', new apigateway.MockIntegration({
-        integrationResponses: [integrationResponse],
+        integrationResponses: [
+          { statusCode: '200', responseParameters: integrationResponse.responseParameters },
+          { statusCode: '201', responseParameters: integrationResponse.responseParameters },
+          { statusCode: '400', responseParameters: integrationResponse.responseParameters },
+          { statusCode: '500', responseParameters: integrationResponse.responseParameters },
+        ],
         passthroughBehavior: apigateway.PassthroughBehavior.NEVER,
         requestTemplates: {
           'application/json': '{"statusCode": 200}',
         },
       }), {
-        methodResponses: [methodResponse],
+        methodResponses: [
+          { statusCode: '200', responseParameters: methodResponse.responseParameters },
+          { statusCode: '201', responseParameters: methodResponse.responseParameters },
+          { statusCode: '400', responseParameters: methodResponse.responseParameters },
+          { statusCode: '500', responseParameters: methodResponse.responseParameters },
+        ],
       });
     };
 
@@ -228,7 +244,7 @@ export class LambdizeAptGptStack extends cdk.Stack {
         integrationResponses: [integrationResponse],
       }), {
         methodResponses: [methodResponse],
-        authorizer: authorizer,
+        // authorizer: authorizer,
       });
     };
 
@@ -243,8 +259,8 @@ export class LambdizeAptGptStack extends cdk.Stack {
     const datasRouteResource = datasResource.addResource('route');
     createLambdaIntegration(datasRouteResource, datas_route, "POST");
 
-    const datasNeighborhoodResource = datasResource.addResource('neighborhood');
-    createLambdaIntegration(datasNeighborhoodResource, datas_neighborhood, "POST");
+    const datasNeighborhoodResource = datasResource.addResource('neighborhoods');
+    createLambdaIntegration(datasNeighborhoodResource, datas_neighborhoods, "POST");
 
     const datasSearchResource = datasResource.addResource('search');
     createLambdaIntegration(datasSearchResource, datas_search, "POST");

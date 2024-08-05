@@ -33,11 +33,6 @@ exports.handler = async (event) => {
     const responses = await dbCall(query, values);
 
     console.log(responses, "res");
-
-    //create a map of the unit ids
-    //go through the results
-    // if there is a duplicate, remove it
-    //maintain the ordering and return
     const result = filterDuplicateUnits(responses);
     console.log(result, "rest");
     
