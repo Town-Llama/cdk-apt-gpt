@@ -5,12 +5,13 @@ exports.handler = async (event) => {
         const body = JSON.parse(event.body);
         const { msg } = body;
 
-        const mapboxKeys = "auto_repair, restaurant, bar, grocery, fitness_center, park, pharmacy, hospital";
+        const mapboxKeys = "auto_repair, restaurant, bar, grocery, fitness_center, park, pharmacy, hospital, education, outdoors, hairdresser, place_of_worship";
         const prompt = `
         The below is a list of mapbox api categories: ${mapboxKeys}. Analyze the user message. Then give me a string array of which of the mapbox apis they want. If none match, return an empty array
         Example 1: msg: "I want restaurants and bars" return: ["restaurant", "bar"]
         Example 2: msg: "I want flamingos" return: ["zoo"]
         Example 3: msg: "who are you?" return: []
+        Example 4: msg: "rock shops, breweries, and airshows" return: ["bar"]
         `;
 
         const response = await callLLM([

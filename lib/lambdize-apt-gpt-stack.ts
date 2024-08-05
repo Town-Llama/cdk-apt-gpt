@@ -133,27 +133,6 @@ export class LambdizeAptGptStack extends cdk.Stack {
         timeout: cdk.Duration.seconds(90)
       });
 
-    const createPythonLambdaFunction = (name: string, handlerPath: string) =>
-      new lambda.Function(this, name, {
-        runtime: lambda.Runtime.PYTHON_3_9,
-        handler: 'index.lambda_handler',
-        code: lambda.Code.fromAsset(`lambda/${handlerPath}`, {
-          bundling: {
-            image: lambda.Runtime.PYTHON_3_9.bundlingImage,
-            command: [
-              'bash', '-c',
-              'pip install -r requirements.txt -t /asset-output && cp index.py /asset-output'
-            ],
-          },
-        }),
-        environment: {
-          "OPEN_AI_KEY": OPEN_AI_KEY,
-          "GOOGLE_API_KEY": GOOGLE_API_KEY,
-          "OUTSCRAPER_API_KEY": OUTSCRAPER_API_KEY
-        },
-        timeout: cdk.Duration.seconds(30)
-      });
-
     // Define Lambda functions
     const datas_route = createNodeLambdaFunction('Lambda-datas-route', '/datas/route');
     const datas_neighborhoods = createNodeLambdaFunction('Lambda-datas-neighborhoods', '/datas/neighborhood');
@@ -179,7 +158,14 @@ export class LambdizeAptGptStack extends cdk.Stack {
     });
     datas_search.addToRolePolicy(invokeLambdaPolicyStatement);
 
-    const chat_reviews = createPythonLambdaFunction("Lambda-chat-reviews", '/chat/reviews');
+    const chat_reviews = new lambda.DockerImageFunction(this, 'Lambda-chat-reviews', {
+      functionName: 'Lambda-chat-reviews',
+      code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../lambda/chat/reviews'), {
+        platform: Platform.LINUX_AMD64, // Specify the architecture
+      }),
+      timeout: cdk.Duration.seconds(90),
+      memorySize: 128 //once approved go to 10240
+    });
     const chat_next = createNodeLambdaFunction("Lambda-chat-next", '/chat/next');
     const chat_pois = createNodeLambdaFunction("Lambda-chat-pois", '/chat/pois');
     const chat_suggestion = createNodeLambdaFunction("Lambda-chat-suggestion", '/chat/suggestion');
