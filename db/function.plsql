@@ -65,10 +65,17 @@ BEGIN
           AND calculate_distance(p.latitude, p.longitude, input_lat, input_lng) < max_distance
     )
     SELECT fu.*,
-           (e.data <-> embedding_vector)::DECIMAL(9, 6) AS embedding_similarity
+           MIN((e.data <-> embedding_vector)::DECIMAL(9, 6)) AS embedding_similarity
     FROM filtered_units fu
     JOIN Photos ph ON fu.property_id = ph.entityid
     JOIN embeddings e ON ph.id = e.photo_id
+    GROUP BY fu.unit_id, fu.property_id, fu.property_ts, fu.available, fu.name, fu.baths, fu.beds, fu.area, fu.ts,
+             fu.rent_12_month_monthly, fu.rent_11_month_monthly, fu.rent_10_month_monthly, fu.rent_9_month_monthly,
+             fu.rent_8_month_monthly, fu.rent_7_month_monthly, fu.rent_6_month_monthly, fu.rent_5_month_monthly,
+             fu.rent_4_month_monthly, fu.rent_3_month_monthly, fu.rent_2_month_monthly, fu.rent_1_month_monthly,
+             fu.property_timestamp, fu.addressStreet, fu.addressCity, fu.addressState, fu.addressZipCode,
+             fu.latitude, fu.longitude, fu.photosArray, fu.description, fu.transitScore, fu.transitDescription,
+             fu.walkScore, fu.walkDescription, fu.buildingName, fu.distance
     ORDER BY embedding_similarity;
 END;
 $$ LANGUAGE plpgsql;
