@@ -9,7 +9,9 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as path from 'path';
 import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
 import * as logs from 'aws-cdk-lib/aws-logs';
-
+import * as route53 from 'aws-cdk-lib/aws-route53';
+import * as route53_targets from 'aws-cdk-lib/aws-route53-targets';
+import * as certificatemanager from 'aws-cdk-lib/aws-certificatemanager';
 
 export class LambdizeAptGptStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -32,15 +34,14 @@ export class LambdizeAptGptStack extends cdk.Stack {
     const AUTH0_TOKEN_ISSUER = process.env.AUTH0_TOKEN_ISSUER!;
     const AUTH0_JWKS_URI = process.env.AUTH0_JWKS_URI!;
 
-    // S3 bucket for web hosting with proper public access settings
+    const domainName = 'townllama.ai';
     const websiteBucket = new s3.Bucket(this, 'WebsiteBucket', {
       websiteIndexDocument: 'index.html',
       websiteErrorDocument: 'error.html',
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS, // Block ACL-based public access
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    // Allow public access to the bucket for web hosting
     websiteBucket.addToResourcePolicy(new iam.PolicyStatement({
       actions: ['s3:GetObject'],
       resources: [`${websiteBucket.bucketArn}/*`],
@@ -48,7 +49,18 @@ export class LambdizeAptGptStack extends cdk.Stack {
       principals: [new iam.AnyPrincipal()],
     }));
 
-    // CloudFront distribution
+    // Look up the hosted zone for townllama.ai
+    const zone = route53.HostedZone.fromLookup(this, 'HostedZone', {
+      domainName: domainName,
+    });
+
+    // SSL certificate for the domain
+    const certificate = new certificatemanager.DnsValidatedCertificate(this, 'SiteCertificate', {
+      domainName: domainName,
+      hostedZone: zone,
+      region: 'us-east-1', // CloudFront requires the certificate to be in us-east-1
+    });
+
     const distribution = new cloudfront.CloudFrontWebDistribution(this, 'WebsiteDistribution', {
       originConfigs: [
         {
@@ -58,9 +70,13 @@ export class LambdizeAptGptStack extends cdk.Stack {
           behaviors: [{ isDefaultBehavior: true }],
         },
       ],
+      viewerCertificate: cloudfront.ViewerCertificate.fromAcmCertificate(certificate, {
+        aliases: [domainName],
+        securityPolicy: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
+        sslMethod: cloudfront.SSLMethod.SNI,
+      }),
     });
 
-    // Deploy React app to S3
     new s3deploy.BucketDeployment(this, 'DeployReactApp', {
       sources: [s3deploy.Source.asset('./react-app/build')],
       destinationBucket: websiteBucket,
@@ -68,15 +84,17 @@ export class LambdizeAptGptStack extends cdk.Stack {
       distributionPaths: ['/*'],
     });
 
+    // Route 53 alias record pointing to the CloudFront distribution
+    new route53.ARecord(this, 'AliasRecord', {
+      zone: zone,
+      target: route53.RecordTarget.fromAlias(new route53_targets.CloudFrontTarget(distribution)),
+      recordName: domainName,
+    });
+
+
     /**
      * lambda layers
      */
-    const authLayer = new lambda.LayerVersion(this, 'AuthLayer', {
-      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/layers/jwt')),
-      compatibleRuntimes: [lambda.Runtime.NODEJS_20_X],
-      description: 'A layer for JWT authentication',
-    });
-
     const dbLayer = new lambda.LayerVersion(this, 'DbLayer', {
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/layers/db')),
       compatibleRuntimes: [lambda.Runtime.NODEJS_20_X],
