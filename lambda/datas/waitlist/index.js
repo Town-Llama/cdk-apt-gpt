@@ -27,6 +27,9 @@ exports.handler = async (event) => {
 
         // If the user is not on the waitlist, insert them
         if (entries.length === 0) {
+
+            //check if they're one of the first 100 to use the platform
+
             query = "INSERT INTO waitlist (userid, approved, time) VALUES ($1, $2, $3);";
             values = [userid, false, new Date()];
             await dbCall(query, values);

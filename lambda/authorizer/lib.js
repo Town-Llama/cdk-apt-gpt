@@ -55,7 +55,7 @@ module.exports.authenticate = (params) => {
         })
         .then((decoded)=> ({
             principalId: decoded.sub,
-            policyDocument: getPolicyDocument('Allow', params.methodArn),
+            policyDocument: getPolicyDocument('Allow', '*'),
             context: { scope: decoded.scope }
         }));
 }

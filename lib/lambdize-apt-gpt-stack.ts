@@ -12,6 +12,7 @@ import * as logs from 'aws-cdk-lib/aws-logs';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as route53_targets from 'aws-cdk-lib/aws-route53-targets';
 import * as certificatemanager from 'aws-cdk-lib/aws-certificatemanager';
+import { Role, CompositePrincipal, ServicePrincipal, PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';
 
 export class LambdizeAptGptStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -110,19 +111,37 @@ export class LambdizeAptGptStack extends cdk.Stack {
     /*
     * custom authorizer auth0
     */
-    // const customAuthorizer = new lambda.Function(this, 'Auth0LambdaAuthorizer', {
-    //   runtime: lambda.Runtime.NODEJS_20_X,
-    //   handler: 'index.handler',
-    //   code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/authorizer')),
-    //   environment: {
-    //     "AUTH0_JWKS_URI": AUTH0_JWKS_URI,
-    //     "AUTH0_AUDIENCE": AUTH0_AUDIENCE,
-    //     "AUTH0_TOKEN_ISSUER": AUTH0_TOKEN_ISSUER
-    //   },
-    // });
-    // const authorizer = new apigateway.TokenAuthorizer(this, 'MyCustomAuthorizer', {
-    //   handler: customAuthorizer,
-    // });
+    const myRole = new Role(this, 'MyRole', {
+      assumedBy: new CompositePrincipal(
+        new ServicePrincipal('apigateway.amazonaws.com'),
+        new ServicePrincipal('lambda.amazonaws.com')
+      )
+    });
+
+    // Optional: Add any additional policies to the role
+    myRole.addToPolicy(new PolicyStatement({
+      effect: Effect.ALLOW,
+      actions: ['sts:AssumeRole'],
+      resources: ['*'],
+    }));
+
+    const customAuthorizer = new lambda.Function(this, 'Auth0LambdaAuthorizer', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'index.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/authorizer')),
+      environment: {
+        "AUTH0_JWKS_URI": AUTH0_JWKS_URI,
+        "AUTH0_AUDIENCE": AUTH0_AUDIENCE,
+        "AUTH0_TOKEN_ISSUER": AUTH0_TOKEN_ISSUER
+      },
+      timeout: cdk.Duration.seconds(10)
+    });
+    const authorizer = new apigateway.TokenAuthorizer(this, 'MyCustomAuthorizer', {
+      handler: customAuthorizer,
+      resultsCacheTtl: cdk.Duration.seconds(3600),
+      validationRegex: "^Bearer [-0-9a-zA-z\.]*$",
+      assumeRole: myRole
+    });
 
 
     // Lambda functions with environment variables
@@ -248,7 +267,7 @@ export class LambdizeAptGptStack extends cdk.Stack {
         integrationResponses: [integrationResponse],
       }), {
         methodResponses: [methodResponse],
-        // authorizer: authorizer,
+        authorizer: authorizer,
       });
     };
 
