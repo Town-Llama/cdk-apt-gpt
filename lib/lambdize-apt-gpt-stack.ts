@@ -13,6 +13,7 @@ import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as route53_targets from 'aws-cdk-lib/aws-route53-targets';
 import * as certificatemanager from 'aws-cdk-lib/aws-certificatemanager';
 import { Role, CompositePrincipal, ServicePrincipal, PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';
+import * as ses from 'aws-cdk-lib/aws-ses';
 
 export class LambdizeAptGptStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -91,6 +92,13 @@ export class LambdizeAptGptStack extends cdk.Stack {
       target: route53.RecordTarget.fromAlias(new route53_targets.CloudFrontTarget(distribution)),
       recordName: domainName,
     });
+
+    // email setup
+    const ses_identity = new ses.CfnEmailIdentity(this, 'EmailIdentity', {
+      emailIdentity: 'seaholmdataco@gmail.com', // Replace with your email address
+    });
+    const sesIdentityArn = `arn:aws:ses:${this.region}:${this.account}:identity/${ses_identity.emailIdentity}`;
+
 
 
     /**
@@ -177,6 +185,16 @@ export class LambdizeAptGptStack extends cdk.Stack {
     const datas_chats_record = createNodeLambdaFunction('Lambda-datas-chats_record', '/datas/chats_record');
     const datas_cities = createNodeLambdaFunction('Lambda-datas-cities', '/datas/cities');
     const datas_waitlist = createNodeLambdaFunction('Lambda-datas-waitlist', '/datas/waitlist');
+    const datas_book = createNodeLambdaFunction('Lambda-datas-book', '/datas/book');
+
+    datas_book.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ['ses:SendEmail', 'ses:SendRawEmail'],
+        resources: [sesIdentityArn], // Replace with your SES identity ARN
+      })
+    );
+
     const embeddingModel = new lambda.DockerImageFunction(this, 'Lambda-embedding-model', {
       functionName: 'Lambda-embedding-model',
       code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../lambda/embeddings'), {
@@ -281,6 +299,9 @@ export class LambdizeAptGptStack extends cdk.Stack {
 
     const datasRouteResource = datasResource.addResource('route');
     createLambdaIntegration(datasRouteResource, datas_route, "POST");
+
+    const datasBookResource = datasResource.addResource('book');
+    createLambdaIntegration(datasBookResource, datas_book, "POST");
 
     const datasNeighborhoodResource = datasResource.addResource('neighborhoods');
     createLambdaIntegration(datasNeighborhoodResource, datas_neighborhoods, "POST");
