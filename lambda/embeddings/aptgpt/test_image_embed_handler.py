@@ -13,9 +13,22 @@ def get_test_data():
     img_byte_arr = base64.b64encode(img_byte_arr.getvalue()).decode()
 
     body_data = {
-                            "isText":True,
-                            "payload":"Embed this text please"
-                        }
+                    "isText": True,
+                    "payload": img_byte_arr
+                }
+    test_data = {
+                    "body":json.dumps(body_data)
+                }
+    return json.dumps(test_data)
+
+
+def get_descr_test_data():
+    
+    mock_descr = "Mock description"
+
+    body_data = {
+                    "payload": mock_descr
+                }
     test_data = {
                     "body":json.dumps(body_data)
                 }

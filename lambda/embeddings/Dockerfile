@@ -1,4 +1,4 @@
-FROM public.ecr.aws/lambda/python:3.9
+FROM --platform=linux/amd64 public.ecr.aws/lambda/python:3.9 AS base
 
 ENV HF_HOME=/opt/hf_cache
 
@@ -33,7 +33,14 @@ COPY GoogleLogo.jpg .
 
 RUN pip3 install . --target "${LAMBDA_TASK_ROOT}"
 
+FROM base AS image_embedding_handler
 RUN PYTHONPATH="${LAMBDA_TASK_ROOT}" python aptgpt/ImageEmbedHandler.py
 
 # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
 CMD [ "aptgpt.ImageEmbedHandler.handler" ]
+
+FROM base AS descr_embedding_handler
+RUN PYTHONPATH="${LAMBDA_TASK_ROOT}" python aptgpt/ImageEmbedHandler.py
+
+# Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
+CMD [ "aptgpt.DescrEmbedHandler.handler" ]
