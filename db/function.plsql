@@ -20,7 +20,7 @@ BEGIN
           AND calculate_distance(p.latitude, p.longitude, input_lat, input_lng) < max_distance
     )
     SELECT fu.*,
-           MIN(e.data <-> embedding_vector)::DECIMAL(9, 6) AS embedding_similarity
+           MAX(e.data <-> embedding_vector)::DECIMAL(9, 6) AS embedding_similarity
     FROM filtered_units fu
     JOIN Photos ph ON fu.property_id = ph.entityid
     JOIN embeddings e ON ph.id = e.photo_id
