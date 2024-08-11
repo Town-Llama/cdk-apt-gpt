@@ -77,7 +77,46 @@ export class LambdizeAptGptStack extends cdk.Stack {
         securityPolicy: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
         sslMethod: cloudfront.SSLMethod.SNI,
       }),
+      errorConfigurations: [
+        {
+          errorCode: 403, // Forbidden errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
+        {
+          errorCode: 404, // Not Found errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
+        {
+          errorCode: 500, // Internal Server Errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
+        {
+          errorCode: 502, // Bad Gateway errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
+        {
+          errorCode: 503, // Service Unavailable errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
+        {
+          errorCode: 504, // Gateway Timeout errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
+      ],
     });
+    
 
     new s3deploy.BucketDeployment(this, 'DeployReactApp', {
       sources: [s3deploy.Source.asset('./react-app/build')],
@@ -175,7 +214,7 @@ export class LambdizeAptGptStack extends cdk.Stack {
           "OUTSCRAPER_API_KEY": OUTSCRAPER_API_KEY
         },
         layers: [dbLayer, llmLayer], // all of them will have auth protection for now
-        timeout: cdk.Duration.seconds(90)
+        timeout: cdk.Duration.seconds(90),
       });
 
     // Define Lambda functions
