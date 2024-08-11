@@ -1,11 +1,8 @@
-import base64
-import io
 import json
 import logging
 import traceback
 
 from aptgpt.test_image_embed_handler import get_descr_test_data
-from PIL import Image
 
 model = None
 logger = logging.getLogger()
