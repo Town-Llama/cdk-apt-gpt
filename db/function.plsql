@@ -1,52 +1,7 @@
-CREATE OR REPLACE FUNCTION search_properties_with_embeddings(
-    min_rent NUMERIC,
-    max_rent NUMERIC,
-    bedrooms INTEGER,
-    input_lat NUMERIC,
-    input_lng NUMERIC,
-    max_distance NUMERIC,
-    embedding_vector vector
-)
-RETURNS TABLE (
-    unit_id character varying,
-    property_id character varying,
-    property_ts timestamp without time zone,
-    available BOOLEAN,
-    name TEXT,
-    baths NUMERIC,
-    beds INTEGER,
-    area INTEGER,
-    ts TIMESTAMP,
-    rent_12_month_monthly NUMERIC,
-    rent_11_month_monthly NUMERIC,
-    rent_10_month_monthly NUMERIC,
-    rent_9_month_monthly NUMERIC,
-    rent_8_month_monthly NUMERIC,
-    rent_7_month_monthly NUMERIC,
-    rent_6_month_monthly NUMERIC,
-    rent_5_month_monthly NUMERIC,
-    rent_4_month_monthly NUMERIC,
-    rent_3_month_monthly NUMERIC,
-    rent_2_month_monthly NUMERIC,
-    rent_1_month_monthly NUMERIC,
-    property_timestamp timestamp without time zone,
-    addressStreet character varying,
-    addressCity character varying,
-    addressState character varying,
-    addressZipCode character varying,
-    latitude NUMERIC,
-    longitude NUMERIC,
-    photosArray TEXT,
-    description TEXT,
-    transitScore INTEGER,
-    transitDescription TEXT,
-    walkScore INTEGER,
-    walkDescription TEXT,
-    buildingName character varying,
-    distance double precision,
-    embedding_similarity NUMERIC
-)
-AS $$
+CREATE OR REPLACE FUNCTION public.search_properties_with_embeddings(min_rent numeric, max_rent numeric, bedrooms integer, input_lat numeric, input_lng numeric, max_distance numeric, embedding_vector vector)
+ RETURNS TABLE(unit_id character varying, property_id character varying, property_ts timestamp without time zone, available boolean, name text, baths numeric, beds integer, area integer, ts timestamp without time zone, rent_12_month_monthly numeric, rent_11_month_monthly numeric, rent_10_month_monthly numeric, rent_9_month_monthly numeric, rent_8_month_monthly numeric, rent_7_month_monthly numeric, rent_6_month_monthly numeric, rent_5_month_monthly numeric, rent_4_month_monthly numeric, rent_3_month_monthly numeric, rent_2_month_monthly numeric, rent_1_month_monthly numeric, property_timestamp timestamp without time zone, addressstreet character varying, addresscity character varying, addressstate character varying, addresszipcode character varying, latitude numeric, longitude numeric, photosarray text, description text, transitscore integer, transitdescription text, walkscore integer, walkdescription text, buildingname character varying, distance double precision, embedding_similarity numeric)
+ LANGUAGE plpgsql
+AS $function$
 BEGIN
     RETURN QUERY
     WITH filtered_units AS (
@@ -78,4 +33,5 @@ BEGIN
              fu.walkScore, fu.walkDescription, fu.buildingName, fu.distance
     ORDER BY embedding_similarity;
 END;
-$$ LANGUAGE plpgsql;
+$function$
+;
