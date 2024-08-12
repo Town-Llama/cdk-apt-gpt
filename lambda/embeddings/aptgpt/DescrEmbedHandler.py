@@ -1,11 +1,8 @@
-import base64
-import io
 import json
 import logging
 import traceback
 
-from aptgpt.test_image_embed_handler import get_test_data
-from PIL import Image
+from aptgpt.test_image_embed_handler import get_descr_test_data
 
 model = None
 logger = logging.getLogger()
@@ -13,19 +10,15 @@ logger = logging.getLogger()
 logger.info("hit")
 
 def createEmbed(
-    is_text: bool, payload
+    payload
 ):
     from txtai.vectors import VectorsFactory
 
     global model
     if model is None:
-        model = VectorsFactory.create({'path': 'sentence-transformers/clip-ViT-B-32', 'method': 'sentence-transformers', 'content': False})
-    if not is_text:
-        image_bytes = base64.b64decode(payload)
-        image = Image.open(io.BytesIO(image_bytes))
+        model = VectorsFactory.create({'path': 'sentence-transformers/all-MiniLM-L6-v2', 'method': 'sentence-transformers', 'content': False})
     # Embed the payload
-    processed_payload = payload if is_text else image
-    embedding = model.encode(processed_payload)
+    embedding = model.encode(payload)
     return embedding
 
 def handler(event, context):  # pragma: no cover
@@ -35,10 +28,9 @@ def handler(event, context):  # pragma: no cover
         
         # Parse the HTTP event
         body = json.loads(event["body"])
-        is_text = body["isText"]
         payload = body["payload"]
 
-        embedding = createEmbed(is_text, payload)
+        embedding = createEmbed(payload)
 
         return {
             "statusCode": 200,
@@ -56,7 +48,7 @@ if __name__ == "__main__":  # pragma: no cover
     logging.basicConfig(level=10)
     result = handler(
             json.loads(
-                get_test_data()
+                get_descr_test_data()
             ),
             None,
         )
