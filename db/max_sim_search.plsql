@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.search_properties_with_embeddings(min_rent numeric, max_rent numeric, bedrooms integer, input_lat numeric, input_lng numeric, max_distance numeric, embedding_vector vector, model_name text default 'sentence-transformers/clip-ViT-B-32')
+CREATE OR REPLACE FUNCTION public.search_properties_with_embeddings(min_rent numeric, max_rent numeric, bedrooms integer, input_lat numeric, input_lng numeric, max_distance numeric, embedding_vector vector)
  RETURNS TABLE(unit_id character varying, property_id character varying, property_ts timestamp without time zone, available boolean, name text, baths numeric, beds integer, area integer, ts timestamp without time zone, rent_12_month_monthly numeric, rent_11_month_monthly numeric, rent_10_month_monthly numeric, rent_9_month_monthly numeric, rent_8_month_monthly numeric, rent_7_month_monthly numeric, rent_6_month_monthly numeric, rent_5_month_monthly numeric, rent_4_month_monthly numeric, rent_3_month_monthly numeric, rent_2_month_monthly numeric, rent_1_month_monthly numeric, property_timestamp timestamp without time zone, addressstreet character varying, addresscity character varying, addressstate character varying, addresszipcode character varying, latitude numeric, longitude numeric, photosarray text, description text, transitscore integer, transitdescription text, walkscore integer, walkdescription text, buildingname character varying, distance double precision, embedding_similarity numeric)
  LANGUAGE plpgsql
 AS $function$
@@ -20,11 +20,10 @@ BEGIN
           AND calculate_distance(p.latitude, p.longitude, input_lat, input_lng) < max_distance
     )
     SELECT fu.*,
-           MIN((e.data <-> embedding_vector)::DECIMAL(9, 6)) AS embedding_similarity
+           MAX((e.data <-> embedding_vector)::DECIMAL(9, 6)) AS embedding_similarity
     FROM filtered_units fu
     JOIN Photos ph ON fu.property_id = ph.entityid
     JOIN embeddings e ON ph.id = e.photo_id
-    WHERE embeddings.model = model_name
     GROUP BY fu.unit_id, fu.property_id, fu.property_ts, fu.available, fu.name, fu.baths, fu.beds, fu.area, fu.ts,
              fu.rent_12_month_monthly, fu.rent_11_month_monthly, fu.rent_10_month_monthly, fu.rent_9_month_monthly,
              fu.rent_8_month_monthly, fu.rent_7_month_monthly, fu.rent_6_month_monthly, fu.rent_5_month_monthly,
