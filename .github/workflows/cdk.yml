@@ -1,0 +1,9 @@
+on: workflow_dispatch
+jobs:
+  push-to-cdk:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          sudo apt update && sudo apt install nodejs
+          npm install
+          npx cdk deploy --profile jasongauci -v
