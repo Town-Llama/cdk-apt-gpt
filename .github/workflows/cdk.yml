@@ -14,10 +14,9 @@ jobs:
         name: Deploy
         run: |
           echo $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY $AWS_DEFAULT_REGION
-          npx cdk bootstrap --profile jasongauci -v
-          npx cdk deploy --profile jasongauci -v
+          npx cdk deploy -v
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AwsAccessKey }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AwsSecretKey }}
           AWS_DEFAULT_REGION: us-east-2
-          AWS_PROFILE: jasongauci
+
