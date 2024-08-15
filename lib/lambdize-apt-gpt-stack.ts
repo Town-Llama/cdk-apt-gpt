@@ -235,10 +235,24 @@ export class LambdizeAptGptStack extends cdk.Stack {
       })
     );
 
-    const embeddingModel = new lambda.DockerImageFunction(this, 'Lambda-embedding-model', {
-      functionName: 'Lambda-embedding-model',
+    const imageEmbeddingModel = new lambda.DockerImageFunction(this, 'Lambda-image-embedding-model', {
+      functionName: 'Lambda-image-embedding-model',
       code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../lambda/embeddings'), {
         platform: Platform.LINUX_AMD64, // Specify the architecture
+        buildArgs: {
+          TARGET: 'image_embedding_handler'
+        }
+      }),
+      timeout: cdk.Duration.seconds(90),
+      memorySize: 3008 //once approved go to 10240
+    });
+    const descrEmbeddingModel = new lambda.DockerImageFunction(this, 'Lambda-descr-embedding-model', {
+      functionName: 'Lambda-descr-embedding-model',
+      code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../lambda/embeddings'), {
+        platform: Platform.LINUX_AMD64, // Specify the architecture
+        buildArgs: {
+          TARGET: 'descr_embedding_handler'
+        }
       }),
       timeout: cdk.Duration.seconds(90),
       memorySize: 3008 //once approved go to 10240
