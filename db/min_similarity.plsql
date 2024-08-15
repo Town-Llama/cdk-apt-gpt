@@ -20,7 +20,7 @@ BEGIN
           AND calculate_distance(p.latitude, p.longitude, input_lat, input_lng) < max_distance
     )
     SELECT fu.*,
-           MIN((e.data <-> embedding_vector)::DECIMAL(9, 6)) AS embedding_similarity
+           MIN(cosine_distance(e.data, embedding_vector)::DECIMAL(9, 6)) AS embedding_similarity
     FROM filtered_units fu
     JOIN Photos ph ON fu.property_id = ph.entityid
     JOIN embeddings e ON ph.id = e.photo_id
@@ -31,7 +31,7 @@ BEGIN
              fu.property_timestamp, fu.addressStreet, fu.addressCity, fu.addressState, fu.addressZipCode,
              fu.latitude, fu.longitude, fu.photosArray, fu.description, fu.transitScore, fu.transitDescription,
              fu.walkScore, fu.walkDescription, fu.buildingName, fu.distance
-    ORDER BY embedding_similarity;
+    ORDER BY embedding_similarity ASC;
 END;
 $function$
 ;
