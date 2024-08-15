@@ -19,4 +19,19 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AwsAccessKey }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AwsSecretKey }}
           AWS_DEFAULT_REGION: us-east-2
+          MAPBOX_ACCESS_TOKEN: ${{ secrets.AwsAccessKey }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          AUTH0_DOMAIN: dev-svptkuh71ya7uog8.us.auth0.com
+          AUTH0_AUDIENCE: https://dev-svptkuh71ya7uog8.us.auth0.com/api/v2/
+          AUTH0_JWKS_URI: https://dev-svptkuh71ya7uog8.us.auth0.com/.well-known/jwks.json
+          DB_USER: tilly0315
+          DB_HOST: database-2.c1ywou6es1fj.us-east-2.rds.amazonaws.com
+          DB_PORT: 5432
+          DB_DATABASE: postgres
+          DB_PW: ${{ secrets.DB_PW }}
+          DB_SSL: true
+          FIREWORKS_API_KEY: ${{ secrets.FIREWORKS_API_KEY }}
+          OPEN_AI_KEY: ${{ secrets.OPEN_AI_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OUTSCRAPER_API_KEY: ${{ secrets.OUTSCRAPER_API_KEY }}
 
