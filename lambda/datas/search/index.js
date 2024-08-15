@@ -15,7 +15,7 @@ exports.handler = async (event) => {
       ask,
       bedrooms, 
       image
-   } = body; // Adjust to your actual parameters
+   } = body;
    console.log(coordinates,
       max_distance,
       min_rent,
@@ -23,6 +23,20 @@ exports.handler = async (event) => {
       bedrooms
     );
 
+    // check if the user has enough
+    if(!recommendedEnoughPeople(user)){
+      return {
+        statusCode: 200,
+        headers: {
+          "Content-Type": "application/json",
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Credentials': true,
+        },
+        body: JSON.stringify({
+          data: false
+        }),
+      };
+    }
 
     let payload = ask === null ? image : ask;
     const query_embedding = await callEmbeddingModel(payload, ask !== null);
@@ -63,6 +77,14 @@ exports.handler = async (event) => {
     };
   }
 };
+
+async function recommendedEnoughPeople(user) {
+  const query = "SELECT * FROM check_user_eligibility($1, $2, $3);"; // $6 is lease length for now we use default of 12
+  const values = [user, 3, 3]; // setting here the values for waitlist
+  const returned =  await dbCall(query, values);
+  console.log("returned ", returned);
+  return returned;
+}
 
 function filterDuplicateUnits(results) {
   const seenUnitIds = new Set();

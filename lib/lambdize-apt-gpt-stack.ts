@@ -138,8 +138,6 @@ export class LambdizeAptGptStack extends cdk.Stack {
     });
     const sesIdentityArn = `arn:aws:ses:${this.region}:${this.account}:identity/${ses_identity.emailIdentity}`;
 
-
-
     /**
      * lambda layers
      */
