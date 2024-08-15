@@ -13,7 +13,7 @@ def get_test_data():
     img_byte_arr = base64.b64encode(img_byte_arr.getvalue()).decode()
 
     body_data = {
-                    "isText": True,
+                    "isText": False,
                     "payload": img_byte_arr
                 }
     test_data = {
@@ -27,6 +27,7 @@ def get_descr_test_data():
     mock_descr = "Mock description"
 
     body_data = {
+                    "isText": True,
                     "payload": mock_descr
                 }
     test_data = {
