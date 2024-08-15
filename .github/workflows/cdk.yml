@@ -5,11 +5,16 @@ jobs:
     steps:
       - name: checkout repo
         uses: actions/checkout@v4
-      - run: |
+      - shell: bash
+        name: Update Environment
+        run: |
           sudo apt update && sudo apt install nodejs
           npm install
+      - shell: bash
+        name: Deploy
+        run: |
           npx cdk deploy --profile jasongauci -v
-      - env:
+        env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-2
