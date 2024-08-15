@@ -80,7 +80,7 @@ function filterDuplicateUnits(results) {
 
 const callEmbeddingModel = async (data, isText) => {
   const params = {
-    FunctionName: 'Lambda-embedding-model', // The name of the Lambda function to invoke
+    FunctionName: 'Lambda-image-embedding-model', // The name of the Lambda function to invoke
     InvocationType: 'RequestResponse', // Synchronous invocation
     Payload: JSON.stringify({
       body: JSON.stringify({
