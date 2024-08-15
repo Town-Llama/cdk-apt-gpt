@@ -33,7 +33,7 @@ exports.handler = async (event) => {
             const count = parseInt(countResult[0].count, 10);
 
             // Determine if the user should be approved immediately
-            const isApproved = count < 100; // Approve if less than 100 users are approved
+            const isApproved = count <=  0; // Approve if less than 100 users are approved
             approved = isApproved;
 
             query = "INSERT INTO waitlist (userid, approved, time) VALUES ($1, $2, $3)";

@@ -225,6 +225,7 @@ export class LambdizeAptGptStack extends cdk.Stack {
     const datas_cities = createNodeLambdaFunction('Lambda-datas-cities', '/datas/cities');
     const datas_waitlist = createNodeLambdaFunction('Lambda-datas-waitlist', '/datas/waitlist');
     const datas_book = createNodeLambdaFunction('Lambda-datas-book', '/datas/book');
+    const datas_previouschat = createNodeLambdaFunction('Lambda-datas-previouschat', "/datas/previouschat");
 
     datas_book.addToRolePolicy(
       new iam.PolicyStatement({
@@ -347,6 +348,9 @@ export class LambdizeAptGptStack extends cdk.Stack {
 
     const datasSearchResource = datasResource.addResource('search');
     createLambdaIntegration(datasSearchResource, datas_search, "POST");
+
+    const datasPreviousChatResource = datasResource.addResource('previouschat');
+    createLambdaIntegration(datasPreviousChatResource, datas_previouschat, "POST");
 
     const datasChatsResource = datasResource.addResource('chats');
     createLambdaIntegration(datasChatsResource, datas_chats, "POST");

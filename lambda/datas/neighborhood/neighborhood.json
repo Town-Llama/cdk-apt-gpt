@@ -1,5 +1,27 @@
 {
     "Austin": [
-        {"name": "Downtown", "street": "600 Congress Ave", "city": "Austin", "zip_code": "78701"}
+        {"name": "Downtown", "coordinates": [30.269038, -97.746288]},
+        {"name": "The Aboretum", "coordinates": [30.392081, -97.747923]},
+        {"name": "The Domain","coordinates": [30.402639, -97.721610]},
+        {"name": "North Austin Civic Association", "coordinates": [30.375970, -97.705026]},
+        {"name": "South Congress Avenue", "coordinates": [30.247030, -97.750630]},
+        {"name": "Bouldin Creek", "coordinates": [30.252661, -97.757650]},
+        {"name": "Zilker", "coordinates": [30.255599, -97.768398]},
+        {"name": "Barton Hills", "coordinates": [30.251908, -97.785415]},
+        {"name": "South Lamar", "coordinates": [30.237858, -97.783122]},
+        {"name": "Galindo", "coordinates": [30.235358, -97.770019]},
+        {"name": "Travis Heights", "coordinates": [30.244395, -97.743917]},
+        {"name": "Riverside", "coordinates": [30.243176, -97.729390]},
+        {"name": "East Caesar Chavez", "coordinates": [30.257801, -97.726642]},
+        {"name": "Central East Austin", "coordinates": [30.270007, -97.717578]},
+        {"name": "Mueller", "coordinates": [30.296312, -97.700372]},
+        {"name": "Cherrywood", "coordinates": [30.292339, -97.714555]},
+        {"name": "Windsor Park", "coordinates": [30.314534, -97.692377]},
+        {"name": "Hyde Park", "coordinates": [30.309968, -97.731171]},
+        {"name": "Allandale", "coordinates": [30.335945, -97.744830]},
+        {"name": "West University", "coordinates": [30.288095, -97.745564]},
+        {"name": "North University", "coordinates": [30.298446, -97.735090]},
+        {"name": "University of Texas", "coordinates": [30.285422, -97.736350]},
+        {"name": "North Loop", "coordinates": [30.315757, -97.714406]}
     ]
   }
