@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { LambdizeAptGptStack } from '../lib/lambdize-apt-gpt-stack';
+import { MainStack } from '../lib/main-stack';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
 
 const app = new cdk.App();
-new LambdizeAptGptStack(app, 'LambdizeAptGptStack', {
+new MainStack(app, 'MainStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
