@@ -8,11 +8,13 @@ export class MainStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const domainName = 'townllama.ai';
+    const isProd = props?.env?.account === "021891618047";
+    const domainName = isProd ? 'townllama.ai' : "beta.townllama.ai";
 
     // Create the Frontend Stack
     const frontendStack = new FrontendStack(this, 'FrontendStack', {
-      env: props?.env,
+      domainName,
+      env: props?.env
     });
 
     // Create the Lambda Stack

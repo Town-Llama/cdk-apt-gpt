@@ -8,7 +8,6 @@ import * as route53_targets from 'aws-cdk-lib/aws-route53-targets';
 import * as certificatemanager from 'aws-cdk-lib/aws-certificatemanager';
 import * as path from 'path';
 
-
 interface ApiGatewayStackProps extends cdk.StackProps {
   domainName: string;
   authorizerProps: {
@@ -43,7 +42,7 @@ export class ApiGatewayStack extends cdk.Stack {
       super(scope, id, props);
 
     const domainName = 'townllama.ai';
-    const apiDomainName = `prod.${domainName}`;
+    const apiDomainName = `api.${domainName}`;
     const zone = route53.HostedZone.fromLookup(this, 'HostedZone', {
       domainName: domainName,
     });
