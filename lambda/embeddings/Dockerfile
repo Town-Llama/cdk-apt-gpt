@@ -35,14 +35,14 @@ RUN pip3 install . --target "${LAMBDA_TASK_ROOT}"
 
 FROM base AS image_embedding_handler
 # load the model
-RUN PYTHONPATH="${LAMBDA_TASK_ROOT}" python -m aptgpt.ImageEmbedHandler.download_model
+RUN PYTHONPATH="${LAMBDA_TASK_ROOT}" python -m aptgpt.ImageEmbedHandler
 
 # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
 CMD [ "aptgpt.ImageEmbedHandler.handler" ]
 
 FROM base AS descr_embedding_handler
 # load the model
-RUN PYTHONPATH="${LAMBDA_TASK_ROOT}" python -m aptgpt.DescrEmbedHandler.download_model
+RUN PYTHONPATH="${LAMBDA_TASK_ROOT}" python -m aptgpt.DescrEmbedHandler
 
 # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
 CMD [ "aptgpt.DescrEmbedHandler.handler" ]
