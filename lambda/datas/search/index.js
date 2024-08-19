@@ -41,7 +41,7 @@ exports.handler = async (event) => {
     let payload = ask === null ? image : ask;
     const query_embedding = await callEmbeddingModel(payload, ask !== null);
     console.log("query_embedding", query_embedding);
-    const query = "SELECT * FROM search_properties_with_embeddings($1, $2, $3, $4, $5, $6, $7);"; // $6 is lease length for now we use default of 12
+    const query = "SELECT * FROM search_properties_with_clip_large_embeddings($1, $2, $3, $4, $5, $6, $7);"; // $6 is lease length for now we use default of 12
     const values = [min_rent, max_rent, bedrooms, coordinates.lat, coordinates.lng, max_distance, pgvector.toSql(query_embedding)];
     console.log(pgvector.toSql(query_embedding));
     const responses = await dbCall(query, values);

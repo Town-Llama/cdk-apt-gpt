@@ -7,7 +7,14 @@ import traceback
 from aptgpt.test_image_embed_handler import get_test_data
 from PIL import Image
 
+from .utils import load_model
+
 model = None
+model_cfg = {
+    'path': 'sentence-transformers/clip-ViT-L-14', 
+    'method': 'sentence-transformers', 
+    'content': False
+}
 logger = logging.getLogger()
 
 logger.info("hit")
@@ -15,11 +22,9 @@ logger.info("hit")
 def createEmbed(
     is_text: bool, payload
 ):
-    from txtai.vectors import VectorsFactory
-
     global model
     if model is None:
-        model = VectorsFactory.create({'path': 'sentence-transformers/clip-ViT-B-32', 'method': 'sentence-transformers', 'content': False})
+        model = download_model()
     if not is_text:
         image_bytes = base64.b64decode(payload)
         image = Image.open(io.BytesIO(image_bytes))
@@ -27,6 +32,12 @@ def createEmbed(
     processed_payload = payload if is_text else image
     embedding = model.encode(processed_payload)
     return embedding
+
+
+def download_model():
+    """Wrapper function to download the model."""
+    return load_model(model_cfg)
+
 
 def handler(event, context):  # pragma: no cover
     try:

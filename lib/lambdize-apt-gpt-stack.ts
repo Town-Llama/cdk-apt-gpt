@@ -246,22 +246,22 @@ export class LambdizeAptGptStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(90),
       memorySize: 3008 //once approved go to 10240
     });
-    const descrEmbeddingModel = new lambda.DockerImageFunction(this, 'Lambda-descr-embedding-model', {
-      functionName: 'Lambda-descr-embedding-model',
-      code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../lambda/embeddings'), {
-        platform: Platform.LINUX_AMD64, // Specify the architecture
-        buildArgs: {
-          TARGET: 'descr_embedding_handler'
-        }
-      }),
-      timeout: cdk.Duration.seconds(90),
-      memorySize: 3008 //once approved go to 10240
-    });
+    // const descrEmbeddingModel = new lambda.DockerImageFunction(this, 'Lambda-descr-embedding-model', {
+    //   functionName: 'Lambda-descr-embedding-model',
+    //   code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../lambda/embeddings'), {
+    //     platform: Platform.LINUX_AMD64, // Specify the architecture
+    //     buildArgs: {
+    //       TARGET: 'descr_embedding_handler'
+    //     }
+    //   }),
+    //   timeout: cdk.Duration.seconds(90),
+    //   memorySize: 3008 //once approved go to 10240
+    // });
     const datas_search = createNodeLambdaFunction('Lambda-datas-search', '/datas/search');
     const invokeLambdaPolicyStatement = new iam.PolicyStatement({
       actions: ['lambda:InvokeFunction'],
       resources: [
-        `arn:aws:lambda:${cdk.Stack.of(this).region}:${cdk.Stack.of(this).account}:function:Lambda-embedding-model`
+        `arn:aws:lambda:${cdk.Stack.of(this).region}:${cdk.Stack.of(this).account}:function:Lambda-image-embedding-model`
       ],
       effect: iam.Effect.ALLOW,
     });
