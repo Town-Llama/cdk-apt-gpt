@@ -99,4 +99,3 @@ export class LambdaStack extends cdk.Stack {
     memorySize: 3008
   });
 }
-}

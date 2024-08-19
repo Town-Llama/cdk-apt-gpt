@@ -5,9 +5,9 @@ import logging
 import traceback
 
 from aptgpt.test_image_embed_handler import get_test_data
+from aptgpt.utils import load_model
 from PIL import Image
 
-from .utils import load_model
 
 model = None
 model_cfg = {
@@ -64,6 +64,10 @@ def handler(event, context):  # pragma: no cover
         }
 
 if __name__ == "__main__":  # pragma: no cover
+    
+    # Download the model
+    download_model()
+    
     logging.basicConfig(level=10)
     result = handler(
             json.loads(
