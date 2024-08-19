@@ -1,0 +1,42 @@
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  thead th,
+  tbody td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  thead th {
+    background-color: #f2f2f2;
+  }
+  
+  thead th:first-child,
+  tbody td:first-child {
+    width: 1vw; /* Let the first column auto size */
+  }
+  
+  thead th:not(:first-child),
+  tbody td:not(:first-child) {
+    width: 150px; /* Set a fixed width for all other columns */
+  }
+  
+  tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .hiddenColumn {
+    display: none;
+  }
+
+  .alignTop{
+    vertical-align: top;
+  }
