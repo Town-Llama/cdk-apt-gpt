@@ -88,7 +88,7 @@ export class LambdaStack extends cdk.Stack {
 
   // Descr embedding model is NOT accessible directly from API Gateway
   const embeddingModel = new lambda.DockerImageFunction(this, 'Lambda-descr-embedding-model', {
-    functionName: 'Lambda-image-embedding-Lambda',
+    functionName: 'Lambda-descr-embedding-model',
     code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../lambda/embeddings'), {
       platform: Platform.LINUX_AMD64,
       buildArgs: {
