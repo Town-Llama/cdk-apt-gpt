@@ -21,6 +21,7 @@ jobs:
           popd
         env:
           CI: false
+          REACT_APP_MAPBOX_ACCESS_TOKEN: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
       - shell: bash
         name: Deploy
         run: |
