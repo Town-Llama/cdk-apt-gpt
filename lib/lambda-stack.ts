@@ -3,6 +3,7 @@ import { Construct } from 'constructs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
 import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
+import * as iam from 'aws-cdk-lib/aws-iam';
 
 export class LambdaStack extends cdk.Stack {
   public readonly functions: { [key: string]: lambda.Function };
@@ -84,6 +85,15 @@ export class LambdaStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(90),
       memorySize: 3008
     });
+    const invokeLambdaPolicyStatementImage = new iam.PolicyStatement({
+      actions: ['lambda:InvokeFunction'],
+      resources: [
+        `arn:aws:lambda:${cdk.Stack.of(this).region}:${cdk.Stack.of(this).account}:function:Lambda-image-embedding-model`
+      ],
+      effect: iam.Effect.ALLOW,
+    });
+    this.functions.datas_search.addToRolePolicy(invokeLambdaPolicyStatementImage);
+
 
     // Descr embedding model is NOT accessible directly from API Gateway
     const embeddingDescrModel = new lambda.DockerImageFunction(this, 'Lambda-descr-embedding-model', {
@@ -97,5 +107,13 @@ export class LambdaStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(90),
       memorySize: 3008
     });
+    const invokeLambdaPolicyStatementDescription = new iam.PolicyStatement({
+      actions: ['lambda:InvokeFunction'],
+      resources: [
+        `arn:aws:lambda:${cdk.Stack.of(this).region}:${cdk.Stack.of(this).account}:function:Lambda-descr-embedding-model`
+      ],
+      effect: iam.Effect.ALLOW,
+    });
+    this.functions.datas_search.addToRolePolicy(invokeLambdaPolicyStatementDescription);
   }
 }

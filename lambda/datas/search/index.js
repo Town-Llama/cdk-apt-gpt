@@ -8,6 +8,7 @@ exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body);
     const { 
+      user,
       max_distance,
       min_rent,
       max_rent,
