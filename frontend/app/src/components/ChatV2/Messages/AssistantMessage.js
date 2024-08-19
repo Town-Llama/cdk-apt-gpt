@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useSelector } from 'react-redux';
 import remarkGfm from 'remark-gfm';
@@ -7,6 +8,18 @@ import PropertyPreview from '../../PropertyPreview/PropertyPreview';
 const AssistantMessage = ({ msg, image = null, component = null, displayProperties = [], shouldPreview = true }) => {
 
   const df = useSelector(state => state.df);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 960); // Assuming 960px is the breakpoint for md
+    };
+
+    handleResize(); // Call once to set initial state
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const chosenApts = [];
   df.comparingIndices.forEach(i => {
@@ -36,7 +49,7 @@ const AssistantMessage = ({ msg, image = null, component = null, displayProperti
   }
 
   const showComponent = component !== null;
-  const showPreviews = !showComponent && shouldPreview && image === null;
+  const showPreviews = !showComponent && shouldPreview && image === null && !isSmallScreen;
 
   return (
     <div className="flex items-start mb-6">
@@ -47,9 +60,8 @@ const AssistantMessage = ({ msg, image = null, component = null, displayProperti
             textAlign: "left",
             marginLeft: "1vw",
             padding: "1vw",
-            paddingBottom: "10vw",
             color: "grey",
-            marginBottom: "0px"
+            marginBottom: "0px",
           }}>Town Llama</p>
           <div className="mb-4" style={{ textAlign: "left", fontSize: "16px" }}>
             <ReactMarkdown remarkPlugins={remarkGfm}>{msg}</ReactMarkdown>
@@ -63,7 +75,7 @@ const AssistantMessage = ({ msg, image = null, component = null, displayProperti
             component
           ) : null}
           {chosenApts.length > 0 && showPreviews ? (
-            <div className="overflow-x-auto whitespace-nowrap space-x-4">
+            <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${Math.min(chosenApts.length, 4)}, minmax(0, 1fr))` }}>
               {previewApts}
             </div>
           ) : null}

@@ -13,6 +13,7 @@ const ChatArea = ({ showLoading }) => {
   const form_data = useSelector((state) => state.formData);
 
   const [message, setMessage] = useState("");
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
 
   const { isAuthenticated, getAccessTokenSilently, user } = useAuth0();
 
@@ -56,6 +57,17 @@ const ChatArea = ({ showLoading }) => {
   };
 
   useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 960); // Assuming 960px is the breakpoint for md
+    };
+
+    handleResize(); // Call once to set initial state
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
     //this is happening multiple times >> fix this
     if (chat.chatState === "BEGIN") {
       dispatch(advance(null, df, chat.chatState));
@@ -64,7 +76,9 @@ const ChatArea = ({ showLoading }) => {
 
   return (
     <div id="chat" className="flex flex-col overflow-y-auto">
-      <div className="flex-grow p-6 overflow-y-auto">
+      <div className="flex-grow p-6 overflow-y-auto" style={{
+        paddingBottom: isSmallScreen ? "10vh" : null
+      }}>
         <div className="max-w-7xl mx-auto">
           {chat.reactNotation}
           <div ref={chatEndRef} />
