@@ -423,7 +423,8 @@ const ApartmentTableV2 = () => {
     </table>
   );
 
-  console.log(chosenApts);
+  console.log(chosenApts, poiData);
+
   const blogData = isSmallScreen && (
     <Box 
       sx={{
@@ -497,16 +498,48 @@ const ApartmentTableV2 = () => {
               <Typography noWrap>Baths: <span className="gradient-text">{a.baths}</span></Typography>
             </Box>
             <br/>
-            {/* <Box sx={{ 
-              flexBasis: '30%', 
-              minWidth: '80px', 
-              marginBottom: '8px',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              margin: "auto"
-            }}>
-              <Typography noWrap>Baths: <span className="gradient-text">{a.baths}</span></Typography>
-            </Box> */}
+            {commuteData.length > 0 && (
+              <>
+                <br/>
+                <Typography style={{margin: "auto"}}>Commute Time: <span className="gradient-text">{commuteData[index].duration}</span></Typography>
+                <br/>
+                <Typography style={{margin: "auto"}}>Commute Distance: <span className="gradient-text">{commuteData[index].distance}</span></Typography>
+              </>
+            )}
+            {poiData.length > 0 && (
+              <>
+                {(() => {
+                  const arr = [];
+                  let apt_lng = parseFloat(a.longitude);
+                  let apt_lat = parseFloat(a.latitude);
+                  let totalDistance = 0;
+                  console.log(Object.keys(poiData[0]), "KK")
+                  const keys = Object.keys(poiData[0]);
+                  for(let i = 0; i < keys.length; i++){
+                    const pArr = poiData[0][keys[i]][index];
+                    for(let j = 0; j < pArr.length; j++){
+                      const p = pArr[j];
+                      totalDistance += calculateDistance(
+                        p.geometry.coordinates[1],
+                        p.geometry.coordinates[0],
+                        apt_lat,
+                        apt_lng
+                      );
+                    }
+                    arr.push(
+                      <>
+                      <br/>
+                      <Typography style={{margin: "auto"}}>Average Distance to {keys[i]}:<br/>
+                      <span className="gradient-text">{(0.621371 * (totalDistance/pArr.length)).toFixed(2)} miles</span>
+                      </Typography>
+                      </>
+                    )
+                    totalDistance = 0;
+                  }
+                  return arr;
+                })()}
+              </>
+            )}
           </Box>
         </Box>
       ))}

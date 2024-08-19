@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useSelector } from 'react-redux';
 import remarkGfm from 'remark-gfm';
@@ -7,35 +8,48 @@ import PropertyPreview from '../../PropertyPreview/PropertyPreview';
 const AssistantMessage = ({ msg, image = null, component = null, displayProperties = [], shouldPreview = true }) => {
 
   const df = useSelector(state => state.df);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 960); // Assuming 960px is the breakpoint for md
+    };
+
+    handleResize(); // Call once to set initial state
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const chosenApts = [];
   df.comparingIndices.forEach(i => {
     chosenApts.push(df.payload[i])
-  })
+  });
 
-  let previewApts = []
+  let previewApts = [];
   if (displayProperties.length === 0) {
     previewApts = chosenApts.map((apt, index) => {
-      console.log("apt", apt);
-      const data = { ...apt, index: df.comparingIndices[index] }
+      const data = { ...apt, index: df.comparingIndices[index] };
       return (
         <PropertyPreview
           apt={data}
+          key={index}
         />
-      )
-    })
+      );
+    });
   } else {
-    previewApts = displayProperties.map((apt) => {
+    previewApts = displayProperties.map((apt, index) => {
       return (
         <PropertyPreview
           apt={apt}
+          key={index}
         />
-      )
-    })
+      );
+    });
   }
 
   const showComponent = component !== null;
-  const showPreviews = !showComponent && shouldPreview && image === null;
+  const showPreviews = !showComponent && shouldPreview && image === null && !isSmallScreen;
 
   return (
     <div className="flex items-start mb-6">
@@ -47,7 +61,7 @@ const AssistantMessage = ({ msg, image = null, component = null, displayProperti
             marginLeft: "1vw",
             padding: "1vw",
             color: "grey",
-            marginBottom: "0px"
+            marginBottom: "0px",
           }}>Town Llama</p>
           <div className="mb-4" style={{ textAlign: "left", fontSize: "16px" }}>
             <ReactMarkdown remarkPlugins={remarkGfm}>{msg}</ReactMarkdown>
@@ -59,12 +73,12 @@ const AssistantMessage = ({ msg, image = null, component = null, displayProperti
           )}
           {showComponent ? (
             component
-          ) : (null)}
+          ) : null}
           {chosenApts.length > 0 && showPreviews ? (
             <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${Math.min(chosenApts.length, 4)}, minmax(0, 1fr))` }}>
               {previewApts}
             </div>
-          ) : (null)}
+          ) : null}
         </div>
       </div>
     </div>
