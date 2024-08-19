@@ -19,6 +19,8 @@ jobs:
           rm -rf ../../react-app/build
           cp -r build ../../react-app/
           popd
+        env:
+          CI: false
       - shell: bash
         name: Deploy
         run: |
