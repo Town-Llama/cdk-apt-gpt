@@ -11,27 +11,28 @@ const AssistantMessage = ({ msg, image = null, component = null, displayProperti
   const chosenApts = [];
   df.comparingIndices.forEach(i => {
     chosenApts.push(df.payload[i])
-  })
+  });
 
-  let previewApts = []
+  let previewApts = [];
   if (displayProperties.length === 0) {
     previewApts = chosenApts.map((apt, index) => {
-      console.log("apt", apt);
-      const data = { ...apt, index: df.comparingIndices[index] }
+      const data = { ...apt, index: df.comparingIndices[index] };
       return (
         <PropertyPreview
           apt={data}
+          key={index}
         />
-      )
-    })
+      );
+    });
   } else {
-    previewApts = displayProperties.map((apt) => {
+    previewApts = displayProperties.map((apt, index) => {
       return (
         <PropertyPreview
           apt={apt}
+          key={index}
         />
-      )
-    })
+      );
+    });
   }
 
   const showComponent = component !== null;
@@ -46,6 +47,7 @@ const AssistantMessage = ({ msg, image = null, component = null, displayProperti
             textAlign: "left",
             marginLeft: "1vw",
             padding: "1vw",
+            paddingBottom: "10vw",
             color: "grey",
             marginBottom: "0px"
           }}>Town Llama</p>
@@ -59,12 +61,12 @@ const AssistantMessage = ({ msg, image = null, component = null, displayProperti
           )}
           {showComponent ? (
             component
-          ) : (null)}
+          ) : null}
           {chosenApts.length > 0 && showPreviews ? (
-            <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${Math.min(chosenApts.length, 4)}, minmax(0, 1fr))` }}>
+            <div className="overflow-x-auto whitespace-nowrap space-x-4">
               {previewApts}
             </div>
-          ) : (null)}
+          ) : null}
         </div>
       </div>
     </div>
