@@ -11,6 +11,15 @@ jobs:
           sudo apt update && sudo apt install nodejs
           npm install
       - shell: bash
+        name: Build Frontend
+        run: |
+          pushd frontend/app
+          yarn
+          yarn build
+          rm -rf ../../react-app/build
+          cp -r build ../../react-app/
+          popd
+      - shell: bash
         name: Deploy
         run: |
           echo $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY $AWS_DEFAULT_REGION
