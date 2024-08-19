@@ -1,0 +1,24 @@
+/* AIExplanation.module.css */
+.list {
+    list-style-type: disc;
+    padding-left: 20px;
+    text-align: left; /* Ensure text aligns to the left */
+
+}
+
+.list-item {
+    margin-bottom: 5px;
+    text-align: left; /* Ensure text aligns to the left */
+}
+
+.table-cell-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    height: 100%;
+    width: 100%;
+}
+
+.align-top{
+    vertical-align: top;
+}

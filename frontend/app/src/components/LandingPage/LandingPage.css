@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+.landing-page {
+  height: 100vh;
+  background-image: url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267'); /* Replace with your own background image URL */
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  text-align: center;
+  position: relative;
+}
+
+.overlay {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 700px;
+}
+
+.header {
+  margin-bottom: 40px;
+}
+
+.title {
+  font-size: 3.5em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #ded3c8; /* Changed to a tech-focused, vibrant color */
+  /* text-shadow: 2px 2px #000; */
+}
+
+.subtitle {
+  font-size: 1.5em;
+  color: #f0ddc3; /* Changed to a tech-focused, vibrant color */
+}
+
+.overview {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 2em;
+  margin-bottom: 10px;
+  color: #be353f; /* Changed to a tech-focused, vibrant color */
+}
+
+.section-content {
+  font-size: 1.2em;
+  margin-bottom: 20px;
+}
+
+.steps-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .steps-list li {
+    margin: 10px 0;
+    font-size: 1.1em; /* Increase font size for better visibility */
+    font-weight: bold; /* Add bold font weight for emphasis */
+    color: #f0ddcf; /* Match the color scheme for consistency */
+  }
+
+.step-icon {
+  margin-right: 15px;
+}
+
+.signup {
+  margin-top: 20px;
+}
+
+.email-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.email-form input {
+  padding: 10px;
+  font-size: 1em;
+  margin-bottom: 10px;
+  border: 2px solid #2a2b2c; /* Changed to match the new color scheme */
+  border-radius: 5px;
+  width: 100%;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
+  color: #fff; /* White text color */
+}
+
+.email-form input::placeholder {
+  color: #e0e0e0; /* Light placeholder color */
+}
+
+.email-form input:focus {
+  background: rgba(255, 255, 255, 0.3); /* Slightly less transparent on focus */
+  outline: none; /* Remove default outline */
+}
+
+.email-form button {
+  padding: 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background-color: #c99d93; /* Changed to match the new color scheme */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.email-form button:hover {
+  background-color: #a97267; /* Changed to match the new color scheme */
+}
