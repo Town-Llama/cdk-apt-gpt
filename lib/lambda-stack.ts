@@ -85,4 +85,18 @@ export class LambdaStack extends cdk.Stack {
       memorySize: 3008
     });
   }
+
+  // Descr embedding model is NOT accessible directly from API Gateway
+  const embeddingModel = new lambda.DockerImageFunction(this, 'Lambda-descr-embedding-model', {
+    functionName: 'Lambda-image-embedding-Lambda',
+    code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../lambda/embeddings'), {
+      platform: Platform.LINUX_AMD64,
+      buildArgs: {
+        TARGET: 'descr_embedding_handler'
+      }
+    }),
+    timeout: cdk.Duration.seconds(90),
+    memorySize: 3008
+  });
+}
 }
