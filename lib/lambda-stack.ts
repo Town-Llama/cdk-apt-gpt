@@ -72,14 +72,31 @@ export class LambdaStack extends cdk.Stack {
     };
 
     // Special cases
-    // embedding model is NOT accessible directly from API Gateway
-    const embeddingModel = new lambda.DockerImageFunction(this, 'Lambda-embedding-model', {
-      functionName: 'Lambda-embedding-model',
+    // Image embedding model is NOT accessible directly from API Gateway
+    const embeddingImageModel = new lambda.DockerImageFunction(this, 'Lambda-image-embedding-model', {
+      functionName: 'Lambda-image-embedding-model',
       code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../lambda/embeddings'), {
         platform: Platform.LINUX_AMD64,
+        buildArgs: {
+          TARGET: 'image_embedding_handler'
+        }
       }),
       timeout: cdk.Duration.seconds(90),
       memorySize: 3008
     });
   }
+
+  // Descr embedding model is NOT accessible directly from API Gateway
+  const embeddingDescrModel = new lambda.DockerImageFunction(this, 'Lambda-descr-embedding-model', {
+    functionName: 'Lambda-descr-embedding-model',
+    code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../lambda/embeddings'), {
+      platform: Platform.LINUX_AMD64,
+      buildArgs: {
+        TARGET: 'descr_embedding_handler'
+      }
+    }),
+    timeout: cdk.Duration.seconds(90),
+    memorySize: 3008
+  });
+}
 }

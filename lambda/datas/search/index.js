@@ -39,9 +39,9 @@ exports.handler = async (event) => {
     }
 
     let payload = ask === null ? image : ask;
-    const query_embedding = await callEmbeddingModel(payload, ask !== null);
+    const query_embedding = await callImageEmbeddingModel(payload, ask !== null);
     console.log("query_embedding", query_embedding);
-    const query = "SELECT * FROM search_properties_with_embeddings($1, $2, $3, $4, $5, $6, $7);"; // $6 is lease length for now we use default of 12
+    const query = "SELECT * FROM search_properties_with_clip_large_embeddings($1, $2, $3, $4, $5, $6, $7);"; // $6 is lease length for now we use default of 12
     const values = [min_rent, max_rent, bedrooms, coordinates.lat, coordinates.lng, max_distance, pgvector.toSql(query_embedding)];
     console.log(pgvector.toSql(query_embedding));
     const responses = await dbCall(query, values);
@@ -100,9 +100,27 @@ function filterDuplicateUnits(results) {
   return filteredResults;
 }
 
-const callEmbeddingModel = async (data, isText) => {
+const callImageEmbeddingModel = async (data, isText) => {
   const params = {
-    FunctionName: 'Lambda-embedding-model', // The name of the Lambda function to invoke
+    FunctionName: 'Lambda-image-embedding-model', // The name of the Lambda function to invoke
+    InvocationType: 'RequestResponse', // Synchronous invocation
+    Payload: JSON.stringify({
+      body: JSON.stringify({
+        'isText': isText,
+        'payload': data
+      })
+    }), // Pass the event received by this Lambda function to the other Lambda function
+  };
+  //allow it to take longer than 3 seconds on cold start
+  const result = await lambda.invoke(params).promise();
+  const a = JSON.parse(result.Payload);
+  const b = JSON.parse(a.body);
+  return b.embedding;
+}
+
+const callDescrEmbeddingModel = async (data, isText) => {
+  const params = {
+    FunctionName: 'Lambda-descr-embedding-model', // The name of the Lambda function to invoke
     InvocationType: 'RequestResponse', // Synchronous invocation
     Payload: JSON.stringify({
       body: JSON.stringify({

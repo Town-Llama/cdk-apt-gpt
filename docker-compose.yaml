@@ -1,0 +1,10 @@
+services:
+  cdk-apt-gpt:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .aws_credentials
+    volumes:
+      - .:/opt/app
