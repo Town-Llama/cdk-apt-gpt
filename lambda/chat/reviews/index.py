@@ -13,7 +13,7 @@ def lambda_handler(event, context):
         body = json.loads(event['body'])
         apt = body.get('apt')
 
-        if not apt or 'longitude' not in apt or 'latitude' not in apt:
+        if not apt or 'buildingname' not in apt:
             return {
                 'statusCode': 400,
                 'headers': {
@@ -22,15 +22,11 @@ def lambda_handler(event, context):
                     "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
                     "Access-Control-Allow-Methods": "*"
                 },
-                'body': json.dumps({'error': 'Apartment longitude and latitude are required'})
+                'body': json.dumps({'error': 'Apartment Building Required'})
             }
 
-        lng = float(apt['longitude'])
-        lat = float(apt['latitude'])
-
-        apicall = search_nearby(lat, long, g_api_key, radius=10)
-        places_nearby = apicall['places']
-        place_id = places_nearby[0]['id']
+        # building name
+        place_id = get_place_id(apt['buildingname'], g_api_key)
         reviews = get_reviews(place_id, outscraper_api_key, reviews_limit=10)
         summary = summarize_reviews(reviews=reviews, client=client)
 
@@ -207,3 +203,25 @@ def format_reviews(reviews):
     # Combine the formatted reviews into a single string
     combined_reviews = "\n".join([review[1] for review in formatted_reviews])
     return combined_reviews
+
+def get_place_id(address, g_api_key):
+    """
+    Retrieves the latitude and longitude coordinates of a given address using the Google Geocoding API.
+
+    Parameters:
+        address (str): The address for which to retrieve the coordinates.
+        g_api_key (str): The API key for accessing the Google Geocoding API.
+
+    Returns:
+        tuple: A tuple containing the latitude and longitude coordinates of the address. If the API request fails, 
+               returns (None, None).
+    """
+    url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={g_api_key}"
+
+    response = requests.get(url)
+    data = response.json()
+
+    if data['status'] == 'OK':
+        return data['results'][0]['place_id']
+    else:
+        return None
