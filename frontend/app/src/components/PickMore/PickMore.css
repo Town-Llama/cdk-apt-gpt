@@ -2,3 +2,10 @@
     white-space: normal;
     word-wrap: break-word;
 }
+
+.cell-max-width {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
