@@ -2,6 +2,8 @@ import json
 import requests
 from openai import OpenAI
 from outscraper import ApiClient
+import psycopg2
+import os
 
 def lambda_handler(event, context):
     try:
@@ -12,6 +14,19 @@ def lambda_handler(event, context):
         # Parse the request body
         body = json.loads(event['body'])
         apt = body.get('apt')
+
+        # check if the user is waitlist approved
+        if not hasAccessToReviews():
+            return {
+                'statusCode': 200,
+                'headers': {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                    "Access-Control-Allow-Methods": "*"
+                },
+                'body': json.dumps({'data': 'Recommend Friends to Synthesize Reviews'})
+            }
 
         if not apt or 'buildingname' not in apt:
             return {
@@ -225,3 +240,24 @@ def get_place_id(address, g_api_key):
         return data['results'][0]['place_id']
     else:
         return None
+    
+def hasAccessToReviews(user:str):
+    host = os.getenv('REDSHIFT_HOST')
+    port = os.getenv('REDSHIFT_PORT')
+    database = os.getenv('REDSHIFT_DATABASE')
+    user = os.getenv('REDSHIFT_USER')
+    password = os.getenv('REDSHIFT_PASSWORD')
+    db_params = {
+        "host": host,
+        "database": database,
+        "user": user,
+        "password": password
+    }
+    conn = psycopg2.connect(**db_params)
+    cur = conn.cursor()
+
+    cur.execute("SELECT recommendationid FROM recommendations where userid=%s", (user))
+    result = cur.fetchall()
+
+    # is true or not
+    return len(result) > 0

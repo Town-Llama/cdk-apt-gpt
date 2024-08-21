@@ -55,6 +55,7 @@ export class LambdaStack extends cdk.Stack {
       datas_chats_record: createNodeLambdaFunction('Lambda-datas-chats_record', '/datas/chats_record'),
       datas_cities: createNodeLambdaFunction('Lambda-datas-cities', '/datas/cities'),
       datas_waitlist: createNodeLambdaFunction('Lambda-datas-waitlist', '/datas/waitlist'),
+      datas_waitlist_record: createNodeLambdaFunction('Lambda-datas-waitlist-record', '/datas/waitlist_record'),
       datas_book: createNodeLambdaFunction('Lambda-datas-book', '/datas/book'),
       datas_previouschat: createNodeLambdaFunction('Lambda-datas-previouschat', "/datas/previouschat"),
       datas_search: createNodeLambdaFunction('Lambda-datas-search', '/datas/search'),
