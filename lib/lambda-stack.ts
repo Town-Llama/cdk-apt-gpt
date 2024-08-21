@@ -69,7 +69,15 @@ export class LambdaStack extends cdk.Stack {
           platform: Platform.LINUX_AMD64,
         }),
         timeout: cdk.Duration.seconds(90),
-        memorySize: 128
+        memorySize: 128,
+        environment: {
+          "DB_USER": process.env.DB_USER!,
+          "DB_HOST": process.env.DB_HOST!,
+          "DB_PORT": process.env.DB_PORT!,
+          "DB_DATABASE": process.env.DB_DATABASE!,
+          "DB_PW": process.env.DB_PW!,
+          "DB_SSL": process.env.DB_SSL!,
+        }
       })
     };
 

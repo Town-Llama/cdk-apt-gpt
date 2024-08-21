@@ -66,7 +66,7 @@ class AptGptUtility {
 
     async chat_reviews(apt){
       const res = await globalRequestManager.enqueueRequest(()=> this.post("chat/reviews", {
-        apt
+        apt, user: this.user.email
       }));
       return res.data;
     }

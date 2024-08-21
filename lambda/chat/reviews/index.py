@@ -1,22 +1,23 @@
 import json
 import requests
-from openai import OpenAI
+import openai
 from outscraper import ApiClient
 import psycopg2
 import os
+import traceback
 
 def lambda_handler(event, context):
     try:
         g_api_key = os.getenv('GOOGLE_API_KEY')
-        oai_api_key = os.getenv('OPEN_AI_KEY')
         outscraper_api_key = os.getenv("OUTSCRAPER_API_KEY")
-        client = OpenAI(api_key=oai_api_key)
+        openai.api_key = os.getenv('OPEN_AI_KEY')
         # Parse the request body
         body = json.loads(event['body'])
         apt = body.get('apt')
+        user = body.get('user')
 
         # check if the user is waitlist approved
-        if not hasAccessToReviews():
+        if not hasAccessToReviews(user):
             return {
                 'statusCode': 200,
                 'headers': {
@@ -43,7 +44,7 @@ def lambda_handler(event, context):
         # building name
         place_id = get_place_id(apt['buildingname'], g_api_key)
         reviews = get_reviews(place_id, outscraper_api_key, reviews_limit=10)
-        summary = summarize_reviews(reviews=reviews, client=client)
+        summary = summarize_reviews(reviews=reviews)
 
         # Log the review summary
         print(f"{summary} OK")
@@ -61,6 +62,7 @@ def lambda_handler(event, context):
         }
     except Exception as e:
         print(f"ERROR in reviews: {e}")
+        traceback.print_exc()
 
         return {
             'statusCode': 200,
@@ -141,7 +143,7 @@ def get_reviews(place_id, out_key, reviews_limit=10):
     results = api_client.google_maps_reviews(place_id, reviews_limit=reviews_limit)
     return results[0]['reviews_data']
 
-def summarize_reviews(reviews, client):
+def summarize_reviews(reviews):
     """
     Summarizes a list of apartment reviews based on a user query.
 
@@ -177,7 +179,7 @@ def summarize_reviews(reviews, client):
         """
 
     # Call the OpenAI API
-    response = client.chat.completions.create(
+    response = openai.ChatCompletion.create(
         model="gpt-4o-mini",
         messages=[{"role": "system", "content": "You are a helpful assistant."},
                   {"role": "user", "content": f"{prompt}"}],
@@ -241,23 +243,24 @@ def get_place_id(address, g_api_key):
     else:
         return None
     
-def hasAccessToReviews(user:str):
-    host = os.getenv('REDSHIFT_HOST')
-    port = os.getenv('REDSHIFT_PORT')
-    database = os.getenv('REDSHIFT_DATABASE')
-    user = os.getenv('REDSHIFT_USER')
-    password = os.getenv('REDSHIFT_PASSWORD')
+def hasAccessToReviews(user: str):
+    host = os.getenv('DB_HOST')
+    port = os.getenv('DB_PORT')
+    database = os.getenv('DB_DATABASE')
+    db_user = os.getenv('DB_USER')  # Renamed to avoid shadowing the function argument
+    password = os.getenv('DB_PW')
     db_params = {
         "host": host,
         "database": database,
-        "user": user,
+        "user": db_user,
         "password": password
     }
     conn = psycopg2.connect(**db_params)
     cur = conn.cursor()
 
-    cur.execute("SELECT recommendationid FROM recommendations where userid=%s", (user))
+    # Note the comma after 'user'
+    cur.execute("SELECT recommendationid FROM recommendations where userid=%s", (user,))
     result = cur.fetchall()
 
-    # is true or not
+    # Check if there are any results
     return len(result) > 0
