@@ -3,8 +3,7 @@ services:
     platform: linux/amd64
     build:
       context: .
+      target: dev
       dockerfile: Dockerfile
     env_file:
       - .aws_credentials
-    volumes:
-      - .:/opt/app
