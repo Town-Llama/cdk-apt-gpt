@@ -55,7 +55,6 @@ const AIExplanation = ({showOnLoad=false, apt, short=false}) => {
 
     return (
         <div>
-            {/* className={styles['table-cell-content']} */}
             {!getSuggestion ? (
                 <button onClick={get}>
                     Why Should I Live Here?

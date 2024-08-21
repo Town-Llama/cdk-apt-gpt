@@ -529,7 +529,7 @@ const ApartmentTableV2 = () => {
                     arr.push(
                       <>
                       <br/>
-                      <Typography style={{margin: "auto"}}>Average Distance to {keys[i]}:<br/>
+                      <Typography style={{margin: "auto"}}>Average Distance to {keys[i]}s:<br/>
                       <span className="gradient-text">{(0.621371 * (totalDistance/pArr.length)).toFixed(2)} miles</span>
                       </Typography>
                       </>
@@ -540,6 +540,9 @@ const ApartmentTableV2 = () => {
                 })()}
               </>
             )}
+            <br/>
+            <br/>
+            <ReviewAggregation apt={a} />
           </Box>
         </Box>
       ))}

@@ -39,6 +39,9 @@ const ReviewAggregation = ({ apt }) => {
     return (
         <>
             <div 
+                style={{
+                    borderTop: "1px solid #a4a5a6"
+                }}
                 className="cursor-pointer transition-colors duration-300 hover:text-blue-600"
                 onClick={handleClick}
             >
