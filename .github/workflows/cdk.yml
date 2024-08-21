@@ -30,7 +30,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AwsAccessKey }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AwsSecretKey }}
           AWS_DEFAULT_REGION: us-east-2
-          REACT_APP_MAPBOX_ACCESS_TOKEN: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
+          MAPBOX_ACCESS_TOKEN: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           AUTH0_DOMAIN: dev-svptkuh71ya7uog8.us.auth0.com
           AUTH0_AUDIENCE: https://dev-svptkuh71ya7uog8.us.auth0.com/api/v2/
