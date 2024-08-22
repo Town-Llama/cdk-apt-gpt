@@ -50,6 +50,14 @@ class AptGptUtility {
       return res.authenticated;
     }
 
+    async datas_waitlist_record(phone) {
+      const res = await globalRequestManager.enqueueRequest(()=>  this.post("datas/waitlist/record", {
+        userid: this.user.email,
+        recommendeduser: phone
+      }));
+      return res.authenticated;
+    }
+
     async datas_chats() {
       const res = await globalRequestManager.enqueueRequest(()=>  this.post("datas/chats", {
         userid: this.user.email

@@ -25,19 +25,19 @@ exports.handler = async (event) => {
     );
 
     // check if the user has enough
-    if(!recommendedEnoughPeople(user)){
-      return {
-        statusCode: 200,
-        headers: {
-          "Content-Type": "application/json",
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Credentials': true,
-        },
-        body: JSON.stringify({
-          data: false
-        }),
-      };
-    }
+    // if(!recommendedEnoughPeople(user)){
+    //   return {
+    //     statusCode: 200,
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       'Access-Control-Allow-Origin': '*',
+    //       'Access-Control-Allow-Credentials': true,
+    //     },
+    //     body: JSON.stringify({
+    //       data: false
+    //     }),
+    //   };
+    // }
 
     let payload = ask === null ? image : ask;
     const query_embedding = await callImageEmbeddingModel(payload, ask !== null);

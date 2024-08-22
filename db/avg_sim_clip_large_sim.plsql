@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION public.search_properties_with_clip_large_embeddings(min_rent numeric, max_rent numeric, bedrooms integer, input_lat numeric, input_lng numeric, max_distance numeric, embedding_vector vector)
- RETURNS TABLE(unit_id character varying, property_id character varying, property_ts timestamp without time zone, available boolean, name text, baths numeric, beds integer, area integer, ts timestamp without time zone, rent_12_month_monthly numeric, rent_11_month_monthly numeric, rent_10_month_monthly numeric, rent_9_month_monthly numeric, rent_8_month_monthly numeric, rent_7_month_monthly numeric, rent_6_month_monthly numeric, rent_5_month_monthly numeric, rent_4_month_monthly numeric, rent_3_month_monthly numeric, rent_2_month_monthly numeric, rent_1_month_monthly numeric, property_timestamp timestamp without time zone, addressstreet character varying, addresscity character varying, addressstate character varying, addresszipcode character varying, latitude numeric, longitude numeric, photosarray text, description text, transitscore integer, transitdescription text, walkscore integer, walkdescription text, buildingname character varying, distance double precision, embedding_similarity numeric)
+ RETURNS TABLE(unit_id character varying, property_id character varying, property_ts timestamp without time zone, available boolean, name text, baths numeric, beds integer, area integer, ts timestamp without time zone, rent_12_month_monthly numeric, rent_11_month_monthly numeric, rent_10_month_monthly numeric, rent_9_month_monthly numeric, rent_8_month_monthly numeric, rent_7_month_monthly numeric, rent_6_month_monthly numeric, rent_5_month_monthly numeric, rent_4_month_monthly numeric, rent_3_month_monthly numeric, rent_2_month_monthly numeric, rent_1_month_monthly numeric, property_timestamp timestamp without time zone, addressstreet character varying, addresscity character varying, addressstate character varying, addresszipcode character varying, latitude numeric, longitude numeric, photosarray text, description text, transitscore integer, transitdescription text, walkscore integer, walkdescription text, buildingname character varying, distance double precision, embedding_similarity numeric, image_data bytea)
  LANGUAGE plpgsql
 AS $function$
 BEGIN
@@ -20,7 +20,8 @@ BEGIN
           AND calculate_distance(p.latitude, p.longitude, input_lat, input_lng) < max_distance
     )
     SELECT fu.*,
-           AVG(cosine_distance(e.data, embedding_vector)::DECIMAL(9, 6)) AS embedding_similarity
+           AVG(cosine_distance(e.data, embedding_vector)::DECIMAL(9, 6)) AS embedding_similarity,
+           ph.image_data as image_data
     FROM filtered_units fu
     JOIN Photos ph ON fu.property_id = ph.entityid
     JOIN clip_embeddings_large e ON ph.id = e.photo_id
@@ -30,7 +31,7 @@ BEGIN
              fu.rent_4_month_monthly, fu.rent_3_month_monthly, fu.rent_2_month_monthly, fu.rent_1_month_monthly,
              fu.property_timestamp, fu.addressStreet, fu.addressCity, fu.addressState, fu.addressZipCode,
              fu.latitude, fu.longitude, fu.photosArray, fu.description, fu.transitScore, fu.transitDescription,
-             fu.walkScore, fu.walkDescription, fu.buildingName, fu.distance
+             fu.walkScore, fu.walkDescription, fu.buildingName, fu.distance, ph.image_data
     ORDER BY embedding_similarity ASC;
 END;
 $function$

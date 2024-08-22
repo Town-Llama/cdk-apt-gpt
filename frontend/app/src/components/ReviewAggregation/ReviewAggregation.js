@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useSelector } from 'react-redux';
+import FriendPhoneForm from '../FriendPhoneForm/FriendPhoneForm';
 
 import AptGptUtility from '../utils/API/AptGptUtility';
 
@@ -61,7 +62,13 @@ const ReviewAggregation = ({ apt }) => {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                     <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-2xl font-bold">Individual Reviews</h2>
+                            <h2 className="text-2xl font-bold">{
+                                msg === "Recommend Friends to Synthesize Reviews" ? (
+                                    null
+                                ) : (
+                                    "Individual Reviews"
+                                )
+                                }</h2>
                             <button 
                                 onClick={() => setIsModalOpen(false)}
                                 className="text-gray-500 hover:text-gray-700"
@@ -72,12 +79,11 @@ const ReviewAggregation = ({ apt }) => {
                             </button>
                         </div>
                         <div className="space-y-4">
-                            {reviews.map((review, index) => (
-                                <div key={index} className="border-b pb-4 last:border-b-0">
-                                    <p className="text-gray-700 mb-2">{review.text}</p>
-                                    <p className="text-sm text-gray-500">- {review.author}</p>
-                                </div>
-                            ))}
+                            { msg === "Recommend Friends to Synthesize Reviews" ?
+                                (
+                                    <FriendPhoneForm onSubmit={null}/>
+                                ) : (null)
+                            }
                         </div>
                     </div>
                 </div>
