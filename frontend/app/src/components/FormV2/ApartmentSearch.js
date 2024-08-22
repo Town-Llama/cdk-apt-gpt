@@ -26,7 +26,8 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
     const [cities, setCities] = useState([]);
     const [neighborhoods, setNeighborhoods] = useState([]);
     const [notSure, setNotSure] = useState(false);
-    const [apartmentFeatures, setApartmentFeatures] = useState('');
+    const [textQueryAsk, setTextQueryAsk] = useState('');
+    const [photosQuerySemantics, setPhotosQuerySemantics] = useState('');
     const [bedrooms, setBedrooms] = useState('');
     const [searchOption, setSearchOption] = useState('text');
     const [uploadedImage, setUploadedImage] = useState(null);
@@ -53,7 +54,8 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        setValue("ask", apartmentFeatures);
+        setValue("ask", textQueryAsk);
+        setValue("semantic", photosQuerySemantics);
         trackButtonClick("FormV2_search", user.sub);
         handleSubmit(handleFormSubmit)(e);
     };
@@ -147,10 +149,17 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
         trackFilledInput('FormV2_Rent_Range', isAuthenticated ? user.sub : null);
     };
 
-    const handleApartmentFeaturesChange = (e) => {
-        setApartmentFeatures(e.target.value);
+    const handleTextQueryAskChange = (e) => {
+        setTextQueryAsk(e.target.value);
         if (e.target.value) {
             trackFilledInput('FormV2_Apartment_Features', isAuthenticated ? user.sub : null);
+        }
+    };
+
+    const handlePhotosQuerySemanticsChange = (e) => {
+        setPhotosQuerySemantics(e.target.value);
+        if (e.target.value) {
+            trackFilledInput('FormV2_Apartment_Semantics', isAuthenticated ? user.sub : null);
         }
     };
 
@@ -281,8 +290,8 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
                             type="text"
                             placeholder="Pet friendly, luxury building..."
                             className="w-full border rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={apartmentFeatures}
-                            onChange={handleApartmentFeaturesChange}
+                            value={textQueryAsk}
+                            onChange={handleTextQueryAskChange}
                         />
                     ) : searchOption === 'semantic' ? (
                         <input
@@ -290,8 +299,8 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
                             type="text"
                             placeholder="Loft, in-unit laundry, balcony..."
                             className="w-full border rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={apartmentFeatures}
-                            onChange={handleApartmentFeaturesChange}
+                            value={photosQuerySemantics}
+                            onChange={handlePhotosQuerySemanticsChange}
                         />
                     ) : (
                         <div

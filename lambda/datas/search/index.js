@@ -34,9 +34,9 @@ exports.handler = async (event) => {
       const query = "SELECT * FROM search_properties_with_clip_large_embeddings($1, $2, $3, $4, $5, $6, $7);"; // $6 is lease length for now we use default of 12
       const values = [min_rent, max_rent, bedrooms, coordinates.lat, coordinates.lng, max_distance, pgvector.toSql(query_embedding)];
       console.log(pgvector.toSql(query_embedding));
-      console.time("datas.search:dbCall - start");
+      console.time("datas.search:dbCall");
       responses = await dbCall(query, values);
-      console.time("datas.search:dbCall - end");
+      console.timeEnd("datas.search:dbCall");
     } else if (semantic !== null) {
       console.log("semantic", semantic);
       const query_embedding = await callImageEmbeddingModel(semantic, true);
@@ -44,9 +44,9 @@ exports.handler = async (event) => {
       const query = "SELECT * FROM search_properties_with_clip_large_embeddings($1, $2, $3, $4, $5, $6, $7);"; // $6 is lease length for now we use default of 12
       const values = [min_rent, max_rent, bedrooms, coordinates.lat, coordinates.lng, max_distance, pgvector.toSql(query_embedding)];
       console.log(pgvector.toSql(query_embedding));
-      console.time("datas.search:dbCall - start");
+      console.time("datas.search:dbCall");
       responses = await dbCall(query, values);
-      console.time("datas.search:dbCall - end");
+      console.timeEnd("datas.search:dbCall");
     } else {
       //descriptions
       const query_embedding = await callDescrEmbeddingModel(ask, true);
@@ -54,9 +54,9 @@ exports.handler = async (event) => {
       const query = "SELECT * FROM search_properties_with_desc_embeddings($1, $2, $3, $4, $5, $6, $7);"; // $6 is lease length for now we use default of 12
       const values = [min_rent, max_rent, bedrooms, coordinates.lat, coordinates.lng, max_distance, pgvector.toSql(query_embedding)];
       console.log(pgvector.toSql(query_embedding));
-      console.time("datas.search:dbCall - start");
+      console.time("datas.search:dbCall");
       responses = await dbCall(query, values);
-      console.time("datas.search:dbCall - end");
+      console.timeEnd("datas.search:dbCall");
     }
 
     console.log(responses, "res");
