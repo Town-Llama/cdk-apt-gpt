@@ -87,9 +87,7 @@ export class LambdaStack extends cdk.Stack {
       functionName: 'Lambda-image-embedding-model',
       code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../lambda/embeddings'), {
         platform: Platform.LINUX_AMD64,
-        buildArgs: {
-          TARGET: 'image_embedding_handler'
-        }
+        target: 'image_embedding_handler'
       }),
       timeout: cdk.Duration.seconds(90),
       memorySize: 3008
@@ -109,9 +107,7 @@ export class LambdaStack extends cdk.Stack {
       functionName: 'Lambda-descr-embedding-model',
       code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../lambda/embeddings'), {
         platform: Platform.LINUX_AMD64,
-        buildArgs: {
-          TARGET: 'descr_embedding_handler'
-        }
+        target: 'descr_embedding_handler'
       }),
       timeout: cdk.Duration.seconds(90),
       memorySize: 3008
