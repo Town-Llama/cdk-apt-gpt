@@ -7,47 +7,62 @@ const pgvector = require('pgvector/pg');
 exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body);
-    const { 
+    const {
       user,
       max_distance,
       min_rent,
       max_rent,
       coordinates,
       ask,
-      bedrooms, 
-      image
-   } = body;
-   console.log(coordinates,
+      bedrooms,
+      image,
+      semantic
+    } = body;
+    console.log(coordinates,
       max_distance,
       min_rent,
       max_rent,
       bedrooms
     );
 
-    const isImage = ask === null;
-    console.log(isImage, ask, image, "k")
+    // console.log(isImage, ask, image, "k")
     let responses;
-    if(isImage) {
-      const query_embedding = await callImageEmbeddingModel(image, ask !== null);
-      console.log("query_embedding", query_embedding);
+    if (image !== null) {
+      console.log("image", image);
+      const query_embedding = await callImageEmbeddingModel(image, false);
+      console.log("image_query_embedding", query_embedding);
       const query = "SELECT * FROM search_properties_with_clip_large_embeddings($1, $2, $3, $4, $5, $6, $7);"; // $6 is lease length for now we use default of 12
       const values = [min_rent, max_rent, bedrooms, coordinates.lat, coordinates.lng, max_distance, pgvector.toSql(query_embedding)];
       console.log(pgvector.toSql(query_embedding));
+      console.time("datas.search:dbCall - start");
       responses = await dbCall(query, values);
+      console.time("datas.search:dbCall - end");
+    } else if (semantic !== null) {
+      console.log("semantic", semantic);
+      const query_embedding = await callImageEmbeddingModel(semantic, true);
+      console.log("semantic_query_embedding", query_embedding);
+      const query = "SELECT * FROM search_properties_with_clip_large_embeddings($1, $2, $3, $4, $5, $6, $7);"; // $6 is lease length for now we use default of 12
+      const values = [min_rent, max_rent, bedrooms, coordinates.lat, coordinates.lng, max_distance, pgvector.toSql(query_embedding)];
+      console.log(pgvector.toSql(query_embedding));
+      console.time("datas.search:dbCall - start");
+      responses = await dbCall(query, values);
+      console.time("datas.search:dbCall - end");
     } else {
       //descriptions
-      const query_embedding = await callDescrEmbeddingModel(ask, ask !== null);
-      console.log("query_embedding", query_embedding);
+      const query_embedding = await callDescrEmbeddingModel(ask, true);
+      console.log("test_query_embedding", query_embedding);
       const query = "SELECT * FROM search_properties_with_desc_embeddings($1, $2, $3, $4, $5, $6, $7);"; // $6 is lease length for now we use default of 12
       const values = [min_rent, max_rent, bedrooms, coordinates.lat, coordinates.lng, max_distance, pgvector.toSql(query_embedding)];
       console.log(pgvector.toSql(query_embedding));
+      console.time("datas.search:dbCall - start");
       responses = await dbCall(query, values);
+      console.time("datas.search:dbCall - end");
     }
 
     console.log(responses, "res");
     const result = filterDuplicateUnits(responses);
     console.log(result, "rest");
-    
+
     return {
       statusCode: 200,
       headers: {
@@ -79,7 +94,7 @@ exports.handler = async (event) => {
 async function recommendedEnoughPeople(user) {
   const query = "SELECT * FROM check_user_eligibility($1, $2, $3);"; // $6 is lease length for now we use default of 12
   const values = [user, 3, 3]; // setting here the values for waitlist
-  const returned =  await dbCall(query, values);
+  const returned = await dbCall(query, values);
   console.log("returned ", returned);
   return returned;
 }
@@ -89,10 +104,10 @@ function filterDuplicateUnits(results) {
   const filteredResults = [];
 
   for (const unit of results) {
-      if (!seenUnitIds.has(unit.unit_id)) {
-          seenUnitIds.add(unit.unit_id);
-          filteredResults.push(unit);
-      }
+    if (!seenUnitIds.has(unit.unit_id)) {
+      seenUnitIds.add(unit.unit_id);
+      filteredResults.push(unit);
+    }
   }
 
   return filteredResults;
