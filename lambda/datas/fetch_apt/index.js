@@ -1,7 +1,5 @@
 const AWS = require("aws-sdk");
-const lambda = new AWS.Lambda();
 const { dbCall } = require("db");
-const pgvector = require("pgvector/pg");
 
 exports.handler = async (event) => {
   try {
@@ -53,62 +51,4 @@ exports.handler = async (event) => {
       }),
     };
   }
-};
-
-async function recommendedEnoughPeople(user) {
-  const query = "SELECT * FROM check_user_eligibility($1, $2, $3);"; // $6 is lease length for now we use default of 12
-  const values = [user, 3, 3]; // setting here the values for waitlist
-  const returned = await dbCall(query, values);
-  console.log("returned ", returned);
-  return returned;
-}
-
-function filterDuplicateUnits(results) {
-  const seenUnitIds = new Set();
-  const filteredResults = [];
-
-  for (const unit of results) {
-    if (!seenUnitIds.has(unit.unit_id)) {
-      seenUnitIds.add(unit.unit_id);
-      filteredResults.push(unit);
-    }
-  }
-
-  return filteredResults;
-}
-
-const callImageEmbeddingModel = async (data, isText) => {
-  const params = {
-    FunctionName: "Lambda-image-embedding-model", // The name of the Lambda function to invoke
-    InvocationType: "RequestResponse", // Synchronous invocation
-    Payload: JSON.stringify({
-      body: JSON.stringify({
-        isText: isText,
-        payload: data,
-      }),
-    }), // Pass the event received by this Lambda function to the other Lambda function
-  };
-  //allow it to take longer than 3 seconds on cold start
-  const result = await lambda.invoke(params).promise();
-  const a = JSON.parse(result.Payload);
-  const b = JSON.parse(a.body);
-  return b.embedding;
-};
-
-const callDescrEmbeddingModel = async (data, isText) => {
-  const params = {
-    FunctionName: "Lambda-descr-embedding-model", // The name of the Lambda function to invoke
-    InvocationType: "RequestResponse", // Synchronous invocation
-    Payload: JSON.stringify({
-      body: JSON.stringify({
-        isText: isText,
-        payload: data,
-      }),
-    }), // Pass the event received by this Lambda function to the other Lambda function
-  };
-  //allow it to take longer than 3 seconds on cold start
-  const result = await lambda.invoke(params).promise();
-  const a = JSON.parse(result.Payload);
-  const b = JSON.parse(a.body);
-  return b.embedding;
 };
