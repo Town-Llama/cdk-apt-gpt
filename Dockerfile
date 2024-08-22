@@ -5,4 +5,5 @@ WORKDIR /opt/app
 COPY . .
 # Install app dependencies
 # RUN npm install
-CMD ["npx", "cdk", "deploy"]
+# CMD ["npx", "cdk", "deploy"]
+EXPOSE 3000
