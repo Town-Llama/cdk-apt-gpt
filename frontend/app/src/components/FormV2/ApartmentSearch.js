@@ -279,7 +279,7 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
                         <input
                             {...register("ask")}
                             type="text"
-                            placeholder="Pet friendly, luxury building, in-unit laundry, balcony..."
+                            placeholder="Pet friendly, luxury building..."
                             className="w-full border rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             value={apartmentFeatures}
                             onChange={handleApartmentFeaturesChange}
@@ -288,7 +288,7 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
                         <input
                             {...register("semantic")}
                             type="text"
-                            placeholder="Pet friendly, luxury building, in-unit laundry, balcony..."
+                            placeholder="Loft, in-unit laundry, balcony..."
                             className="w-full border rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             value={apartmentFeatures}
                             onChange={handleApartmentFeaturesChange}
