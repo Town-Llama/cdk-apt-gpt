@@ -16,8 +16,6 @@ jobs:
           pushd frontend/app
           yarn
           yarn build
-          rm -rf ../../react-app/build
-          cp -r build ../../react-app/
           popd
         env:
           CI: false
