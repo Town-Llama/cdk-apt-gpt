@@ -173,54 +173,66 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
     }
 
     return (
-        <>
+        <div className="max-w-md mx-auto">
             <h2 className="text-2xl font-bold gradient-text mb-4">Hello{isAuthenticated ? " " + user.given_name : ""},</h2>
             <p className="text-xl mb-6">Find Your Best Home!</p>
-            <form onSubmit={onSubmit}>
-                <div className="mb-4">
+            <form onSubmit={onSubmit} className="space-y-6">
+                <div>
                     <label className="block text-gray-700 font-bold mb-2">City</label>
-                    <select {...register("city")} onChange={handleCityChange}>
+                    <select
+                        {...register("city")}
+                        onChange={handleCityChange}
+                        className="w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
                         <option value="">Select a city</option>
                         {cities.map((city, index) => (
                             <option key={index} value={city}>{city}</option>
                         ))}
                     </select>
                 </div>
+
                 {watch("city") && (
-                    <div className="mb-4">
+                    <div>
                         <label className="block text-gray-700 font-bold mb-2">
                             Which neighborhood are you interested in?
                         </label>
-                        <select {...register("neighborhood")} onChange={handleNeighborhoodChange}>
+                        <select
+                            {...register("neighborhood")}
+                            onChange={handleNeighborhoodChange}
+                            className="w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
                             {neighborhoods.map((neighborhood, index) => (
                                 <option key={index} value={index}>{neighborhood.name}</option>
                             ))}
                         </select>
-                        <div className="mt-2">
+                        <div className="mt-2 flex items-center">
                             <input
                                 {...register("notsure")}
                                 type="checkbox"
                                 checked={notSure}
                                 onChange={(e) => setNotSure(e.target.checked)}
+                                className="mr-2"
                             />
-                            <label className="ml-2">I am not sure yet.</label>
+                            <label>I am not sure yet.</label>
                         </div>
                     </div>
                 )}
-                <div className="mb-4">
+
+                <div>
                     <label className="block text-gray-700 font-bold mb-2">Number of Bedrooms</label>
                     <input
                         {...register("bedrooms")}
                         type="number"
                         placeholder="Enter the number of bedrooms..."
-                        className="w-full border rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={bedrooms}
                         onChange={handleBedroomsChange}
                     />
                 </div>
-                <div className="mb-4">
+
+                <div>
                     <label className="block text-gray-700 font-bold mb-2">Rent Range</label>
-                    <div className="flex items-center">
+                    <div className="px-2">
                         <Controller
                             name="rent_range"
                             control={control}
@@ -234,16 +246,16 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
                                     renderTrack={({ props, children }) => (
                                         <div
                                             {...props}
-                                            className="range-track"
-                                            style={{
-                                                background: `linear-gradient(to right, lightgrey ${100 * (field.value[0] - 500) / (10000 - 500)}%, blue ${100 * (field.value[0] - 500) / (10000 - 500)}%, blue ${100 * (field.value[1] - 500) / (10000 - 500)}%, lightgrey ${100 * (field.value[1] - 500) / (10000 - 500)}%)`
-                                            }}
+                                            className="h-3 w-full bg-gray-200 rounded-md"
                                         >
                                             {children}
                                         </div>
                                     )}
                                     renderThumb={({ props }) => (
-                                        <div {...props} className="range-thumb" />
+                                        <div
+                                            {...props}
+                                            className="h-6 w-6 rounded-full bg-blue-500 shadow"
+                                        />
                                     )}
                                 />
                             )}
@@ -255,9 +267,9 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
                     </div>
                 </div>
 
-                <div className="mb-4">
+                <div>
                     <label className="block text-gray-700 font-bold mb-2">What do you want in your home?</label>
-                    <div className="flex space-x-4 mb-4">
+                    <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-4">
                         <button
                             type="button"
                             className={`flex-1 py-2 px-4 rounded-full ${searchOption === 'text' ? 'message-bubble text-white' : 'bg-gray-200'}`}
@@ -285,7 +297,7 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
                             {...register("ask")}
                             type="text"
                             placeholder="Pet friendly, luxury building..."
-                            className="w-full border rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             value={textQueryAsk}
                             onChange={handleTextQueryAskChange}
                         />
@@ -294,7 +306,7 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
                             {...register("semantic")}
                             type="text"
                             placeholder="Loft, in-unit laundry, balcony..."
-                            className="w-full border rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             value={photosQuerySemantics}
                             onChange={handlePhotosQuerySemanticsChange}
                         />
@@ -315,19 +327,20 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
                         </div>
                     )}
                 </div>
+
                 <div className="flex justify-end">
                     <button
                         type="submit"
-                        className="message-bubble text-white rounded-full py-2 px-4"
+                        className="message-bubble text-white rounded-full py-2 px-4 flex items-center"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 inline-block mr-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 mr-2">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
                         Search
                     </button>
                 </div>
             </form>
-        </>
+        </div>
     );
 };
 
