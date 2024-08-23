@@ -58,41 +58,41 @@ export class FrontendStack extends cdk.Stack {
       }),
       errorConfigurations: [
         {
-            errorCode: 403, // Forbidden errors
-            responsePagePath: '/error.html',
-            responseCode: 200,
-            errorCachingMinTtl: 300
-          },
-          {
-            errorCode: 404, // Not Found errors
-            responsePagePath: '/error.html',
-            responseCode: 200,
-            errorCachingMinTtl: 300
-          },
-          {
-            errorCode: 500, // Internal Server Errors
-            responsePagePath: '/error.html',
-            responseCode: 200,
-            errorCachingMinTtl: 300
-          },
-          {
-            errorCode: 502, // Bad Gateway errors
-            responsePagePath: '/error.html',
-            responseCode: 200,
-            errorCachingMinTtl: 300
-          },
-          {
-            errorCode: 503, // Service Unavailable errors
-            responsePagePath: '/error.html',
-            responseCode: 200,
-            errorCachingMinTtl: 300
-          },
-          {
-            errorCode: 504, // Gateway Timeout errors
-            responsePagePath: '/error.html',
-            responseCode: 200,
-            errorCachingMinTtl: 300
-          },
+          errorCode: 403, // Forbidden errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
+        {
+          errorCode: 404, // Not Found errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
+        {
+          errorCode: 500, // Internal Server Errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
+        {
+          errorCode: 502, // Bad Gateway errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
+        {
+          errorCode: 503, // Service Unavailable errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
+        {
+          errorCode: 504, // Gateway Timeout errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
       ],
     });
 
@@ -101,6 +101,7 @@ export class FrontendStack extends cdk.Stack {
       destinationBucket: websiteBucket,
       distribution,
       distributionPaths: ['/*'],
+      memoryLimit: 1024
     });
 
     new route53.ARecord(this, 'AliasRecord', {

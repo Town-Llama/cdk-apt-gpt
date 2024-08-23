@@ -17,7 +17,7 @@ import "./FormV2.css";
 
 const ApartmentSearch = ({ onRequestClose, showLoading }) => {
     const dispatch = useDispatch();
-    const { register, handleSubmit, watch, control, setValue } = useForm({
+    const { register, handleSubmit, watch, control, setValue, formState: { errors } } = useForm({
         defaultValues: {
             rent_range: [1000, 2000],
             neighborhood: 0,
@@ -33,6 +33,8 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
     const [searchOption, setSearchOption] = useState('text');
     const [uploadedImage, setUploadedImage] = useState(null);
     const [askForRecs, setAskForRecs] = useState(false);
+    const [formError, setFormError] = useState('');
+
 
     const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
 
@@ -54,9 +56,36 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
     };
 
     const onSubmit = async (e) => {
+        console.log("HELLO")
         e.preventDefault();
         setValue("ask", textQueryAsk);
         setValue("semantic", photosQuerySemantics);
+        console.log("HIT");
+
+        // Validation checks
+        if (!watch("city")) {
+            setFormError('Please select a city.');
+            return;
+        }
+        // if (!watch("neighborhood") && !notSure) {
+        //     console.log(watch("neighborhood"), 'ok')
+        //     setFormError('Please select a neighborhood or check "I am not sure yet".');
+        //     return;
+        // }
+        if (searchOption === 'text' && textQueryAsk === '') {
+            setFormError('Please enter your apartment preferences.');
+            return;
+        }
+        if (searchOption === 'semantic' && !photosQuerySemantics === '') {
+            setFormError('Please enter your photo search criteria.');
+            return;
+        }
+        if (searchOption === 'image' && !uploadedImage) {
+            setFormError('Please upload an image.');
+            return;
+        }
+
+        setFormError('');
         trackButtonClick("FormV2_search", user.sub);
         handleSubmit(handleFormSubmit)(e);
     };
@@ -176,29 +205,36 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
             <h2 className="text-2xl font-bold gradient-text mb-4">Hello{isAuthenticated ? " " + user.given_name : ""},</h2>
             <p className="text-xl mb-6">Find Your Best Home!</p>
             <form onSubmit={onSubmit} className="space-y-6">
+                {formError && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <span className="block sm:inline">{formError}</span>
+                    </div>
+                )}
                 <div>
-                    <label className="block text-gray-700 font-bold mb-2">City</label>
+                    <label className="block text-gray-700 font-bold mb-2">City*</label>
                     <select
-                        {...register("city")}
+                        {...register("city", { required: true })}
                         onChange={handleCityChange}
-                        className="w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.city ? 'border-red-500' : ''}`}
                     >
                         <option value="">Select a city</option>
                         {cities.map((city, index) => (
                             <option key={index} value={city}>{city}</option>
                         ))}
                     </select>
+                    {errors.city && <span className="text-red-500 text-sm">This field is required</span>}
                 </div>
 
                 {watch("city") && (
                     <div>
                         <label className="block text-gray-700 font-bold mb-2">
-                            Which neighborhood are you interested in?
+                            Which neighborhood are you interested in?*
                         </label>
                         <select
-                            {...register("neighborhood")}
+                            {...register("neighborhood", { required: !notSure })}
                             onChange={handleNeighborhoodChange}
-                            className="w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className={`w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.neighborhood ? 'border-red-500' : ''}`}
+                            disabled={notSure}
                         >
                             {neighborhoods.map((neighborhood, index) => (
                                 <option key={index} value={index}>{neighborhood.name}</option>
@@ -209,11 +245,17 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
                                 {...register("notsure")}
                                 type="checkbox"
                                 checked={notSure}
-                                onChange={(e) => setNotSure(e.target.checked)}
+                                onChange={(e) => {
+                                    setNotSure(e.target.checked);
+                                    if (e.target.checked) {
+                                        setValue("neighborhood", "");
+                                    }
+                                }}
                                 className="mr-2"
                             />
                             <label>I am not sure yet.</label>
                         </div>
+                        {errors.neighborhood && !notSure && <span className="text-red-500 text-sm">Please select a neighborhood or check "I am not sure yet"</span>}
                     </div>
                 )}
 
@@ -270,7 +312,7 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
                 </div>
 
                 <div>
-                    <label className="block text-gray-700 font-bold mb-2">What do you want in your home?</label>
+                    <label className="block text-gray-700 font-bold mb-2">What do you want in your home?*</label>
                     <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-4">
                         <button
                             type="button"
@@ -296,26 +338,26 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
                     </div>
                     {searchOption === 'text' ? (
                         <input
-                            {...register("ask")}
+                            {...register("ask", { required: searchOption === 'text' })}
                             type="text"
                             placeholder="Pet friendly, luxury building..."
-                            className="w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className={`w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.ask ? 'border-red-500' : ''}`}
                             value={textQueryAsk}
                             onChange={handleTextQueryAskChange}
                         />
                     ) : searchOption === 'semantic' ? (
                         <input
-                            {...register("semantic")}
+                            {...register("semantic", { required: searchOption === 'semantic' })}
                             type="text"
                             placeholder="Loft, in-unit laundry, balcony..."
-                            className="w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className={`w-full border rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.semantic ? 'border-red-500' : ''}`}
                             value={photosQuerySemantics}
                             onChange={handlePhotosQuerySemanticsChange}
                         />
                     ) : (
                         <div
                             {...getRootProps()}
-                            className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}`}
+                            className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'} ${errors.image ? 'border-red-500' : ''}`}
                         >
                             <input {...getInputProps()} />
                             {uploadedImage ? (
@@ -328,6 +370,9 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
                             )}
                         </div>
                     )}
+                    {((searchOption === 'text' && errors.ask) || (searchOption === 'semantic' && errors.semantic) || (searchOption === 'image' && !uploadedImage)) &&
+                        <span className="text-red-500 text-sm">This field is required</span>
+                    }
                 </div>
 
                 <div className="flex justify-end">
