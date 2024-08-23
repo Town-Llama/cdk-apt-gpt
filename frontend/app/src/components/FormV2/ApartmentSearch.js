@@ -246,7 +246,10 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
                                     renderTrack={({ props, children }) => (
                                         <div
                                             {...props}
-                                            className="h-3 w-full bg-gray-200 rounded-md"
+                                            className="h-3 w-full bg-gray-200 rounded-md range-track"
+                                            style={{
+                                                background: `linear-gradient(to right, lightgrey ${100 * (field.value[0] - 500) / (10000 - 500)}%, blue ${100 * (field.value[0] - 500) / (10000 - 500)}%, blue ${100 * (field.value[1] - 500) / (10000 - 500)}%, lightgrey ${100 * (field.value[1] - 500) / (10000 - 500)}%)`
+                                            }}
                                         >
                                             {children}
                                         </div>
@@ -254,7 +257,7 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
                                     renderThumb={({ props }) => (
                                         <div
                                             {...props}
-                                            className="h-6 w-6 rounded-full bg-blue-500 shadow"
+                                            className="range-thumb h-6 w-6 rounded-full shadow"
                                         />
                                     )}
                                 />
