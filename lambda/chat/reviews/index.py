@@ -17,17 +17,17 @@ def lambda_handler(event, context):
         user = body.get('user')
 
         # check if the user is waitlist approved
-        if not hasAccessToReviews(user):
-            return {
-                'statusCode': 200,
-                'headers': {
-                    "Content-Type": "application/json",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-                    "Access-Control-Allow-Methods": "*"
-                },
-                'body': json.dumps({'data': 'Recommend Friends to Synthesize Reviews'})
-            }
+        # if not hasAccessToReviews(user):
+        #     return {
+        #         'statusCode': 200,
+        #         'headers': {
+        #             "Content-Type": "application/json",
+        #             "Access-Control-Allow-Origin": "*",
+        #             "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+        #             "Access-Control-Allow-Methods": "*"
+        #         },
+        #         'body': json.dumps({'data': 'Recommend Friends to Synthesize Reviews'})
+        #     }
 
         if not apt or 'buildingname' not in apt:
             return {

@@ -13,6 +13,7 @@ import { clearChat } from '../../store/actions/chatActions';
 import { advance } from '../utils/ChatFlow';
 import { trackButtonClick, trackFilledInput } from '../utils/analytics';
 import FriendPhoneForm from '../FriendPhoneForm/FriendPhoneForm';
+import "./FormV2.css";
 
 const ApartmentSearch = ({ onRequestClose, showLoading }) => {
     const dispatch = useDispatch();
@@ -82,11 +83,6 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
             bedrooms: data.bedrooms,
             image: uploadedImage
         });
-
-        // if(!df){
-        //     // load the send a friend page (text messages of course)
-        //     setAskForRecs(true);
-        // }
 
         dispatch(updateDFPayload(df));
         dispatch(setRecHash(null));

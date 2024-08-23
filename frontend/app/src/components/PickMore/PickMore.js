@@ -86,11 +86,11 @@ const PickMore = ({isOpen, onRequestClose}) => {
     const data = useMemo(() => {
         const seenBuildingNames = new Set();
         return df.payload
-            .filter(property => {
-                const isDuplicate = seenBuildingNames.has(property.buildingname);
-                seenBuildingNames.add(property.buildingname);
-                return !isDuplicate;
-            })
+            // .filter(property => {
+            //     const isDuplicate = seenBuildingNames.has(property.buildingname);
+            //     seenBuildingNames.add(property.buildingname);
+            //     return !isDuplicate;
+            // })
             .map((property, index) => {
                 const apt = { ...property, index };
                 const obj = {
@@ -134,8 +134,7 @@ const PickMore = ({isOpen, onRequestClose}) => {
             <div style={{padding: "10px"}}>
                 <h2 className="text-2xl font-bold gradient-text mb-4">Pick Which Of the Top 100 You Want to Compare</h2>
                 <div className="overflow-auto" style={{ maxHeight: '70vh' }}>
-                    {isSmallScreen ? (
-                        <table {...getTableProps()}>
+                    <table {...getTableProps()}>
                         <thead>
                             {headerGroups.map(headerGroup => (
                             <tr {...headerGroup.getHeaderGroupProps()}>
@@ -164,9 +163,6 @@ const PickMore = ({isOpen, onRequestClose}) => {
                                 })}
                         </tbody>
                     </table>
-                    ) : (
-                        null
-                    )}
                 </div>
             </div>
         </Modal>
