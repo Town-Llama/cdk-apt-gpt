@@ -29,8 +29,10 @@ exports.handler = async (event) => {
     let responses;
     if (image !== null) {
       console.log("image", image);
+      console.time("datas.search:EmbeddingGeneration");
       const query_embedding = await callImageEmbeddingModel(image, false);
-      console.log("image_query_embedding", query_embedding);
+      console.timeEnd("datas.search:EmbeddingGeneration");
+      // console.log("image_query_embedding", query_embedding);
       const query = "SELECT * FROM search_properties_with_clip_large_embeddings($1, $2, $3, $4, $5, $6, $7);"; // $6 is lease length for now we use default of 12
       const values = [min_rent, max_rent, bedrooms, coordinates.lat, coordinates.lng, max_distance, pgvector.toSql(query_embedding)];
       console.log(pgvector.toSql(query_embedding));
@@ -39,8 +41,10 @@ exports.handler = async (event) => {
       console.timeEnd("datas.search:dbCall");
     } else if (semantic !== null && semantic !== "") {
       console.log("semantic", semantic);
+      console.time("datas.search:EmbeddingGeneration");
       const query_embedding = await callImageEmbeddingModel(semantic, true);
-      console.log("semantic_query_embedding", query_embedding);
+      console.timeEnd("datas.search:EmbeddingGeneration");
+      // console.log("semantic_query_embedding", query_embedding);
       const query = "SELECT * FROM search_properties_with_clip_large_embeddings($1, $2, $3, $4, $5, $6, $7);"; // $6 is lease length for now we use default of 12
       const values = [min_rent, max_rent, bedrooms, coordinates.lat, coordinates.lng, max_distance, pgvector.toSql(query_embedding)];
       console.log(pgvector.toSql(query_embedding));
@@ -49,8 +53,11 @@ exports.handler = async (event) => {
       console.timeEnd("datas.search:dbCall");
     } else {
       //descriptions
+      console.log("ask", ask);
+      console.time("datas.search:EmbeddingGeneration");
       const query_embedding = await callDescrEmbeddingModel(ask, true);
-      console.log("test_query_embedding", query_embedding);
+      console.timeEnd("datas.search:EmbeddingGeneration");
+      // console.log("text_query_embedding", query_embedding);
       const query = "SELECT * FROM search_properties_with_desc_embeddings($1, $2, $3, $4, $5, $6, $7);"; // $6 is lease length for now we use default of 12
       const values = [min_rent, max_rent, bedrooms, coordinates.lat, coordinates.lng, max_distance, pgvector.toSql(query_embedding)];
       console.log(pgvector.toSql(query_embedding));
