@@ -42,7 +42,6 @@ const ChatArea = ({ showLoading }) => {
       let arr = await client.chat_pois(message);
       data = JSON.parse(arr);
     } else {
-      console.log("ai", chat.openAINotation);
       data = await client.chat_next(
         [...chat.openAINotation, { role: "user", content: message }],
         chat.conversationId

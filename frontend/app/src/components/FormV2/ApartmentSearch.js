@@ -161,7 +161,6 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
 
     const handleFriendFormSubmit = (friendsData) => {
         // Handle the submission of friends' data
-        console.log('Friends data:', friendsData);
 
         // You can add logic here to send this data to your backend or perform any other necessary actions
         setAskForRecs(false);  // Close the friend form after submission

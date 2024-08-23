@@ -75,9 +75,9 @@ const ApartmentTableV2 = () => {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(toRadians(lat1)) *
-        Math.cos(toRadians(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
+      Math.cos(toRadians(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
@@ -254,9 +254,7 @@ const ApartmentTableV2 = () => {
 
   const data = useMemo(() => {
 
-    console.log("HIT here?", isSmallScreen)
-
-    if(isSmallScreen) return [];
+    if (isSmallScreen) return [];
     const send = [];
 
     send[0] = {
@@ -378,8 +376,7 @@ const ApartmentTableV2 = () => {
             {headerGroup.headers.map((column, colIndex) => (
               <th
                 {...column.getHeaderProps()}
-                className={`${styles.th} ${
-                  colIndex === 0 ? styles.firstColumn : styles.fixedWidth
+                className={`${styles.th} ${colIndex === 0 ? styles.firstColumn : styles.fixedWidth
                   }`}
               >
                 {colIndex == 0 ? (
@@ -423,131 +420,116 @@ const ApartmentTableV2 = () => {
     </table>
   );
 
-  console.log(chosenApts, poiData);
+  const blogData = useMemo(() => {
+    if (!isSmallScreen) return null;
 
-  const blogData = isSmallScreen && (
-    <Box 
-      sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        overflowX: 'auto',
-        overflowY: 'hidden',
-        whiteSpace: 'nowrap',
-        WebkitOverflowScrolling: 'touch',
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none',
-        '&::-webkit-scrollbar': {
-          display: 'none'
-        },
-        width: '100%',
-        maxWidth: '63vw',
-      }}
-    >
-      {chosenApts.map((a, index) => (
-        <Box 
-          key={"Apartment_" + index} 
-          sx={{
-            minWidth: '70vw',
-            maxWidth: '70vw',
-            marginRight: '16px',
-            padding: '16px',
-            borderRight: index < chosenApts.length - 1 ? '1px solid #bebcc4' : 'none',
-            display: 'flex',
-            flexDirection: 'column',
-            flexShrink: 0,
-          }}
-        >
-          <PropertyPreview apt={a} index={index} />
-          <Box sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            whiteSpace: 'normal',
-            marginTop: '16px',
-          }}>
-            <AIExplanation apt={a} showOnLoad={true} short={true} />
-            <br/>
-            <div style={{borderTop: "1px solid black"}} />
-            <Box sx={{ 
-              flexBasis: '30%', 
-              minWidth: '80px', 
-              marginBottom: '8px',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          whiteSpace: 'nowrap',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          '&::-webkit-scrollbar': {
+            display: 'none'
+          },
+          width: '100%',
+          maxWidth: '80vw',
+        }}
+      >
+        {chosenApts.map((a, index) => (
+          <Box
+            key={`Apartment_${index}_${a.buildingname}`}
+            sx={{
+              minWidth: '70vw',
+              maxWidth: '70vw',
+              marginRight: '16px',
+              padding: '16px',
+              borderRight: index < chosenApts.length - 1 ? '1px solid #bebcc4' : 'none',
+              display: 'flex',
+              flexDirection: 'column',
+              flexShrink: 0,
+            }}
+          >
+            <PropertyPreview apt={a} index={index} />
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              whiteSpace: 'normal',
+              marginTop: '16px',
             }}>
-              <Typography noWrap>Sq Ft: <span className="gradient-text">{a.area}</span></Typography>
-            </Box>
-            <Box sx={{ 
-              flexBasis: '30%', 
-              minWidth: '80px', 
-              marginBottom: '8px',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}>
-              <Typography noWrap>Beds: <span className="gradient-text">{a.beds}</span></Typography>
-            </Box>
-            <Box sx={{ 
-              flexBasis: '30%', 
-              minWidth: '80px', 
-              marginBottom: '8px',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              margin: "auto"
-            }}>
-              <Typography noWrap>Baths: <span className="gradient-text">{a.baths}</span></Typography>
-            </Box>
-            <br/>
-            {commuteData.length > 0 && (
-              <>
-                <br/>
-                <Typography style={{margin: "auto"}}>Commute Time: <span className="gradient-text">{commuteData[index].duration}</span></Typography>
-                <br/>
-                <Typography style={{margin: "auto"}}>Commute Distance: <span className="gradient-text">{commuteData[index].distance}</span></Typography>
-              </>
-            )}
-            {poiData.length > 0 && (
-              <>
-                {(() => {
-                  const arr = [];
-                  let apt_lng = parseFloat(a.longitude);
-                  let apt_lat = parseFloat(a.latitude);
-                  let totalDistance = 0;
-                  console.log(Object.keys(poiData[0]), "KK")
-                  const keys = Object.keys(poiData[0]);
-                  for(let i = 0; i < keys.length; i++){
-                    const pArr = poiData[0][keys[i]][index];
-                    for(let j = 0; j < pArr.length; j++){
-                      const p = pArr[j];
-                      totalDistance += calculateDistance(
+              <AIExplanation apt={a} showOnLoad={true} short={true} />
+              <br />
+
+              <Box sx={{
+                flexBasis: '30%',
+                minWidth: '80px',
+                marginBottom: '8px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}>
+                <Typography noWrap>Sq Ft: <span className="gradient-text">{a.area}</span></Typography>
+              </Box>
+              <Box sx={{
+                flexBasis: '30%',
+                minWidth: '80px',
+                marginBottom: '8px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}>
+                <Typography noWrap>Beds: <span className="gradient-text">{a.beds}</span></Typography>
+              </Box>
+              <Box sx={{
+                flexBasis: '30%',
+                minWidth: '80px',
+                marginBottom: '8px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}>
+                <Typography noWrap>Baths: <span className="gradient-text">{a.baths}</span></Typography>
+              </Box>
+              {commuteData.length > index && (
+                <>
+                  <Typography style={{ margin: "auto" }}>Commute Time: <span className="gradient-text">{commuteData[index].duration}</span></Typography>
+                  <Typography style={{ margin: "auto" }}>Commute Distance: <span className="gradient-text">{commuteData[index].distance}</span></Typography>
+                </>
+              )}
+              {poiData.length > 0 && (
+                <>
+                  {poiData.map((element) => {
+                    const key = Object.keys(element)[0];
+                    const pArr = element[key][index];
+                    if (!pArr) return null;
+                    const totalDistance = pArr.reduce((sum, p) => {
+                      return sum + calculateDistance(
                         p.geometry.coordinates[1],
                         p.geometry.coordinates[0],
-                        apt_lat,
-                        apt_lng
+                        parseFloat(a.latitude),
+                        parseFloat(a.longitude)
                       );
-                    }
-                    arr.push(
-                      <>
-                      <br/>
-                      <Typography style={{margin: "auto"}}>Average Distance to {keys[i]}s:<br/>
-                      <span className="gradient-text">{(0.621371 * (totalDistance/pArr.length)).toFixed(2)} miles</span>
+                    }, 0);
+                    const avgDistance = (0.621371 * (totalDistance / pArr.length)).toFixed(2);
+                    return (
+                      <Typography key={key} style={{ margin: "auto" }}>
+                        Average Distance to {key}s:<br />
+                        <span className="gradient-text">{avgDistance} miles</span>
                       </Typography>
-                      </>
-                    )
-                    totalDistance = 0;
-                  }
-                  return arr;
-                })()}
-              </>
-            )}
-            <br/>
-            <br/>
-            <ReviewAggregation apt={a} />
+                    );
+                  })}
+                </>
+              )}
+              <ReviewAggregation apt={a} />
+            </Box>
           </Box>
-        </Box>
-      ))}
-        <Box 
-          key={"Apartment_none"} 
+        ))}
+        <Box
+          key="Apartment_none"
           sx={{
             minWidth: '0vw',
             maxWidth: '80vw',
@@ -562,16 +544,16 @@ const ApartmentTableV2 = () => {
         >
           <button onClick={clickMore}><span className="gradient-text">See Other Options</span></button>
         </Box>
-    </Box>
-  );
-  console.log(isSmallScreen, "ISS");
+      </Box>
+    );
+  }, [chosenApts, commuteData, poiData, isSmallScreen]);
 
   return (
     <Accordion title="Report" defaultToOpen={true}>
       <PickMore isOpen={pickMoreOpen} onRequestClose={closeModal} />
       <MapComponent apts={chosenApts} />
       <Box sx={{ display: { xs: "block", md: "none" } }}>
-        <br/>
+        <br />
         {blogData}
       </Box>
       <Box
@@ -579,7 +561,7 @@ const ApartmentTableV2 = () => {
         sx={{ display: { xs: "none", md: "block" } }}
       >
         {tableData}
-        <br/>
+        <br />
         <button onClick={clickMore}><span className="gradient-text">See Other Options</span></button>
       </Box>
     </Accordion>

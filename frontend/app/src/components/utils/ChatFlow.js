@@ -5,7 +5,7 @@ import ApartmentTableV2 from '../ApartmentTable/ApartmentTableV2';
 import AssistantMessage from '../ChatV2/Messages/AssistantMessage';
 import UserMessage from '../ChatV2/Messages/UserMessage';
 
-export const advance = (msg, df, chatState, response=null) => async (dispatch) => {
+export const advance = (msg, df, chatState, response = null) => async (dispatch) => {
 
   switch (chatState) {
     case "BEGIN":
@@ -25,59 +25,60 @@ export const advance = (msg, df, chatState, response=null) => async (dispatch) =
       dispatch(setChatState(chatState));
       break;
     case "ANYTHING":
-        const displayProperties = [];
-        for(let i = 0; i < df.comparingIndices.length; i++) {
-          let name = df.payload[df.comparingIndices[i]].buildingname.toLowerCase();
-          if (response.data.toLowerCase().includes(name)){
-            displayProperties.push({
-              ...df.payload[df.comparingIndices[i]],
-              index: df.comparingIndices[i]
-            });
-          }
+      const displayProperties = [];
+      for (let i = 0; i < df.comparingIndices.length; i++) {
+        let name = df.payload[df.comparingIndices[i]].buildingname.toLowerCase();
+        if (response.data.toLowerCase().includes(name)) {
+          displayProperties.push({
+            ...df.payload[df.comparingIndices[i]],
+            index: df.comparingIndices[i]
+          });
         }
-  
-        dispatch(dialogue(
-          {role: "user", content: msg},
-          <UserMessage msg={msg}/>,
-          {role: "assistant", content: response.data},
-          <AssistantMessage key="response-am" msg={response.data} displayProperties={displayProperties} />
-        ))
-        dispatch(setConversationId(response.conversation_id));
+      }
+
+      dispatch(dialogue(
+        { role: "user", content: msg },
+        <UserMessage msg={msg} />,
+        { role: "assistant", content: response.data },
+        <AssistantMessage key="response-am" msg={response.data} displayProperties={displayProperties} />
+      ))
+      dispatch(setConversationId(response.conversation_id));
       // State remains as ANYTHING
       break;
     case "COMMUTE":
       dispatch(clearChat());
-        let index = 0;
-        const chosenIndices = [];
+      let index = 0;
+      const chosenIndices = [];
 
-        //handling when the df is == 0
-        if(df.length == 0){
-          dispatch(addReactNotation(
-            <AssistantMessage
-              key="no-results-am"
-              msg={"Based on your criteria, I didn't see anything that was a good match, let's try again"}
-            />
-          ));
-          return;
-        }
+      //handling when the df is == 0
+      if (df.length == 0) {
+        dispatch(addReactNotation(
+          <AssistantMessage
+            key="no-results-am"
+            msg={"Based on your criteria, I didn't see anything that was a good match, let's try again"}
+            image={`/maps.webp`}
+          />
+        ));
+        return;
+      }
 
-        while (chosenIndices.length < 4) {
-          let possibleApt = df[index];
-            let matched = false;
-            for(let i = 0; i < chosenIndices.length; i++) {
-              let indexedLat = parseFloat(df[chosenIndices[i]].latitude);
-              let indexedLng = parseFloat(df[chosenIndices[i]].longitude);
-              let possibleLat = parseFloat(possibleApt.latitude);
-              let possibleLng = parseFloat(possibleApt.longitude);
-              if (indexedLat === possibleLat && indexedLng === possibleLng) {
-                matched = true;
-              }
-            }
-            if (!matched){
-              chosenIndices.push(index);
-            }
-          index++;
+      while (chosenIndices.length < 4) {
+        let possibleApt = df[index];
+        let matched = false;
+        for (let i = 0; i < chosenIndices.length; i++) {
+          let indexedLat = parseFloat(df[chosenIndices[i]].latitude);
+          let indexedLng = parseFloat(df[chosenIndices[i]].longitude);
+          let possibleLat = parseFloat(possibleApt.latitude);
+          let possibleLng = parseFloat(possibleApt.longitude);
+          if (indexedLat === possibleLat && indexedLng === possibleLng) {
+            matched = true;
+          }
         }
+        if (!matched) {
+          chosenIndices.push(index);
+        }
+        index++;
+      }
       dispatch(updateComparingIndices(chosenIndices)); // Show the top 4
       dispatch(addOpenAINotation({
         role: "system",
@@ -89,14 +90,14 @@ export const advance = (msg, df, chatState, response=null) => async (dispatch) =
       }));
       dispatch(addReactNotation(
         <AssistantMessage
-        key="report-am"
+          key="report-am"
           msg={"Based on your criteria, I generated the below report with some recommendations."}
           component={<ApartmentTableV2 />}
         />
       ));
       dispatch(addReactNotation(
         <AssistantMessage
-        key="commute-am"
+          key="commute-am"
           msg={"Let's estimate your commute. Give me a street address to compare the commute times."}
           shouldPreview={false}
         />
@@ -107,15 +108,14 @@ export const advance = (msg, df, chatState, response=null) => async (dispatch) =
       dispatch(setConversationId(uniqueId));
       break;
     case "POI_SEARCH":
-        dispatch(setCommuteAddress(response)); // response is [lat, lng]
+      dispatch(setCommuteAddress(response)); // response is [lat, lng]
       dispatch(addReactNotation(
         <UserMessage msg={msg} />
       ));
-      console.log("DDD ", df)
       if (df !== null) {
         dispatch(addReactNotation(
           <AssistantMessage
-          key="nearby-am"
+            key="nearby-am"
             msg={"Let's find interesting places nearby. What types of stores and places of interest would you like to?"}
             shouldPreview={false}
           />
@@ -124,8 +124,8 @@ export const advance = (msg, df, chatState, response=null) => async (dispatch) =
       } else {
         dispatch(addReactNotation(
           <AssistantMessage
-          key="got-it-am"
-            msg={"You got it! Updated to show commute to "+msg}
+            key="got-it-am"
+            msg={"You got it! Updated to show commute to " + msg}
             shouldPreview={false}
           />
         ));
@@ -140,7 +140,7 @@ export const advance = (msg, df, chatState, response=null) => async (dispatch) =
       dispatch(setPoiArr(response))
       dispatch(addReactNotation(
         <AssistantMessage
-        key="thanks-am"
+          key="thanks-am"
           msg={"Great! Added those to your report! We can talk more here or you can click on an apartment to get more in-depth information"}
           shouldPreview={true}
         />
@@ -155,28 +155,27 @@ export const advance = (msg, df, chatState, response=null) => async (dispatch) =
 };
 
 const buildJsonPromptData = (arr) => {
-    const columnMapping = {
-      rent_12_month_monthly: "rent",
-      description: "property_description",
-      buildingname: "buildingname",
-      distance: "Distance from Neighborhood",
-      area: "square_feet",
-      beds: "beds",
-      baths: "baths",
-    };
+  const columnMapping = {
+    rent_12_month_monthly: "rent",
+    description: "property_description",
+    buildingname: "buildingname",
+    distance: "Distance from Neighborhood",
+    area: "square_feet",
+    beds: "beds",
+    baths: "baths",
+  };
 
-    const translatedData = [];
-    for(let i = 0; i < arr.length; i++){
-      const mappedData = {};
-      let data = arr[i];
-      for (const key in data) {
-        console.log(key, columnMapping[key], 'test', data);
-          if (columnMapping[key]) {
-              mappedData[columnMapping[key]] = data[key];
-          }
+  const translatedData = [];
+  for (let i = 0; i < arr.length; i++) {
+    const mappedData = {};
+    let data = arr[i];
+    for (const key in data) {
+      if (columnMapping[key]) {
+        mappedData[columnMapping[key]] = data[key];
       }
-      translatedData[i] = mappedData;
     }
+    translatedData[i] = mappedData;
+  }
 
-    return JSON.stringify(translatedData);
+  return JSON.stringify(translatedData);
 };

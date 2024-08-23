@@ -46,50 +46,48 @@ const InputBar = ({ onSend, setMessage, showLoading, message }) => {
         return `${baseClass} ${selectedButton === buttonName ? selectedClass : unselectedClass}`;
     };
 
-    console.log(chat, "cs");
     if (chat.chatState === "POI_SEARCH") {
-        console.log(Object.keys(chat.commuteAddress).length, "KK")
         return (
             <div>
                 {Object.keys(chat.commuteAddress).length > 0 ? (
                     <div className="mb-4 flex justify-center space-x-2">
-                    <button 
-                        onClick={() => handleButtonClick("commute", changeToPOI_SEARCH)}
-                        className={getButtonClass("commute")}
-                    >
-                        <MapPin className="mr-2" size={16} />
-                        Change commute destination
-                        {selectedButton === "commute" && (
-                            <X 
-                                className="ml-2 cursor-pointer" 
-                                size={16} 
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedButton(null);
-                                    dispatch(setChatState("ANYTHING"));
-                                }}
-                            />
-                        )}
-                    </button>
-                    <button 
-                        onClick={() => handleButtonClick("poi", changeToREPORT_FOLLOWUP)}
-                        className={getButtonClass("poi")}
-                    >
-                        <Compass className="mr-2" size={16} />
-                        Change points of interest
-                        {selectedButton === "poi" && (
-                            <X 
-                                className="ml-2 cursor-pointer" 
-                                size={16} 
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedButton(null);
-                                    dispatch(setChatState("ANYTHING"));
-                                }}
-                            />
-                        )}
-                    </button>
-                </div>
+                        <button
+                            onClick={() => handleButtonClick("commute", changeToPOI_SEARCH)}
+                            className={getButtonClass("commute")}
+                        >
+                            <MapPin className="mr-2" size={16} />
+                            Change commute destination
+                            {selectedButton === "commute" && (
+                                <X
+                                    className="ml-2 cursor-pointer"
+                                    size={16}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedButton(null);
+                                        dispatch(setChatState("ANYTHING"));
+                                    }}
+                                />
+                            )}
+                        </button>
+                        <button
+                            onClick={() => handleButtonClick("poi", changeToREPORT_FOLLOWUP)}
+                            className={getButtonClass("poi")}
+                        >
+                            <Compass className="mr-2" size={16} />
+                            Change points of interest
+                            {selectedButton === "poi" && (
+                                <X
+                                    className="ml-2 cursor-pointer"
+                                    size={16}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedButton(null);
+                                        dispatch(setChatState("ANYTHING"));
+                                    }}
+                                />
+                            )}
+                        </button>
+                    </div>
                 ) : null}
                 <MapSearchInput />
             </div>
@@ -103,13 +101,13 @@ const InputBar = ({ onSend, setMessage, showLoading, message }) => {
     return (
         <div className="bg-white border-t p-4 relative">
             <div className="max-w-3xl mx-auto flex items-center">
-                <input 
+                <input
                     disabled={!isAuthenticated}
-                    type="text" 
+                    type="text"
                     placeholder={isAuthenticated ? "Ask follow up..." : "Login to use Town Llama"}
-                    className="flex-1 border rounded-l-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                    value={message} 
-                    onChange={handleInputChange} 
+                    className="flex-1 border rounded-l-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={message}
+                    onChange={handleInputChange}
                     onKeyPress={handleKeyPress}
                 />
                 <button className="message-bubble text-white rounded-r-full py-2 px-4" onClick={() => { showLoading(onSend) }}>
@@ -118,16 +116,16 @@ const InputBar = ({ onSend, setMessage, showLoading, message }) => {
             </div>
             {message.length == 0 && Object.keys(chat.commuteAddress).length > 0 && Object.keys(chat.poiArr).length > 0 && (
                 <div className="absolute bottom-full left-0 right-0 mb-4 flex justify-center space-x-2">
-                    <button 
+                    <button
                         onClick={() => handleButtonClick("commute", changeToPOI_SEARCH)}
                         className={getButtonClass("commute")}
                     >
                         <MapPin className="mr-2" size={16} />
                         Change commute destination
                         {selectedButton === "commute" && (
-                            <X 
-                                className="ml-2 cursor-pointer" 
-                                size={16} 
+                            <X
+                                className="ml-2 cursor-pointer"
+                                size={16}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setSelectedButton(null);
@@ -136,16 +134,16 @@ const InputBar = ({ onSend, setMessage, showLoading, message }) => {
                             />
                         )}
                     </button>
-                    <button 
+                    <button
                         onClick={() => handleButtonClick("poi", changeToREPORT_FOLLOWUP)}
                         className={getButtonClass("poi")}
                     >
                         <Compass className="mr-2" size={16} />
                         Change points of interest
                         {selectedButton === "poi" && (
-                            <X 
-                                className="ml-2 cursor-pointer" 
-                                size={16} 
+                            <X
+                                className="ml-2 cursor-pointer"
+                                size={16}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setSelectedButton(null);

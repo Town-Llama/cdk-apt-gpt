@@ -11,7 +11,7 @@ const MAPBOX_ACCESS_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 const CustomSearchBox = ({ accessToken, ...otherProps }) => {
 
   return (
-    <div style={{width: "75%", margin: "auto"}}>
+    <div style={{ width: "75%", margin: "auto" }}>
       <SearchBox
         accessToken={accessToken}
         popoverOptions={{
@@ -59,20 +59,19 @@ const CustomSearchBox = ({ accessToken, ...otherProps }) => {
 };
 
 export default function MapSearchInput() {
-    const dispatch= useDispatch();
+  const dispatch = useDispatch();
 
-    const {
-      user
-    } = useAuth0();
+  const {
+    user
+  } = useAuth0();
 
-    const df = useSelector(state=>state.df);
-    const chatState = useSelector(state=>state.chat);
+  const df = useSelector(state => state.df);
+  const chatState = useSelector(state => state.chat);
 
   const handleRetrieve = (result) => {
     trackFilledInput("MapSearchInput", user.sub)
     const { coordinates } = result.features[0].geometry;
-    const {name} = result.features[0].properties;
-    console.log(Object.keys(chatState.commuteAddress).length, chatState.commuteAddress, df);
+    const { name } = result.features[0].properties;
     const twop = Object.keys(chatState.commuteAddress).length == 0 ? df : null;
     dispatch(advance(name, twop, chatState.chatState, [coordinates[1], coordinates[0]]));
   };

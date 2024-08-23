@@ -21,16 +21,14 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
 
   const openChat = async (data) => {
     //found
-    console.log(data);
     const client = new AptGptUtility(
       getAccessTokenSilently,
       isAuthenticated,
       user
     );
     const res = await client.datas_previouschat(data.conversationid);
-    console.log(res, "RES");
 
-    
+
     // dispatch like crazy then
     // we'll need a chatflow function to bring it up to speed too (nah)
 
@@ -53,7 +51,7 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
           let classname =
             "flex items-center" + (active ? " gradient-text" : "");
           convoArr.push(
-            <li key={"sidebar-li-" + i} className={classname} onClick={()=>openChat(data[i])}>
+            <li key={"sidebar-li-" + i} className={classname} onClick={() => openChat(data[i])}>
               <MessageCircle
                 color={active ? "blue" : "white"}
                 size={16}
@@ -80,15 +78,15 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
         setConvos(convoArr);
       } else {
         convoArr.push(
-            <li key="else-l11" className="flex items-center gradient-text">
-              <MessageCircle color={"blue"} size={16} className="mr-2" />
-              Pet friendly in downtown
-            </li>);
+          <li key="else-l11" className="flex items-center gradient-text">
+            <MessageCircle color={"blue"} size={16} className="mr-2" />
+            Pet friendly in downtown
+          </li>);
         convoArr.push(
           <li key="else-li2" className="flex items-center">
-              <MessageCircle size={16} className="mr-2" />
-              Luxury buildings
-            </li>
+            <MessageCircle size={16} className="mr-2" />
+            Luxury buildings
+          </li>
         );
       }
       setConvos(convoArr);
@@ -104,9 +102,8 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
 
   return (
     <div
-      className={`h-screen bg-gray-900 text-white flex flex-col transition-transform ${
-        isOpen ? "translate-x-0" : "-translate-x-full"
-      }`}
+      className={`h-screen bg-gray-900 text-white flex flex-col transition-transform ${isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
     >
       <div className="flex-grow overflow-y-auto">
         <h1 className="text-2xl font-bold mb-6">Town Llama</h1>
