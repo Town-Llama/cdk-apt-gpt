@@ -25,7 +25,6 @@ exports.handler = async (event) => {
       bedrooms
     );
 
-    // console.log(isImage, ask, image, "k")
     let responses;
     if (image !== null) {
       console.log("image", image);
@@ -40,6 +39,9 @@ exports.handler = async (event) => {
       responses = await dbCall(query, values);
       console.timeEnd("datas.search:dbCall");
     } else if (semantic !== null && semantic !== "") {
+      let saveQuery = "INSERT INTO queries (userid, time, query, type) VALUES ($1, NOW(), $2, 'semantic') ON CONFLICT DO NOTHING;";
+      let saveValues = [user, semantic];
+      await dbCall(saveQuery, saveValues); // as long it saves we don't care
       console.log("semantic", semantic);
       console.time("datas.search:EmbeddingGeneration");
       const query_embedding = await callImageEmbeddingModel(semantic, true);
@@ -54,6 +56,9 @@ exports.handler = async (event) => {
     } else {
       //descriptions
       console.log("ask", ask);
+      let saveQuery = "INSERT INTO queries (userid, time, query, type) VALUES ($1, NOW(), $2, 'description') ON CONFLICT DO NOTHING;";
+      let saveValues = [user, ask];
+      await dbCall(saveQuery, saveValues); // as long it saves we don't care
       console.time("datas.search:EmbeddingGeneration");
       const query_embedding = await callDescrEmbeddingModel(ask, true);
       console.timeEnd("datas.search:EmbeddingGeneration");
