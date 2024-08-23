@@ -37,7 +37,7 @@ exports.handler = async (event) => {
       console.time("datas.search:dbCall");
       responses = await dbCall(query, values);
       console.timeEnd("datas.search:dbCall");
-    } else if (semantic !== null || semantic !== "") {
+    } else if (semantic !== null && semantic !== "") {
       console.log("semantic", semantic);
       const query_embedding = await callImageEmbeddingModel(semantic, true);
       console.log("semantic_query_embedding", query_embedding);
