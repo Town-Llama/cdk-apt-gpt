@@ -30,7 +30,7 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
     const res = await client.datas_previouschat(data.conversationid);
     console.log(res, "RES");
 
-    
+
     // dispatch like crazy then
     // we'll need a chatflow function to bring it up to speed too (nah)
 
@@ -53,7 +53,7 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
           let classname =
             "flex items-center" + (active ? " gradient-text" : "");
           convoArr.push(
-            <li key={"sidebar-li-" + i} className={classname} onClick={()=>openChat(data[i])}>
+            <li key={"sidebar-li-" + i} className={classname} onClick={() => openChat(data[i])}>
               <MessageCircle
                 color={active ? "blue" : "white"}
                 size={16}
@@ -80,15 +80,15 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
         setConvos(convoArr);
       } else {
         convoArr.push(
-            <li key="else-l11" className="flex items-center gradient-text">
-              <MessageCircle color={"blue"} size={16} className="mr-2" />
-              Pet friendly in downtown
-            </li>);
+          <li key="else-l11" className="flex items-center gradient-text">
+            <MessageCircle color={"blue"} size={16} className="mr-2" />
+            Pet friendly in downtown
+          </li>);
         convoArr.push(
           <li key="else-li2" className="flex items-center">
-              <MessageCircle size={16} className="mr-2" />
-              Luxury buildings
-            </li>
+            <MessageCircle size={16} className="mr-2" />
+            Luxury buildings
+          </li>
         );
       }
       setConvos(convoArr);
@@ -96,17 +96,85 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
     process();
   }, [isAuthenticated, chat]);
 
+
+  const callAPI = async (data) => {
+    const client = new AptGptUtility(getAccessTokenSilently, isAuthenticated, user);
+    return await client.datas_search(data);
+  };
+
+
+  // Define the checkModelStatus function
+  const loadImageEmbeddingModel = async () => {
+    const params = {
+      FunctionName: 'Lambda-image-embedding-model', // The name of the Lambda function to invoke
+      InvocationType: 'RequestResponse', // Synchronous invocation
+      Payload: JSON.stringify({
+        body: JSON.stringify({
+          'load_model': true,
+        })
+      }), // Pass the event received by this Lambda function to the other Lambda function
+    };
+    //allow it to take longer than 3 seconds on cold start
+    const result = await lambda.invoke(params).promise();
+    const a = JSON.parse(result.Payload);
+    const b = JSON.parse(a.body);
+    return b.model_status;
+  }
+
+  const loadDescrEmbeddingModel = async () => {
+    const params = {
+      FunctionName: 'Lambda-descr-embedding-model', // The name of the Lambda function to invoke
+      InvocationType: 'RequestResponse', // Synchronous invocation
+      Payload: JSON.stringify({
+        body: JSON.stringify({
+          'load_model': true,
+        })
+      }), // Pass the event received by this Lambda function to the other Lambda function
+    };
+    //allow it to take longer than 3 seconds on cold start
+    const result = await lambda.invoke(params).promise();
+    const a = JSON.parse(result.Payload);
+    const b = JSON.parse(a.body);
+    return b.model_status;
+  }
+
+  async function checkModelStatus() {
+    // Check the status of the Image Embedding Model
+    try {
+      const imageModelStatus = await loadImageEmbeddingModel();
+      if (imageModelStatus) {
+        console.log('Image Embedding Model is ready');
+      } else {
+        console.log('Loading Image Embedding Model failed');
+      }
+    } catch (error) {
+      console.error('Error checking Image Embedding Model status:', error);
+    }
+    // Check the status of the Description Embedding Model
+    try {
+      const imageModelStatus = await loadDescrEmbeddingModel();
+      if (imageModelStatus) {
+        console.log('Description Embedding Model is ready');
+      } else {
+        console.log('Loading Description Embedding Model failed');
+      }
+    } catch (error) {
+      console.error('Error checking Description Embedding Model status:', error);
+    }
+  }
+
+
   const click = () => {
     trackButtonClick("Sidebar_newSearch", user.sub);
+    checkModelStatus();
     handleDrawerToggle();
     isOpen();
   };
 
   return (
     <div
-      className={`h-screen bg-gray-900 text-white flex flex-col transition-transform ${
-        isOpen ? "translate-x-0" : "-translate-x-full"
-      }`}
+      className={`h-screen bg-gray-900 text-white flex flex-col transition-transform ${isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
     >
       <div className="flex-grow overflow-y-auto">
         <h1 className="text-2xl font-bold mb-6">Town Llama</h1>

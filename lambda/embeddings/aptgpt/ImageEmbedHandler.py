@@ -46,6 +46,15 @@ def handler(event, context):  # pragma: no cover
         
         # Parse the HTTP event
         body = json.loads(event["body"])
+        should_load_model = body.get("load_model", False)
+        if should_load_model:
+            global model
+            if model is None:
+                model = download_model()
+            return {
+                "statusCode": 200,
+                "body": json.dumps({"model_status": "ready"})
+            }
         is_text = body["isText"]
         payload = body["payload"]
 
