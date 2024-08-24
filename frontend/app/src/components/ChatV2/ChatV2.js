@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import LoginPrompt from "../LoginPrompt/LoginPrompt";
-import Sidebar from "../Sidebar/Sidebar";
+import { Sidebar } from "../Sidebar/Sidebar";
 import AptGptUtility from "../utils/API/AptGptUtility";
 import ViewV2 from "../ViewV2/ViewV2";
 import ChatArea from "./ChatArea/ChatArea";
@@ -77,7 +77,7 @@ const ChatV2 = ({ showLoading }) => {
     setWaitlistApproved(approved);
   };
 
-    const handleDrawerClose = () => {
+  const handleDrawerClose = () => {
     setIsClosing(true);
     setMobileOpen(false);
   };
@@ -92,7 +92,7 @@ const ChatV2 = ({ showLoading }) => {
     }
   };
 
-  const drawer = <Sidebar isOpen={openModal} handleDrawerToggle={handleDrawerToggle}/>;
+  const drawer = <Sidebar isOpen={openModal} handleDrawerToggle={handleDrawerToggle} />;
 
   return (
     <Box sx={{ display: "flex", height: "100vh" }} className="bg-gray-100">

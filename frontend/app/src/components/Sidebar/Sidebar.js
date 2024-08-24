@@ -5,9 +5,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { trackButtonClick } from "../utils/analytics";
 import AptGptUtility from "../utils/API/AptGptUtility";
 import AWS from "aws-sdk";
+import EventEmitter from "events";
+
+
+// Create an EventEmitter object for the model status
+const modelEmitter = new EventEmitter();
+
 
 const Sidebar = ({ isOpen, handleDrawerToggle }) => {
-  const dispatch = useDispatch();
+
   const [convos, setConvos] = useState([]);
   const chat = useSelector((state) => state.chat);
   const formData = useSelector((state) => state.formData.payload);
@@ -104,12 +110,6 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
   }, [isAuthenticated, chat]);
 
 
-  const callAPI = async (data) => {
-    const client = new AptGptUtility(getAccessTokenSilently, isAuthenticated, user);
-    return await client.datas_search(data);
-  };
-
-
   // Define the checkModelStatus function
   const loadImageEmbeddingModel = async () => {
     const params = {
@@ -150,6 +150,7 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
     try {
       const imageModelStatus = await loadImageEmbeddingModel();
       if (imageModelStatus) {
+        modelEmitter.emit('imageModelReady');
         console.log('Image Embedding Model is ready');
       } else {
         console.log('Loading Image Embedding Model failed');
@@ -161,6 +162,7 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
     try {
       const descrModelStatus = await loadDescrEmbeddingModel();
       if (descrModelStatus) {
+        modelEmitter.emit('descrModelReady');
         console.log('Description Embedding Model is ready');
       } else {
         console.log('Loading Description Embedding Model failed');
@@ -226,4 +228,4 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
   );
 };
 
-export default Sidebar;
+export { Sidebar, modelEmitter };
