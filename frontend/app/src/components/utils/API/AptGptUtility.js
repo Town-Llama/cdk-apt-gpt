@@ -39,6 +39,13 @@ class AptGptUtility {
     const res = await this.post("datas/modelTwo", {
       'load_model': true,
     });
+
+  async datas_fetch_apt(apt_id) {
+    const res = await globalRequestManager.enqueueRequest(() =>
+      this.post("datas/fetch_apt", {
+        apt_id,
+      })
+    );
     return res.data;
   }
 

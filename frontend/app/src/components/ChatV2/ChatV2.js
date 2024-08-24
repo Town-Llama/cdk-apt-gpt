@@ -75,6 +75,11 @@ const ChatV2 = ({ showLoading }) => {
     let approved = await client.datas_waitlist();
     setIsLoading(false);
     setWaitlistApproved(approved);
+
+    let apt = await client.datas_fetch_apt("2810 Salado St #31218E285");
+    console.log("APT");
+    console.log(apt);
+    console.dir(apt);
   };
 
   const handleDrawerClose = () => {
@@ -92,7 +97,9 @@ const ChatV2 = ({ showLoading }) => {
     }
   };
 
-  const drawer = <Sidebar isOpen={openModal} handleDrawerToggle={handleDrawerToggle} />;
+  const drawer = (
+    <Sidebar isOpen={openModal} handleDrawerToggle={handleDrawerToggle} />
+  );
 
   return (
     <Box sx={{ display: "flex", height: "100vh" }} className="bg-gray-100">
@@ -138,8 +145,8 @@ const ChatV2 = ({ showLoading }) => {
         sx={{
           flexGrow: 1,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
-          display: 'flex',
-          flexDirection: 'column',
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         <div className="flex-shrink-0 h-16 bg-[#121826] flex items-center px-4 sm:hidden">
@@ -148,11 +155,16 @@ const ChatV2 = ({ showLoading }) => {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, color: 'white' }}
+            sx={{ mr: 2, color: "white" }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ color: 'white' }}>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ color: "white" }}
+          >
             Town Llama
           </Typography>
         </div>
