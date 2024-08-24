@@ -106,7 +106,10 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
         }`}
     >
       <div className="flex-grow overflow-y-auto">
-        <h1 className="text-2xl font-bold mb-6">Town Llama</h1>
+        <h1 className="text-2xl font-bold mb-6">
+          Town Llama
+          <span className="ml-2 px-2 py-1 text-xs font-semibold text-white bg-blue-500 rounded-full">BETA</span>
+        </h1>
         <button
           className="w-full message-bubble text-white py-2 rounded-md mb-6 flex items-center justify-center"
           onClick={click}
