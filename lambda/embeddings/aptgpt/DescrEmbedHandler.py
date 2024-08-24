@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 import traceback
 
 from aptgpt.test_image_embed_handler import get_descr_test_data
@@ -21,6 +22,12 @@ def createEmbed(
 
     global model
     if model is None:
+        for i in range(15):
+            time.sleep(0.5)
+            if model:
+                break
+    if model is None:
+        logger.info("The model is not initiallized. Loading model")
         model = download_model()
     # Embed the payload
     embedding = model.encode(payload)
