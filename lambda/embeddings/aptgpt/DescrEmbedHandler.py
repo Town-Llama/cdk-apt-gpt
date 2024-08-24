@@ -46,7 +46,7 @@ def handler(event, context):  # pragma: no cover
                 model = download_model()
             return {
                 "statusCode": 200,
-                "body": json.dumps({"model_status": "ready"})
+                "body": json.dumps({"model_status": True})
             }
         payload = body["payload"]
 
