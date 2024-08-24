@@ -4,12 +4,19 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { trackButtonClick } from "../utils/analytics";
 import AptGptUtility from "../utils/API/AptGptUtility";
+import AWS from "aws-sdk";
 
 const Sidebar = ({ isOpen, handleDrawerToggle }) => {
   const dispatch = useDispatch();
   const [convos, setConvos] = useState([]);
   const chat = useSelector((state) => state.chat);
   const formData = useSelector((state) => state.formData.payload);
+  AWS.config.update({
+    region: process.env.REACT_APP_AWS_DEFAULT_REGION,
+    accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY
+  });
+  const lambda = new AWS.Lambda();
 
   const {
     isAuthenticated,
@@ -152,8 +159,8 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
     }
     // Check the status of the Description Embedding Model
     try {
-      const imageModelStatus = await loadDescrEmbeddingModel();
-      if (imageModelStatus) {
+      const descrModelStatus = await loadDescrEmbeddingModel();
+      if (descrModelStatus) {
         console.log('Description Embedding Model is ready');
       } else {
         console.log('Loading Description Embedding Model failed');
