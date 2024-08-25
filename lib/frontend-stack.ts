@@ -7,13 +7,14 @@ import * as route53_targets from 'aws-cdk-lib/aws-route53-targets';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
+import { ApiGatewayStack } from './api-gateway-stack';
 
 interface FrontendStackProps extends cdk.StackProps {
   domainName: string;
 }
 
 export class FrontendStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props: FrontendStackProps) {
+  constructor(scope: Construct, id: string, apiGatewayStack: ApiGatewayStack, props: FrontendStackProps) {
     super(scope, id, props);
 
     const domainName = props.domainName;
@@ -50,7 +51,27 @@ export class FrontendStack extends cdk.Stack {
           },
           behaviors: [{ isDefaultBehavior: true }],
         },
-      ],
+        {
+          customOriginSource: { domainName: `${apiGatewayStack.api.restApiId}.execute-api.${this.region}.${this.urlSuffix}`,
+            originPath: `/${apiGatewayStack.api.deploymentStage.stageName}`, },
+          behaviors: [
+              {
+                  pathPattern: "/datas/*",
+                  allowedMethods: cloudfront.CloudFrontAllowedMethods.ALL
+              }
+          ]
+      },
+      {
+        customOriginSource: { domainName: `${apiGatewayStack.api.restApiId}.execute-api.${this.region}.${this.urlSuffix}`,
+          originPath: `/${apiGatewayStack.api.deploymentStage.stageName}`, },
+        behaviors: [
+            {
+                pathPattern: "/chat/*",
+                allowedMethods: cloudfront.CloudFrontAllowedMethods.ALL
+            }
+        ]
+    },
+    ],
       viewerCertificate: cloudfront.ViewerCertificate.fromAcmCertificate(certificate, {
         aliases: [domainName],
         securityPolicy: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
