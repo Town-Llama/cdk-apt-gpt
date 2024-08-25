@@ -5,12 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { trackButtonClick } from "../utils/analytics";
 import AptGptUtility from "../utils/API/AptGptUtility";
 
-import EventEmitter from "events";
-
-
-// Create an EventEmitter object for the model status
-const modelEmitter = new EventEmitter();
-
 const Sidebar = ({ isOpen, handleDrawerToggle }) => {
 
   const [convos, setConvos] = useState([]);
@@ -33,9 +27,6 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
       user
     );
     const res = await client.datas_previouschat(data.conversationid);
-    // dispatch like crazy then
-    // we'll need a chatflow function to bring it up to speed too (nah)
-
   }
 
   useEffect(() => {
@@ -120,36 +111,8 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
     return model_status;
   }
 
-  async function checkModelStatus() {
-    // Check the status of the Image Embedding Model
-    try {
-      const imageModelStatus = await loadImageEmbeddingModel();
-      if (imageModelStatus) {
-        modelEmitter.emit('imageModelReady');
-        console.log('Image Embedding Model is ready');
-      } else {
-        console.log('Loading Image Embedding Model failed');
-      }
-    } catch (error) {
-      console.error('Error checking Image Embedding Model status:', error);
-    }
-    // Check the status of the Description Embedding Model
-    try {
-      const descrModelStatus = await loadDescrEmbeddingModel();
-      if (descrModelStatus) {
-        modelEmitter.emit('descrModelReady');
-        console.log('Description Embedding Model is ready');
-      } else {
-        console.log('Loading Description Embedding Model failed');
-      }
-    } catch (error) {
-      console.error('Error checking Description Embedding Model status:', error);
-    }
-  }
-
   const click = () => {
     trackButtonClick("Sidebar_newSearch", user.sub);
-    checkModelStatus();
     handleDrawerToggle();
     isOpen();
   };
@@ -205,4 +168,4 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
   );
 };
 
-export { Sidebar, modelEmitter };
+export default Sidebar;

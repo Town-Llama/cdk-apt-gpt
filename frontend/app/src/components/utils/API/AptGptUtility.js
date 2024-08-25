@@ -3,7 +3,7 @@ import globalRequestManager from "./RequestManager"; // Import the global reques
 const auth_config = require("../../../auth/auth_config.json");
 
 class AptGptUtility {
-  static BASE_URL = ""; // if beta
+  static BASE_URL = "https://townllama.ai"; // if beta
   //static BASE_URL = 'https://api.beta.townllama.ai'; // if beta
 
   constructor(getAccessTokenSilently, isAuthenticated, user) {
@@ -14,20 +14,17 @@ class AptGptUtility {
   }
 
   async datas_modelOne() {
-    const res = await globalRequestManager.enqueueRequest(() =>
-      this.post("datas/modelOne", {
-        'load_model': true,
-      })
-    );
+    const res = await this.post("datas/modelOne", {
+      'load_model': true,
+    });
+    console.log(res, "res");
     return res.data;
   }
 
   async datas_modelTwo() {
-    const res = await globalRequestManager.enqueueRequest(() =>
-      this.post("datas/modelTwo", {
-        'load_model': true,
-      })
-    );
+    const res = await this.post("datas/modelTwo", {
+      'load_model': true,
+    });
     return res.data;
   }
 

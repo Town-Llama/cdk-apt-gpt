@@ -14,7 +14,6 @@ import { advance } from '../utils/ChatFlow';
 import { trackButtonClick, trackFilledInput } from '../utils/analytics';
 import FriendPhoneForm from '../FriendPhoneForm/FriendPhoneForm';
 import "./FormV2.css";
-import { modelEmitter } from '../Sidebar/Sidebar';
 
 const ApartmentSearch = ({ onRequestClose, showLoading }) => {
     const dispatch = useDispatch();
@@ -57,11 +56,9 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
     };
 
     const onSubmit = async (e) => {
-        console.log("HELLO")
         e.preventDefault();
         setValue("ask", textQueryAsk);
         setValue("semantic", photosQuerySemantics);
-        console.log("HIT");
 
         // Validation checks
         if (!watch("city")) {
@@ -96,35 +93,11 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
         return await client.datas_search(data);
     };
 
-    async function waitForModels() {
-        return new Promise((resolve) => {
-            let imageReady = false;
-            let descrReady = false;
-
-            modelEmitter.on('imageModelReady', () => {
-                imageReady = true;
-                if (imageReady && descrReady) {
-                    resolve();
-                }
-            });
-
-            modelEmitter.on('descrModelReady', () => {
-                descrReady = true;
-                if (imageReady && descrReady) {
-                    resolve();
-                }
-            });
-        });
-    }
-
     const handleFormSubmit = async (data) => {
         let coordinatesArr = neighborhoods[data.neighborhood].coordinates;
         data.distance = "5";
 
         const [minRent, maxRent] = data.rent_range;
-
-        //cold loading fix
-        await waitForModels();
 
         const df = await showLoading(callAPI, {
             max_distance: parseFloat(data.distance),

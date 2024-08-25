@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import LoginPrompt from "../LoginPrompt/LoginPrompt";
-import { Sidebar } from '../Sidebar/Sidebar';
+import Sidebar from '../Sidebar/Sidebar';
 import AptGptUtility from "../utils/API/AptGptUtility";
 import ViewV2 from "../ViewV2/ViewV2";
 import ChatArea from "./ChatArea/ChatArea";

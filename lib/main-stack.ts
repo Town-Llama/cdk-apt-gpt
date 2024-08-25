@@ -49,22 +49,5 @@ export class MainStack extends cdk.Stack {
       domainName,
       env: props?.env,
     });
-
-    const s3Integration = new apigateway.AwsIntegration({
-      service: 's3',
-      integrationHttpMethod: "PUT",
-      path: "{bucket}",
-      options : {
-        credentialsRole: apiGatewayStack.myRole,
-        // should have all kind of path mapping..        
-      }
-    })
-
-    apiGatewayStack.api.root.addResource("{folder}").addMethod("PUT", s3Integration, {
-      methodResponses: [
-        {
-          statusCode: "200"
-        }
-      ]});
   }
 }
