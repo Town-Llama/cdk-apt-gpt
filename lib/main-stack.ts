@@ -1,4 +1,5 @@
 import * as cdk from "aws-cdk-lib";
+import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import { Construct } from "constructs";
 import { ApiGatewayStack } from "./api-gateway-stack";
 import { FrontendStack } from "./frontend-stack";
@@ -44,9 +45,26 @@ export class MainStack extends cdk.Stack {
     apiGatewayStack.addDependency(lambdaStack);
 
     // Create the Frontend Stack
-    const frontendStack = new FrontendStack(this, "FrontendStack", {
+    const frontendStack = new FrontendStack(this, "FrontendStack", apiGatewayStack, {
       domainName,
       env: props?.env,
     });
+
+    const s3Integration = new apigateway.AwsIntegration({
+      service: 's3',
+      integrationHttpMethod: "PUT",
+      path: "{bucket}",
+      options : {
+        credentialsRole: apiGatewayStack.myRole,
+        // should have all kind of path mapping..        
+      }
+    })
+
+    apiGatewayStack.api.root.addResource("{folder}").addMethod("PUT", s3Integration, {
+      methodResponses: [
+        {
+          statusCode: "200"
+        }
+      ]});
   }
 }

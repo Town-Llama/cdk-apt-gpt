@@ -19,6 +19,7 @@ interface ApiGatewayStackProps extends cdk.StackProps {
 export class ApiGatewayStack extends cdk.Stack {
   public readonly api: apigateway.RestApi;
   public readonly authorizer: apigateway.TokenAuthorizer;
+  public readonly myRole: iam.Role;
   // Define reusable method and integration responses
   static methodResponse: apigateway.MethodResponse = {
     statusCode: "200",
@@ -75,13 +76,13 @@ export class ApiGatewayStack extends cdk.Stack {
       recordName: domainTld,
     });
     */
-    const myRole = new iam.Role(this, "MyRole", {
+    this.myRole = new iam.Role(this, "MyRole", {
       assumedBy: new iam.CompositePrincipal(
         new iam.ServicePrincipal("apigateway.amazonaws.com"),
         new iam.ServicePrincipal("lambda.amazonaws.com")
       ),
     });
-    myRole.addToPolicy(
+    this.myRole.addToPolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
         actions: ["sts:AssumeRole"],
@@ -109,7 +110,7 @@ export class ApiGatewayStack extends cdk.Stack {
         handler: customAuthorizer,
         resultsCacheTtl: cdk.Duration.seconds(3600),
         validationRegex: "^Bearer [-0-9a-zA-z.]*$",
-        assumeRole: myRole,
+        assumeRole: this.myRole,
       }
     );
   }
