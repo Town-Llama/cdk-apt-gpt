@@ -5,8 +5,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { trackButtonClick } from "../utils/analytics";
 import AptGptUtility from "../utils/API/AptGptUtility";
 
+import EventEmitter from "events";
+
+
+// Create an EventEmitter object for the model status
+const modelEmitter = new EventEmitter();
+
 const Sidebar = ({ isOpen, handleDrawerToggle }) => {
-  const dispatch = useDispatch();
+
   const [convos, setConvos] = useState([]);
   const chat = useSelector((state) => state.chat);
   const formData = useSelector((state) => state.formData.payload);
@@ -27,8 +33,6 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
       user
     );
     const res = await client.datas_previouschat(data.conversationid);
-
-
     // dispatch like crazy then
     // we'll need a chatflow function to bring it up to speed too (nah)
 
@@ -94,8 +98,58 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
     process();
   }, [isAuthenticated, chat]);
 
+  const loadImageEmbeddingModel = async () => {
+    const client = new AptGptUtility(
+      getAccessTokenSilently,
+      isAuthenticated,
+      user
+    );
+
+    const model_status = await client.datas_modelTwo();
+    return model_status;
+  }
+
+  const loadDescrEmbeddingModel = async () => {
+    const client = new AptGptUtility(
+      getAccessTokenSilently,
+      isAuthenticated,
+      user
+    );
+
+    const model_status = await client.datas_modelOne();
+    return model_status;
+  }
+
+  async function checkModelStatus() {
+    // Check the status of the Image Embedding Model
+    try {
+      const imageModelStatus = await loadImageEmbeddingModel();
+      if (imageModelStatus) {
+        modelEmitter.emit('imageModelReady');
+        console.log('Image Embedding Model is ready');
+      } else {
+        console.log('Loading Image Embedding Model failed');
+      }
+    } catch (error) {
+      console.error('Error checking Image Embedding Model status:', error);
+    }
+    // Check the status of the Description Embedding Model
+    try {
+      const descrModelStatus = await loadDescrEmbeddingModel();
+      if (descrModelStatus) {
+        modelEmitter.emit('descrModelReady');
+        console.log('Description Embedding Model is ready');
+      } else {
+        console.log('Loading Description Embedding Model failed');
+      }
+    } catch (error) {
+      console.error('Error checking Description Embedding Model status:', error);
+    }
+  }
+
   const click = () => {
     trackButtonClick("Sidebar_newSearch", user.sub);
+    checkModelStatus();
     handleDrawerToggle();
     isOpen();
   };
@@ -151,4 +205,4 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
   );
 };
 
-export default Sidebar;
+export { Sidebar, modelEmitter };

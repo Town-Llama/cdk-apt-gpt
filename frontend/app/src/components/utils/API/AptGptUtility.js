@@ -13,6 +13,24 @@ class AptGptUtility {
     this.user = user;
   }
 
+  async datas_modelOne() {
+    const res = await globalRequestManager.enqueueRequest(() =>
+      this.post("datas/modelOne", {
+        'load_model': true,
+      })
+    );
+    return res.data;
+  }
+
+  async datas_modelTwo() {
+    const res = await globalRequestManager.enqueueRequest(() =>
+      this.post("datas/modelTwo", {
+        'load_model': true,
+      })
+    );
+    return res.data;
+  }
+
   async datas_previouschat(conversationid) {
     const res = await globalRequestManager.enqueueRequest(() =>
       this.post("datas/previouschat", {
@@ -182,10 +200,10 @@ class AptGptUtility {
       );
       await this.cloudWatchMetrics.writeLog(
         "Error in AptGptUtility.get/" +
-          endpoint +
-          " user {" +
-          JSON.stringify(this.user) +
-          "}"
+        endpoint +
+        " user {" +
+        JSON.stringify(this.user) +
+        "}"
       );
       throw error;
     }
@@ -225,12 +243,12 @@ class AptGptUtility {
       );
       await this.cloudWatchMetrics.writeLog(
         "Error in AptGptUtility.post/" +
-          endpoint +
-          " user {" +
-          JSON.stringify(this.user) +
-          "} with data {" +
-          JSON.stringify(data) +
-          "}"
+        endpoint +
+        " user {" +
+        JSON.stringify(this.user) +
+        "} with data {" +
+        JSON.stringify(data) +
+        "}"
       );
       throw error;
     }
@@ -256,8 +274,8 @@ class AptGptUtility {
       );
       await this.cloudWatchMetrics.writeLog(
         "Error in AptGptUtility.fetchAccessToken user {" +
-          JSON.stringify(this.user) +
-          "}"
+        JSON.stringify(this.user) +
+        "}"
       );
       throw error;
     }
