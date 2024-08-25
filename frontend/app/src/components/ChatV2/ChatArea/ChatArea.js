@@ -79,7 +79,6 @@ const ChatArea = ({ showLoading }) => {
   }, []);
 
   const initializeModels = async () => {
-    console.log("hit", isAuthenticated);
     if (!isAuthenticated) {
       return; //no need to waste a call
     }
