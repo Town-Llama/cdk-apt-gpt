@@ -110,6 +110,7 @@ export class LambdaStack extends cdk.Stack {
             path.join(__dirname, "../lambda/chat/reviews"),
             {
               platform: Platform.LINUX_AMD64,
+              target: "deploy"
             }
           ),
           timeout: cdk.Duration.seconds(90),
@@ -147,8 +148,7 @@ export class LambdaStack extends cdk.Stack {
     const invokeLambdaPolicyStatementImage = new iam.PolicyStatement({
       actions: ["lambda:InvokeFunction"],
       resources: [
-        `arn:aws:lambda:${cdk.Stack.of(this).region}:${
-          cdk.Stack.of(this).account
+        `arn:aws:lambda:${cdk.Stack.of(this).region}:${cdk.Stack.of(this).account
         }:function:Lambda-image-embedding-model`,
       ],
       effect: iam.Effect.ALLOW,
@@ -177,8 +177,7 @@ export class LambdaStack extends cdk.Stack {
     const invokeLambdaPolicyStatementDescription = new iam.PolicyStatement({
       actions: ["lambda:InvokeFunction"],
       resources: [
-        `arn:aws:lambda:${cdk.Stack.of(this).region}:${
-          cdk.Stack.of(this).account
+        `arn:aws:lambda:${cdk.Stack.of(this).region}:${cdk.Stack.of(this).account
         }:function:Lambda-descr-embedding-model`,
       ],
       effect: iam.Effect.ALLOW,
