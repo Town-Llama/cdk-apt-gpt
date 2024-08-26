@@ -4,6 +4,7 @@ import * as iam from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 import * as path from "path";
+import * as ses from 'aws-cdk-lib/aws-ses';
 
 export class LambdaStack extends cdk.Stack {
   public readonly functions: { [key: string]: lambda.Function };
@@ -184,5 +185,19 @@ export class LambdaStack extends cdk.Stack {
     this.functions.datas_search.addToRolePolicy(
       invokeLambdaPolicyStatementDescription
     );
+
+    const ses_identity = new ses.CfnEmailIdentity(this, 'EmailIdentity', {
+      emailIdentity: 'seaholmdataco@gmail.com', // Replace with your email address
+    });
+    const sesIdentityArn = `arn:aws:ses:${this.region}:${this.account}:identity/${ses_identity.emailIdentity}`;
+
+    this.functions.datas_book.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ['ses:SendEmail', 'ses:SendRawEmail'],
+        resources: [sesIdentityArn], // Replace with your SES identity ARN
+      })
+    );
+
   }
 }
