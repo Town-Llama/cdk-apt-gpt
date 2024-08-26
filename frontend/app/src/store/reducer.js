@@ -5,6 +5,7 @@ import dfReducer from './reducers/dfReducer';
 import formDataReducer from "./reducers/formDataReducer";
 import pastReducer from './reducers/pastReducer';
 import chatReducer from './reducers/chatReducer';
+import modelReducer from './reducers/modelReducer';
 
 const rootReducer = combineReducers({
   df: dfReducer,
@@ -12,7 +13,8 @@ const rootReducer = combineReducers({
   rec: recReducer,
   share: shareReducer,
   formData: formDataReducer,
-  past: pastReducer
+  past: pastReducer,
+  model: modelReducer
   // other reducers can be added here
 });
 

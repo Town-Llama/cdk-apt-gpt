@@ -3,7 +3,7 @@ import globalRequestManager from "./RequestManager"; // Import the global reques
 const auth_config = require("../../../auth/auth_config.json");
 
 class AptGptUtility {
-  static BASE_URL = ""; // if beta
+  static BASE_URL = "https://townllama.ai"; // if beta
   //static BASE_URL = 'https://api.beta.townllama.ai'; // if beta
 
   constructor(getAccessTokenSilently, isAuthenticated, user) {
@@ -11,6 +11,21 @@ class AptGptUtility {
     this.isAuthenticated = isAuthenticated;
     this.cloudWatchMetrics = new CloudWatchMetrics("YourAppNamespace");
     this.user = user;
+  }
+
+  async datas_modelOne() {
+    const res = await this.post("datas/modelOne", {
+      'load_model': true,
+    });
+    console.log(res, "res");
+    return res.data;
+  }
+
+  async datas_modelTwo() {
+    const res = await this.post("datas/modelTwo", {
+      'load_model': true,
+    });
+    return res.data;
   }
 
   async datas_previouschat(conversationid) {
@@ -182,10 +197,10 @@ class AptGptUtility {
       );
       await this.cloudWatchMetrics.writeLog(
         "Error in AptGptUtility.get/" +
-          endpoint +
-          " user {" +
-          JSON.stringify(this.user) +
-          "}"
+        endpoint +
+        " user {" +
+        JSON.stringify(this.user) +
+        "}"
       );
       throw error;
     }
@@ -225,12 +240,12 @@ class AptGptUtility {
       );
       await this.cloudWatchMetrics.writeLog(
         "Error in AptGptUtility.post/" +
-          endpoint +
-          " user {" +
-          JSON.stringify(this.user) +
-          "} with data {" +
-          JSON.stringify(data) +
-          "}"
+        endpoint +
+        " user {" +
+        JSON.stringify(this.user) +
+        "} with data {" +
+        JSON.stringify(data) +
+        "}"
       );
       throw error;
     }
@@ -256,8 +271,8 @@ class AptGptUtility {
       );
       await this.cloudWatchMetrics.writeLog(
         "Error in AptGptUtility.fetchAccessToken user {" +
-          JSON.stringify(this.user) +
-          "}"
+        JSON.stringify(this.user) +
+        "}"
       );
       throw error;
     }

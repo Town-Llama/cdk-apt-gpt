@@ -56,11 +56,9 @@ const ApartmentSearch = ({ onRequestClose, showLoading }) => {
     };
 
     const onSubmit = async (e) => {
-        console.log("HELLO")
         e.preventDefault();
         setValue("ask", textQueryAsk);
         setValue("semantic", photosQuerySemantics);
-        console.log("HIT");
 
         // Validation checks
         if (!watch("city")) {

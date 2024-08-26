@@ -48,6 +48,5 @@ export class MainStack extends cdk.Stack {
       domainName,
       env: props?.env,
     });
-
   }
 }

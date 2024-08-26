@@ -6,7 +6,7 @@ import { trackButtonClick } from "../utils/analytics";
 import AptGptUtility from "../utils/API/AptGptUtility";
 
 const Sidebar = ({ isOpen, handleDrawerToggle }) => {
-  const dispatch = useDispatch();
+
   const [convos, setConvos] = useState([]);
   const chat = useSelector((state) => state.chat);
   const formData = useSelector((state) => state.formData.payload);
@@ -27,11 +27,6 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
       user
     );
     const res = await client.datas_previouschat(data.conversationid);
-
-
-    // dispatch like crazy then
-    // we'll need a chatflow function to bring it up to speed too (nah)
-
   }
 
   useEffect(() => {
@@ -93,6 +88,28 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
     };
     process();
   }, [isAuthenticated, chat]);
+
+  const loadImageEmbeddingModel = async () => {
+    const client = new AptGptUtility(
+      getAccessTokenSilently,
+      isAuthenticated,
+      user
+    );
+
+    const model_status = await client.datas_modelTwo();
+    return model_status;
+  }
+
+  const loadDescrEmbeddingModel = async () => {
+    const client = new AptGptUtility(
+      getAccessTokenSilently,
+      isAuthenticated,
+      user
+    );
+
+    const model_status = await client.datas_modelOne();
+    return model_status;
+  }
 
   const click = () => {
     trackButtonClick("Sidebar_newSearch", user.sub);

@@ -4,6 +4,7 @@ import * as iam from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 import * as path from "path";
+import * as ses from 'aws-cdk-lib/aws-ses';
 
 export class LambdaStack extends cdk.Stack {
   public readonly functions: { [key: string]: lambda.Function };
@@ -50,6 +51,38 @@ export class LambdaStack extends cdk.Stack {
       });
 
     this.functions = {
+      datas_modelOne: new lambda.DockerImageFunction(
+        this,
+        "Lambda-image-embedding-model",
+        {
+          functionName: "Lambda-image-embedding-model",
+          code: lambda.DockerImageCode.fromImageAsset(
+            path.join(__dirname, "../lambda/embeddings"),
+            {
+              platform: Platform.LINUX_AMD64,
+              target: "image_embedding_handler",
+            }
+          ),
+          timeout: cdk.Duration.seconds(90),
+          memorySize: 3008,
+        }
+      ),
+      datas_modelTwo: new lambda.DockerImageFunction(
+        this,
+        "Lambda-descr-embedding-model",
+        {
+          functionName: "Lambda-descr-embedding-model",
+          code: lambda.DockerImageCode.fromImageAsset(
+            path.join(__dirname, "../lambda/embeddings"),
+            {
+              platform: Platform.LINUX_AMD64,
+              target: "descr_embedding_handler",
+            }
+          ),
+          timeout: cdk.Duration.seconds(90),
+          memorySize: 3008,
+        }
+      ),
       datas_route: createNodeLambdaFunction(
         "Lambda-datas-route",
         "/datas/route"
@@ -128,27 +161,10 @@ export class LambdaStack extends cdk.Stack {
 
     // Special cases
     // Image embedding model is NOT accessible directly from API Gateway
-    const embeddingImageModel = new lambda.DockerImageFunction(
-      this,
-      "Lambda-image-embedding-model",
-      {
-        functionName: "Lambda-image-embedding-model",
-        code: lambda.DockerImageCode.fromImageAsset(
-          path.join(__dirname, "../lambda/embeddings"),
-          {
-            platform: Platform.LINUX_AMD64,
-            target: "image_embedding_handler",
-          }
-        ),
-        timeout: cdk.Duration.seconds(90),
-        memorySize: 3008,
-      }
-    );
     const invokeLambdaPolicyStatementImage = new iam.PolicyStatement({
       actions: ["lambda:InvokeFunction"],
       resources: [
-        `arn:aws:lambda:${cdk.Stack.of(this).region}:${
-          cdk.Stack.of(this).account
+        `arn:aws:lambda:${cdk.Stack.of(this).region}:${cdk.Stack.of(this).account
         }:function:Lambda-image-embedding-model`,
       ],
       effect: iam.Effect.ALLOW,
@@ -158,27 +174,10 @@ export class LambdaStack extends cdk.Stack {
     );
 
     // Descr embedding model is NOT accessible directly from API Gateway
-    const embeddingDescrModel = new lambda.DockerImageFunction(
-      this,
-      "Lambda-descr-embedding-model",
-      {
-        functionName: "Lambda-descr-embedding-model",
-        code: lambda.DockerImageCode.fromImageAsset(
-          path.join(__dirname, "../lambda/embeddings"),
-          {
-            platform: Platform.LINUX_AMD64,
-            target: "descr_embedding_handler",
-          }
-        ),
-        timeout: cdk.Duration.seconds(90),
-        memorySize: 3008,
-      }
-    );
     const invokeLambdaPolicyStatementDescription = new iam.PolicyStatement({
       actions: ["lambda:InvokeFunction"],
       resources: [
-        `arn:aws:lambda:${cdk.Stack.of(this).region}:${
-          cdk.Stack.of(this).account
+        `arn:aws:lambda:${cdk.Stack.of(this).region}:${cdk.Stack.of(this).account
         }:function:Lambda-descr-embedding-model`,
       ],
       effect: iam.Effect.ALLOW,
@@ -186,5 +185,19 @@ export class LambdaStack extends cdk.Stack {
     this.functions.datas_search.addToRolePolicy(
       invokeLambdaPolicyStatementDescription
     );
+
+    const ses_identity = new ses.CfnEmailIdentity(this, 'EmailIdentity', {
+      emailIdentity: 'seaholmdataco@gmail.com', // Replace with your email address
+    });
+    const sesIdentityArn = `arn:aws:ses:${this.region}:${this.account}:identity/${ses_identity.emailIdentity}`;
+
+    this.functions.datas_book.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ['ses:SendEmail', 'ses:SendRawEmail'],
+        resources: [sesIdentityArn], // Replace with your SES identity ARN
+      })
+    );
+
   }
 }
