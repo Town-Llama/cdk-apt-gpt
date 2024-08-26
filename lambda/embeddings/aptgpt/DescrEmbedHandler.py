@@ -40,7 +40,7 @@ def handler(event, context):  # pragma: no cover
                 "statusCode": 200,
                 "body": json.dumps({"model_status": True})
             }
-        is_text = body["isText"]
+        is_text = True
         payload = body["payload"]
 
         embedding = createEmbed(is_text, payload)
