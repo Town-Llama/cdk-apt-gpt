@@ -3,8 +3,10 @@ from datetime import datetime
 import json
 import logging
 import requests
-from openai import OpenAI
+import openai
 from outscraper import ApiClient
+import os
+import traceback
 
 
 logging.basicConfig(
@@ -72,6 +74,7 @@ def lambda_handler(event, context):
         }
     except Exception as e:
         print(f"ERROR in reviews: {e}")
+        traceback.print_exc()
 
         return {
             'statusCode': 200,
@@ -152,7 +155,7 @@ def get_reviews(place_id, out_key, reviews_limit=10):
     results = api_client.google_maps_reviews(place_id, reviews_limit=reviews_limit)
     return results[0]['reviews_data']
 
-def summarize_reviews(reviews, client):
+def summarize_reviews(reviews):
     """
     Summarizes a list of apartment reviews based on a user query.
 
@@ -188,7 +191,7 @@ def summarize_reviews(reviews, client):
         """
 
     # Call the OpenAI API
-    response = client.chat.completions.create(
+    response = openai.ChatCompletion.create(
         model="gpt-4o-mini",
         messages=[{"role": "system", "content": "You are a helpful assistant."},
                   {"role": "user", "content": f"{prompt}"}],

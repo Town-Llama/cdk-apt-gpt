@@ -1,19 +1,20 @@
 import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as certificatemanager from 'aws-cdk-lib/aws-certificatemanager';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
-import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as route53_targets from 'aws-cdk-lib/aws-route53-targets';
-import * as certificatemanager from 'aws-cdk-lib/aws-certificatemanager';
-import * as iam from 'aws-cdk-lib/aws-iam';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
+import { Construct } from 'constructs';
+import { ApiGatewayStack } from './api-gateway-stack';
 
 interface FrontendStackProps extends cdk.StackProps {
   domainName: string;
 }
 
 export class FrontendStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props: FrontendStackProps) {
+  constructor(scope: Construct, id: string, apiGatewayStack: ApiGatewayStack, props: FrontendStackProps) {
     super(scope, id, props);
 
     const domainName = props.domainName;
@@ -50,7 +51,27 @@ export class FrontendStack extends cdk.Stack {
           },
           behaviors: [{ isDefaultBehavior: true }],
         },
-      ],
+        {
+          customOriginSource: { domainName: `${apiGatewayStack.api.restApiId}.execute-api.${this.region}.${this.urlSuffix}`,
+            originPath: `/${apiGatewayStack.api.deploymentStage.stageName}`, },
+          behaviors: [
+              {
+                  pathPattern: "/datas/*",
+                  allowedMethods: cloudfront.CloudFrontAllowedMethods.ALL
+              }
+          ]
+      },
+      {
+        customOriginSource: { domainName: `${apiGatewayStack.api.restApiId}.execute-api.${this.region}.${this.urlSuffix}`,
+          originPath: `/${apiGatewayStack.api.deploymentStage.stageName}`, },
+        behaviors: [
+            {
+                pathPattern: "/chat/*",
+                allowedMethods: cloudfront.CloudFrontAllowedMethods.ALL
+            }
+        ]
+    },
+    ],
       viewerCertificate: cloudfront.ViewerCertificate.fromAcmCertificate(certificate, {
         aliases: [domainName],
         securityPolicy: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
@@ -58,49 +79,50 @@ export class FrontendStack extends cdk.Stack {
       }),
       errorConfigurations: [
         {
-            errorCode: 403, // Forbidden errors
-            responsePagePath: '/error.html',
-            responseCode: 200,
-            errorCachingMinTtl: 300
-          },
-          {
-            errorCode: 404, // Not Found errors
-            responsePagePath: '/error.html',
-            responseCode: 200,
-            errorCachingMinTtl: 300
-          },
-          {
-            errorCode: 500, // Internal Server Errors
-            responsePagePath: '/error.html',
-            responseCode: 200,
-            errorCachingMinTtl: 300
-          },
-          {
-            errorCode: 502, // Bad Gateway errors
-            responsePagePath: '/error.html',
-            responseCode: 200,
-            errorCachingMinTtl: 300
-          },
-          {
-            errorCode: 503, // Service Unavailable errors
-            responsePagePath: '/error.html',
-            responseCode: 200,
-            errorCachingMinTtl: 300
-          },
-          {
-            errorCode: 504, // Gateway Timeout errors
-            responsePagePath: '/error.html',
-            responseCode: 200,
-            errorCachingMinTtl: 300
-          },
+          errorCode: 403, // Forbidden errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
+        {
+          errorCode: 404, // Not Found errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
+        {
+          errorCode: 500, // Internal Server Errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
+        {
+          errorCode: 502, // Bad Gateway errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
+        {
+          errorCode: 503, // Service Unavailable errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
+        {
+          errorCode: 504, // Gateway Timeout errors
+          responsePagePath: '/error.html',
+          responseCode: 200,
+          errorCachingMinTtl: 300
+        },
       ],
     });
 
     new s3deploy.BucketDeployment(this, 'DeployReactApp', {
-      sources: [s3deploy.Source.asset('./react-app/build')],
+      sources: [s3deploy.Source.asset('./frontend/app/build')],
       destinationBucket: websiteBucket,
       distribution,
       distributionPaths: ['/*'],
+      memoryLimit: 1024
     });
 
     new route53.ARecord(this, 'AliasRecord', {

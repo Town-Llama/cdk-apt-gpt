@@ -1,0 +1,25 @@
+.range-track {
+    height: 6px;
+    width: 100%;
+    background: lightgrey;
+    position: relative;
+    border-radius: 3px;
+  }
+  
+  .range-thumb {
+    height: 20px;
+    width: 20px;
+    background-color: blue;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  .range-highlight {
+    position: absolute;
+    height: 6px;
+    background-color: blue;
+    border-radius: 3px;
+    top: 0;
+  }

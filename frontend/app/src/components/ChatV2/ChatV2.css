@@ -1,0 +1,16 @@
+.message-bubble {
+    background: linear-gradient(to right, #0099ff, #0062ff);
+    color: white;
+    /* padding: 10px 20px; */
+    /* border-radius: 20px; */
+    /* display: inline-block; */
+    font-family: sans-serif;
+    font-size: 16px;
+  }
+
+  .gradient-text {
+    background-image: linear-gradient(to right, #0099ff, #0062ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }

@@ -11,9 +11,18 @@ jobs:
           sudo apt update && sudo apt install nodejs
           npm install
       - shell: bash
+        name: Build Frontend
+        run: |
+          pushd frontend/app
+          yarn
+          yarn build
+          popd
+        env:
+          CI: false
+          REACT_APP_MAPBOX_ACCESS_TOKEN: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
+      - shell: bash
         name: Deploy
         run: |
-          echo $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY $AWS_DEFAULT_REGION
           npx cdk deploy -v --all
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AwsAccessKey }}
