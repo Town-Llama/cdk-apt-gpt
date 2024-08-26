@@ -31,7 +31,7 @@ class BaseModel(IModel):
         return asyncio.run(self._fwd(data))
         
     async def _fwd(self, data: Data) -> np.ndarray:
-        if not self.load_task:
+        if self.load_task is None:
             self.load()
         
         await self.load_task
@@ -45,8 +45,8 @@ class BaseModel(IModel):
     
     def load(self) -> None:
         """Load the model."""
-        
-        self.load_task = asyncio.create_task(self._load_model())
+        if self.load_task is None:
+            self.load_task = asyncio.create_task(self._load_model())
     
     async def _load_model(self) -> bool:
         start = time.time()
