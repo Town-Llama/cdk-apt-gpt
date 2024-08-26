@@ -33,6 +33,13 @@ COPY GoogleLogo.jpg .
 
 RUN pip3 install . --target "${LAMBDA_TASK_ROOT}"
 
+
+FROM base AS dev
+
+RUN yum update -y && yum install -y \
+    git \
+    tar
+
 FROM base AS descr_embedding_handler
 # load the model
 RUN PYTHONPATH="${LAMBDA_TASK_ROOT}" python -m aptgpt.DescrEmbedHandler
