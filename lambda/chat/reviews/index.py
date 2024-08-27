@@ -23,6 +23,7 @@ def lambda_handler(event, context):
     oai_api_key = os.getenv('OPEN_AI_KEY', None)
     if not oai_api_key:
         raise Exception("OpenAI API Key Not Found")
+    openai.api_key = oai_api_key
     outscraper_api_key = os.getenv("OUTSCRAPER_API_KEY", None)
     if not outscraper_api_key:
         raise Exception("Outscraper API Key Not Found")
@@ -55,8 +56,8 @@ def lambda_handler(event, context):
         reviews = get_reviews(place_id, outscraper_api_key, reviews_limit=10)
         if len(reviews) == 0:
             raise Exception("No Reviews Found")
-        client = OpenAI(api_key=oai_api_key)
-        summary = summarize_reviews(reviews=reviews, client=client)
+        
+        summary = summarize_reviews(reviews=reviews, api_key=oai_api_key)
 
         # Log the review summary
         logger.info(f"{summary} OK")
@@ -155,7 +156,7 @@ def get_reviews(place_id, out_key, reviews_limit=10):
     results = api_client.google_maps_reviews(place_id, reviews_limit=reviews_limit)
     return results[0]['reviews_data']
 
-def summarize_reviews(reviews):
+def summarize_reviews(reviews: list, api_key: str):
     """
     Summarizes a list of apartment reviews based on a user query.
 
@@ -191,7 +192,8 @@ def summarize_reviews(reviews):
         """
 
     # Call the OpenAI API
-    response = openai.ChatCompletion.create(
+    client = openai.OpenAI(api_key=api_key)
+    response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{"role": "system", "content": "You are a helpful assistant."},
                   {"role": "user", "content": f"{prompt}"}],
