@@ -7,6 +7,6 @@ COPY . .
 RUN apk update && apk add alpine-sdk
 
 # Install app dependencies
-# RUN npm install
+RUN npm install
 # CMD ["npx", "cdk", "deploy"]
 EXPOSE 3000
