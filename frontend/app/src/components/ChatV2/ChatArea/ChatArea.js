@@ -87,10 +87,23 @@ const ChatArea = ({ showLoading }) => {
       isAuthenticated,
       user
     );
-    const resOne = await client.datas_modelOne();
-    const resTwo = await client.datas_modelTwo();
-    dispatch(updateDescState(resOne));
-    dispatch(updateImgState(resTwo))
+
+    try {
+      const resOne = await client.datas_modelOne();
+      console.log('Loading Description Model status: ', resOne);
+      dispatch(updateDescState(resOne));
+    } catch (error) {
+      console.error('Error loading Description Model: ', error);
+      throw error;
+    };
+    try {
+      const resTwo = await client.datas_modelTwo();
+      console.log('Loading Image Model status: ', resTwo);
+      dispatch(updateImgState(resTwo));
+    } catch (error) {
+      console.error('Error loading Image Model: ', error);
+      throw error;
+    };
   }
 
   return (
