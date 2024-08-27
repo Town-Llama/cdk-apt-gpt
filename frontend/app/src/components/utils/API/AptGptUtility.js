@@ -26,7 +26,7 @@ class AptGptUtility {
       const res = await this.post("datas/modelOne", {
         'load_model': true,
       });
-      return res.data;
+      return res;
     } catch (error) {
       console.error("AptGptUtility.datas_modelOne error: ", error);
       this.cloudWatchMetrics.emitErrorMetric(
@@ -46,7 +46,7 @@ class AptGptUtility {
       const res = await this.post("datas/modelTwo", {
         'load_model': true,
       });
-      return res.data;
+      return res;
     } catch (error) {
       console.error("AptGptUtility.datas_modelTwo error: ", error);
       this.cloudWatchMetrics.emitErrorMetric(
