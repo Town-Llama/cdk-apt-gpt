@@ -1,35 +1,40 @@
+import os
+from datetime import datetime
 import json
+import logging
 import requests
 import openai
 from outscraper import ApiClient
-import psycopg2
 import os
 import traceback
 
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger("reviews.index")
+
+
 def lambda_handler(event, context):
+    g_api_key = os.getenv('GOOGLE_API_KEY', None)
+    if not g_api_key:
+        raise Exception("Google API Key Not Found")
+    oai_api_key = os.getenv('OPEN_AI_KEY', None)
+    if not oai_api_key:
+        raise Exception("OpenAI API Key Not Found")
+    outscraper_api_key = os.getenv("OUTSCRAPER_API_KEY", None)
+    if not outscraper_api_key:
+        raise Exception("Outscraper API Key Not Found")
+    
     try:
-        g_api_key = os.getenv('GOOGLE_API_KEY')
-        outscraper_api_key = os.getenv("OUTSCRAPER_API_KEY")
-        openai.api_key = os.getenv('OPEN_AI_KEY')
         # Parse the request body
         body = json.loads(event['body'])
         apt = body.get('apt')
-        user = body.get('user')
+        
+        address_fields = ['buildingname', 'addresscity', 'addressstate', 'addressstreet', 'addresszipcode']
 
-        # check if the user is waitlist approved
-        # if not hasAccessToReviews(user):
-        #     return {
-        #         'statusCode': 200,
-        #         'headers': {
-        #             "Content-Type": "application/json",
-        #             "Access-Control-Allow-Origin": "*",
-        #             "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-        #             "Access-Control-Allow-Methods": "*"
-        #         },
-        #         'body': json.dumps({'data': 'Recommend Friends to Synthesize Reviews'})
-        #     }
-
-        if not apt or 'buildingname' not in apt:
+        if not apt or any([field not in apt for field in address_fields]):
             return {
                 'statusCode': 400,
                 'headers': {
@@ -42,12 +47,19 @@ def lambda_handler(event, context):
             }
 
         # building name
-        place_id = get_place_id(apt['buildingname'], g_api_key)
+        address = ", ".join([apt[field] for field in address_fields[1:]])
+        building_name = apt[address_fields[0]]
+        if not address.startswith(building_name):
+            address = ", ".join([building_name, address])
+        place_id = get_place_id(address, g_api_key)
         reviews = get_reviews(place_id, outscraper_api_key, reviews_limit=10)
-        summary = summarize_reviews(reviews=reviews)
+        if len(reviews) == 0:
+            raise Exception("No Reviews Found")
+        client = OpenAI(api_key=oai_api_key)
+        summary = summarize_reviews(reviews=reviews, client=client)
 
         # Log the review summary
-        print(f"{summary} OK")
+        logger.info(f"{summary} OK")
 
         # Return the review summary
         return {
@@ -243,24 +255,22 @@ def get_place_id(address, g_api_key):
     else:
         return None
     
-def hasAccessToReviews(user: str):
-    host = os.getenv('DB_HOST')
-    port = os.getenv('DB_PORT')
-    database = os.getenv('DB_DATABASE')
-    db_user = os.getenv('DB_USER')  # Renamed to avoid shadowing the function argument
-    password = os.getenv('DB_PW')
-    db_params = {
-        "host": host,
-        "database": database,
-        "user": db_user,
-        "password": password
+    
+    
+if __name__ == "__main__":
+    event = {
+        "body": json.dumps({
+            "apt": {
+                "addresscity": "Austin",
+                "addressstate": "TX",
+                "addressstreet": "1621 E 6th St",
+                "addresszipcode": "78702",
+                "area": 598,
+                "buildingname": "The Arnold",
+                "latitude": "30.377040",
+                "longitude": "-97.739914",
+                "name": ""
+            }
+        })
     }
-    conn = psycopg2.connect(**db_params)
-    cur = conn.cursor()
-
-    # Note the comma after 'user'
-    cur.execute("SELECT recommendationid FROM recommendations where userid=%s", (user,))
-    result = cur.fetchall()
-
-    # Check if there are any results
-    return len(result) > 0
+    lambda_handler(event, None)
