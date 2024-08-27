@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import * as certificatemanager from 'aws-cdk-lib/aws-certificatemanager';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
+import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as route53_targets from 'aws-cdk-lib/aws-route53-targets';
@@ -43,78 +44,45 @@ export class FrontendStack extends cdk.Stack {
       region: 'us-east-1',
     });
 
-    const distribution = new cloudfront.CloudFrontWebDistribution(this, 'WebsiteDistribution', {
-      originConfigs: [
-        {
-          s3OriginSource: {
-            s3BucketSource: websiteBucket,
-          },
-          behaviors: [{ isDefaultBehavior: true }],
-        },
-        {
-          customOriginSource: { domainName: `${apiGatewayStack.api.restApiId}.execute-api.${this.region}.${this.urlSuffix}`,
-            originPath: `/${apiGatewayStack.api.deploymentStage.stageName}`, },
-          behaviors: [
-              {
-                  pathPattern: "/datas/*",
-                  allowedMethods: cloudfront.CloudFrontAllowedMethods.ALL
-              }
-          ]
+    // Create a cache policy that includes the Authorization header
+    const cachePolicy = new cloudfront.CachePolicy(this, 'CachePolicyWithAuth', {
+      cachePolicyName: 'CachePolicyWithAuth',
+      headerBehavior: cloudfront.CacheHeaderBehavior.allowList('Authorization'),
+      defaultTtl: cdk.Duration.minutes(5),
+      minTtl: cdk.Duration.seconds(0),
+      maxTtl: cdk.Duration.minutes(10),
+    });
+
+    const distribution = new cloudfront.Distribution(this, 'WebsiteDistribution', {
+      defaultBehavior: {
+        origin: new origins.S3Origin(websiteBucket),
+        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       },
-      {
-        customOriginSource: { domainName: `${apiGatewayStack.api.restApiId}.execute-api.${this.region}.${this.urlSuffix}`,
-          originPath: `/${apiGatewayStack.api.deploymentStage.stageName}`, },
-        behaviors: [
-            {
-                pathPattern: "/chat/*",
-                allowedMethods: cloudfront.CloudFrontAllowedMethods.ALL
-            }
-        ]
-    },
-    ],
-      viewerCertificate: cloudfront.ViewerCertificate.fromAcmCertificate(certificate, {
-        aliases: [domainName],
-        securityPolicy: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
-        sslMethod: cloudfront.SSLMethod.SNI,
-      }),
-      errorConfigurations: [
-        {
-          errorCode: 403, // Forbidden errors
-          responsePagePath: '/error.html',
-          responseCode: 200,
-          errorCachingMinTtl: 300
-        },
-        {
-          errorCode: 404, // Not Found errors
-          responsePagePath: '/error.html',
-          responseCode: 200,
-          errorCachingMinTtl: 300
-        },
-        {
-          errorCode: 500, // Internal Server Errors
-          responsePagePath: '/error.html',
-          responseCode: 200,
-          errorCachingMinTtl: 300
-        },
-        {
-          errorCode: 502, // Bad Gateway errors
-          responsePagePath: '/error.html',
-          responseCode: 200,
-          errorCachingMinTtl: 300
-        },
-        {
-          errorCode: 503, // Service Unavailable errors
-          responsePagePath: '/error.html',
-          responseCode: 200,
-          errorCachingMinTtl: 300
-        },
-        {
-          errorCode: 504, // Gateway Timeout errors
-          responsePagePath: '/error.html',
-          responseCode: 200,
-          errorCachingMinTtl: 300
-        },
+      domainNames: [domainName],
+      certificate: certificate,
+      errorResponses: [
+        { httpStatus: 403, responsePagePath: '/error.html', responseHttpStatus: 200, ttl: cdk.Duration.seconds(300) },
+        { httpStatus: 404, responsePagePath: '/error.html', responseHttpStatus: 200, ttl: cdk.Duration.seconds(300) },
+        { httpStatus: 500, responsePagePath: '/error.html', responseHttpStatus: 200, ttl: cdk.Duration.seconds(300) },
+        { httpStatus: 502, responsePagePath: '/error.html', responseHttpStatus: 200, ttl: cdk.Duration.seconds(300) },
+        { httpStatus: 503, responsePagePath: '/error.html', responseHttpStatus: 200, ttl: cdk.Duration.seconds(300) },
+        { httpStatus: 504, responsePagePath: '/error.html', responseHttpStatus: 200, ttl: cdk.Duration.seconds(300) },
       ],
+    });
+
+    // Add API Gateway behaviors with the cache policy
+    distribution.addBehavior('/datas/*', new origins.HttpOrigin(`${apiGatewayStack.api.restApiId}.execute-api.${this.region}.${this.urlSuffix}`, {
+      originPath: `/${apiGatewayStack.api.deploymentStage.stageName}`,
+    }), {
+      allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+      cachePolicy: cachePolicy,
+    });
+
+    distribution.addBehavior('/chat/*', new origins.HttpOrigin(`${apiGatewayStack.api.restApiId}.execute-api.${this.region}.${this.urlSuffix}`, {
+      originPath: `/${apiGatewayStack.api.deploymentStage.stageName}`,
+    }), {
+      allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+      cachePolicy: cachePolicy,
     });
 
     new s3deploy.BucketDeployment(this, 'DeployReactApp', {

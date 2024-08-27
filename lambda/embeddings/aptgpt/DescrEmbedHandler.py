@@ -21,6 +21,7 @@ def createEmbed(
 
     global model
     if model is None:
+        logger.info("The model is not initiallized. Loading model")
         model = download_model()
     # Embed the payload
     embedding = model.encode(payload)
@@ -39,6 +40,16 @@ def handler(event, context):  # pragma: no cover
         
         # Parse the HTTP event
         body = json.loads(event["body"])
+        should_load_model = body.get("load_model", False)
+        if should_load_model:
+            global model
+            if model is None:
+                model = download_model()
+            return {
+                "statusCode": 200,
+                "body": json.dumps({"model_status": True})
+            }
+
         payload = body["payload"]
 
         embedding = createEmbed(payload)

@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AptGptUtility from "../../utils/API/AptGptUtility";
 import { advance } from "../../utils/ChatFlow";
 import InputBar from "./InputBar";
+import { updateDescState, updateImgState } from "../../../store/actions/modelActions";
 
 const ChatArea = ({ showLoading }) => {
   const dispatch = useDispatch();
@@ -67,11 +68,30 @@ const ChatArea = ({ showLoading }) => {
   }, []);
 
   useEffect(() => {
+    initializeModels();
+  }, [isAuthenticated])
+
+  useEffect(() => {
     //this is happening multiple times >> fix this
     if (chat.chatState === "BEGIN") {
       dispatch(advance(null, df, chat.chatState));
     }
   }, []);
+
+  const initializeModels = async () => {
+    if (!isAuthenticated) {
+      return; //no need to waste a call
+    }
+    const client = new AptGptUtility(
+      getAccessTokenSilently,
+      isAuthenticated,
+      user
+    );
+    const resOne = await client.datas_modelOne();
+    const resTwo = await client.datas_modelTwo();
+    dispatch(updateDescState(resOne));
+    dispatch(updateImgState(resTwo))
+  }
 
   return (
     <div id="chat" className="flex flex-col overflow-y-auto">
