@@ -22,7 +22,7 @@ export class FrontendStack extends cdk.Stack {
 
     const websiteBucket = new s3.Bucket(this, 'WebsiteBucket', {
       websiteIndexDocument: 'index.html',
-      websiteErrorDocument: 'error.html',
+      websiteErrorDocument: 'index.html',
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
@@ -56,19 +56,26 @@ export class FrontendStack extends cdk.Stack {
     const distribution = new cloudfront.Distribution(this, 'WebsiteDistribution', {
       defaultBehavior: {
         origin: new origins.S3Origin(websiteBucket),
-        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS
       },
       domainNames: [domainName],
       certificate: certificate,
       errorResponses: [
         { httpStatus: 403, responsePagePath: '/error.html', responseHttpStatus: 200, ttl: cdk.Duration.seconds(300) },
-        { httpStatus: 404, responsePagePath: '/error.html', responseHttpStatus: 200, ttl: cdk.Duration.seconds(300) },
+        { httpStatus: 404, responsePagePath: '/index.html', responseHttpStatus: 200, ttl: cdk.Duration.seconds(300) },
         { httpStatus: 500, responsePagePath: '/error.html', responseHttpStatus: 200, ttl: cdk.Duration.seconds(300) },
         { httpStatus: 502, responsePagePath: '/error.html', responseHttpStatus: 200, ttl: cdk.Duration.seconds(300) },
         { httpStatus: 503, responsePagePath: '/error.html', responseHttpStatus: 200, ttl: cdk.Duration.seconds(300) },
         { httpStatus: 504, responsePagePath: '/error.html', responseHttpStatus: 200, ttl: cdk.Duration.seconds(300) },
       ],
     });
+
+    distribution.addBehavior('/blog', new origins.HttpOrigin(`${apiGatewayStack.api.restApiId}.execute-api.${this.region}.${this.urlSuffix}`, {
+      originPath: `/${apiGatewayStack.api.deploymentStage.stageName}`,
+    }), {
+      allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+      cachePolicy: cachePolicy,
+    })
 
     // Add API Gateway behaviors with the cache policy
     distribution.addBehavior('/datas/*', new origins.HttpOrigin(`${apiGatewayStack.api.restApiId}.execute-api.${this.region}.${this.urlSuffix}`, {

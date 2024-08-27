@@ -119,7 +119,8 @@ export class ApiGatewayStack extends cdk.Stack {
     resource: apigateway.Resource,
     lambda_fn: lambda.IFunction,
     type: string,
-    authorizer: apigateway.IAuthorizer
+    authorizer: apigateway.IAuthorizer,
+    useAuthorizer: boolean
   ) => {
     this.addCorsOptions(resource);
     resource.addMethod(
@@ -129,7 +130,7 @@ export class ApiGatewayStack extends cdk.Stack {
       }),
       {
         methodResponses: [ApiGatewayStack.methodResponse],
-        authorizer: authorizer,
+        authorizer: useAuthorizer ? authorizer : undefined,
       }
     );
   };

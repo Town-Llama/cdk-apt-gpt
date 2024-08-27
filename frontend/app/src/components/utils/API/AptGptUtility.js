@@ -6,11 +6,19 @@ class AptGptUtility {
   static BASE_URL = "https://townllama.ai"; // if beta
   //static BASE_URL = 'https://api.beta.townllama.ai'; // if beta
 
-  constructor(getAccessTokenSilently, isAuthenticated, user) {
+  constructor(getAccessTokenSilently = null, isAuthenticated = false, user = null) {
     this.getAccessTokenSilently = getAccessTokenSilently;
     this.isAuthenticated = isAuthenticated;
     this.cloudWatchMetrics = new CloudWatchMetrics("YourAppNamespace");
     this.user = user;
+  }
+
+  async blog(id) {
+    const res = await this.post_unauthorized("blog", {
+      id
+    });
+    console.log(res, "res");
+    return res.data[0];
   }
 
   async datas_modelOne() {
@@ -200,6 +208,41 @@ class AptGptUtility {
         endpoint +
         " user {" +
         JSON.stringify(this.user) +
+        "}"
+      );
+      throw error;
+    }
+  }
+
+  async post_unauthorized(endpoint, data) {
+
+    const headers = {
+      "Content-Type": "application/json",
+    };
+
+    const url = `${AptGptUtility.BASE_URL}/${endpoint}`; // Construct the full URL
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    } catch (error) {
+      this.cloudWatchMetrics.emitErrorMetric(
+        "AptGptUtility",
+        "post/" + endpoint
+      );
+      await this.cloudWatchMetrics.writeLog(
+        "Error in AptGptUtility.post/" +
+        endpoint +
+        " user {" +
+        JSON.stringify(this.user) +
+        "} with data {" +
+        JSON.stringify(data) +
         "}"
       );
       throw error;

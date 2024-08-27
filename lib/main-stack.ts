@@ -36,7 +36,8 @@ export class MainStack extends cdk.Stack {
         resource,
         fn,
         method,
-        apiGatewayStack.authorizer
+        apiGatewayStack.authorizer,
+        name !== "blog" //determines if we protect the route (if true, then we do)
       );
     });
 

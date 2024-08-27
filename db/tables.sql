@@ -98,3 +98,13 @@ create table queries (
     query text,
     type text
 );
+
+CREATE TABLE blog (
+    id VARCHAR(100) PRIMARY KEY,
+    title VARCHAR(100) UNIQUE NOT NULL,
+    description TYPE VARCHAR(160),
+    content TEXT NOT NULL,
+    keywords VARCHAR(1000),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
