@@ -1,12 +1,22 @@
 services:
-  cdk-apt-gpt:
+  backend-cdk:
     platform: linux/amd64
     build:
       context: .
-      dockerfile: Dockerfile
+      target: backend
+    env_file:
+      - .env
+
+  frontend:
+    platform: linux/amd64
+    build:
+      context: .
+      target: frontend
+    entrypoint: [ "npm", "start" ]
+    environment:
+      # SERVICE_HOST is the hostname of the backend service
+      - SERVICE_HOST=localhost
     ports:
       - "3000:3000"
     env_file:
       - .env
-    volumes:
-      - .:/opt/app
