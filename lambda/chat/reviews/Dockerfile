@@ -19,7 +19,5 @@ RUN yum update -y && yum install -y git tar
 
 FROM base AS deploy
 
-RUN PYTHONPATH="${LAMBDA_TASK_ROOT}" python index.py
-
 # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
 CMD [ "index.lambda_handler" ]
