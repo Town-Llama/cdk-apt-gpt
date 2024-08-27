@@ -35,7 +35,7 @@ def handler(event, context):  # pragma: no cover
         should_load_model = body.get("load_model", False)
         if should_load_model:
             global model
-            model.load()
+            _ = model.forward(Data(text="hello world"))
             return {
                 "statusCode": 200,
                 "body": json.dumps({"model_status": True})

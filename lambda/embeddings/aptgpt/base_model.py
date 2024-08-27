@@ -4,6 +4,7 @@ import numpy as np
 import time
 from aptgpt.data import Data
 from aptgpt.imodel import IModel
+from aptgpt import models
 
 
 logger = logging.getLogger(__name__)
@@ -47,9 +48,12 @@ class BaseModel(IModel):
         
         if not self.load_task.done():
             await self.load_task
-        data_obj = data.text if data.text else data.image
+        
         start = time.time()
-        embedding = self.model.encode(data_obj)
+        if data.text:
+            embedding = self.model.encode_text(data.text)
+        else:
+            embedding = self.model.encode_image(data.image)
         end = time.time()
         logger.info(f"Embedding computed in {end-start:.2f} seconds")
         return embedding
@@ -62,8 +66,7 @@ class BaseModel(IModel):
     
     async def _load_model(self) -> bool:
         start = time.time()
-        from txtai.vectors import VectorsFactory
-        self.model = VectorsFactory.create(self.config)
+        self.model = models.model_factory(**self.config)
         end = time.time()
         logger.info(f"Model loaded in {end-start:.2f} seconds")
         return True

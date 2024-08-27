@@ -4,9 +4,7 @@ import logging
 
 
 model_cfg = {
-    'path': 'sentence-transformers/clip-ViT-L-14', 
-    'method': 'sentence-transformers', 
-    'content': False
+    'model': 'clip-ViT-L-14'
 }
 logger = logging.getLogger(__name__)
 
