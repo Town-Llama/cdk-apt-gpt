@@ -13,7 +13,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
-logger = logging.getLogger("rewviews/index.py")
+logger = logging.getLogger("reviews.index")
 
 
 def lambda_handler(event, context):
