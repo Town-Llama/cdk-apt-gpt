@@ -96,9 +96,12 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
       user
     );
 
-    const model_status = await client.datas_modelTwo();
-    console.log(`Loading Image Model status: {model_status}`)
-    return model_status;
+    try {
+      const model_status = await client.datas_modelTwo();
+      console.log(`Loading Image Model status: {model_status}`);
+    } catch (error) {
+      console.log(`Error loading Image Model: {error}`);
+    };
   }
 
   const loadDescrEmbeddingModel = async () => {
@@ -108,9 +111,12 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
       user
     );
 
-    const model_status = await client.datas_modelOne();
-    console.log(`Loading Descr Model status: {model_status}`)
-    return model_status;
+    try {
+      const model_status = await client.datas_modelOne();
+      console.log(`Loading Description Model status: {model_status}`);
+    } catch (error) {
+      console.log(`Error loading Description Model: {error}`);
+    };
   }
 
   const click = () => {
