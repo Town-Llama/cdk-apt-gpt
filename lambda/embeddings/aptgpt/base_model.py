@@ -28,13 +28,25 @@ class BaseModel(IModel):
         Returns:
             np.ndarray: The embedding of the data.
         """
-        return asyncio.run(self._fwd(data))
+        try:
+            # Try to get the running loop
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            # If no loop is running, create a new one
+            result = asyncio.run(self._fwd(data))
+        except Exception as e:
+            logger.error(f"forward Error: {e}")
+        else:
+            # If a loop is running, use it
+            result = loop.run_until_complete(self._fwd(data))
+        return result
         
     async def _fwd(self, data: Data) -> np.ndarray:
         if self.load_task is None:
             self.load()
         
-        await self.load_task
+        if not self.load_task.done():
+            await self.load_task
         data_obj = data.text if data.text else data.image
         start = time.time()
         embedding = self.model.encode(data_obj)
