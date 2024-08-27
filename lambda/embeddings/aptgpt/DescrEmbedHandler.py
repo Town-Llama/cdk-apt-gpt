@@ -2,9 +2,9 @@ import json
 import logging
 import traceback
 
-from test_image_embed_handler import get_descr_test_data
-from data import Data
-from descr_model import DescrModel
+from aptgpt.test_image_embed_handler import get_descr_test_data
+from aptgpt.data import Data
+from aptgpt.descr_model import DescrModel
 
 
 logging.basicConfig(

@@ -1,4 +1,4 @@
-from base_model import BaseModel
+from aptgpt.base_model import BaseModel
 import logging
 
 
