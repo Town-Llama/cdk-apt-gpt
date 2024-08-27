@@ -28,7 +28,7 @@ class AptGptUtility {
       });
       return res.data;
     } catch (error) {
-      console.log("AptGptUtility.datas_modelOne error: ", error);
+      console.error("AptGptUtility.datas_modelOne error: ", error);
       this.cloudWatchMetrics.emitErrorMetric(
         "AptGptUtility",
         "datas_modelOne"
@@ -48,7 +48,7 @@ class AptGptUtility {
       });
       return res.data;
     } catch (error) {
-      console.log("AptGptUtility.datas_modelTwo error: ", error);
+      console.error("AptGptUtility.datas_modelTwo error: ", error);
       this.cloudWatchMetrics.emitErrorMetric(
         "AptGptUtility",
         "datas_modelTwo"

@@ -100,7 +100,7 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
       const model_status = await client.datas_modelTwo();
       console.log(`Loading Image Model status: {model_status}`);
     } catch (error) {
-      console.log(`Error loading Image Model: {error}`);
+      console.error(`Error loading Image Model: {error}`);
     };
   }
 
@@ -115,7 +115,7 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
       const model_status = await client.datas_modelOne();
       console.log(`Loading Description Model status: {model_status}`);
     } catch (error) {
-      console.log(`Error loading Description Model: {error}`);
+      console.error(`Error loading Description Model: {error}`);
     };
   }
 
