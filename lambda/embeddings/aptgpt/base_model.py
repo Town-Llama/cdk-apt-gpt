@@ -2,8 +2,8 @@ import asyncio
 import logging
 import numpy as np
 import time
-from data import Data
-from imodel import IModel
+from aptgpt.data import Data
+from aptgpt.imodel import IModel
 
 
 logger = logging.getLogger(__name__)

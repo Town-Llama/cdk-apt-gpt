@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 public.ecr.aws/lambda/python:3.9 as base
+FROM --platform=linux/amd64 public.ecr.aws/lambda/python:3.9 AS base
 
 # Install the function's dependencies using file requirements.txt
 # from your project folder.
@@ -12,14 +12,12 @@ COPY setup.py .
 RUN pip3 install . --target "${LAMBDA_TASK_ROOT}"
 
 
-FROM base as dev
+FROM base AS dev
 
 RUN yum update -y && yum install -y git tar
 
 
-FROM base as deploy
-
-RUN PYTHONPATH="${LAMBDA_TASK_ROOT}" python index.py
+FROM base AS deploy
 
 # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
 CMD [ "index.lambda_handler" ]

@@ -1,15 +1,15 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
 {
-	"name": "Embedding Extraction",
+	"name": "Reviews",
 	"build": {
 		// Sets the run context to one level up instead of the .devcontainer folder.
-		"context": "../../lambda/embeddings",
+		"context": "../../lambda/chat/reviews",
 		// Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
-		"dockerfile": "../../lambda/embeddings/Dockerfile",
+		"dockerfile": "../../lambda/chat/reviews/Dockerfile",
 		"target": "dev"
 	},
-	"workspaceFolder": "/workspaces/cdk-apt-gpt/lambda/embeddings/aptgpt",
+	"workspaceFolder": "/workspaces/cdk-apt-gpt/lambda/chat/reviews",
 	"runArgs": [
 		// Initialize environment variables.
 		"--env-file",
