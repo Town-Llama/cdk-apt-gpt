@@ -68,7 +68,8 @@ const ChatArea = ({ showLoading }) => {
   }, []);
 
   useEffect(() => {
-    initializeModels();
+    initializeDescModels();
+    initializeImageModels();
   }, [isAuthenticated])
 
   useEffect(() => {
@@ -78,7 +79,7 @@ const ChatArea = ({ showLoading }) => {
     }
   }, []);
 
-  const initializeModels = async () => {
+  const initializeDescModels = async () => {
     if (!isAuthenticated) {
       return; //no need to waste a call
     }
@@ -96,6 +97,18 @@ const ChatArea = ({ showLoading }) => {
       console.error('Error loading Description Model: ', error);
       throw error;
     };
+  }
+
+  const initializeImageModels = async () => {
+    if (!isAuthenticated) {
+      return; //no need to waste a call
+    }
+    const client = new AptGptUtility(
+      getAccessTokenSilently,
+      isAuthenticated,
+      user
+    );
+
     try {
       const resTwo = await client.datas_modelTwo();
       console.log('Loading Image Model status: ', resTwo);
