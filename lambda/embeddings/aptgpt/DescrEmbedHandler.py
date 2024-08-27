@@ -2,57 +2,48 @@ import json
 import logging
 import traceback
 
-from aptgpt.test_image_embed_handler import get_descr_test_data
-from aptgpt.utils import load_model
+from test_image_embed_handler import get_descr_test_data
+from data import Data
+from descr_model import DescrModel
 
-model = None
-model_cfg = {
-    'path': 'sentence-transformers/all-MiniLM-L6-v2', 
-    'method': 'sentence-transformers',
-    'content': False
-}
-logger = logging.getLogger()
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+model = DescrModel()
 logger.info("hit")
 
+
 def createEmbed(
-    payload
+    is_text: bool, payload
 ):
-
     global model
-    if model is None:
-        logger.info("The model is not initiallized. Loading model")
-        model = download_model()
-    # Embed the payload
-    embedding = model.encode(payload)
+    if not is_text:
+        data = Data(image=payload)
+    else:
+        data = Data(text=payload)
+    embedding = model.forward(data)
     return embedding
-
-
-def download_model():
-    """Wrapper function to download the model."""
-    return load_model(model_cfg)
 
 
 def handler(event, context):  # pragma: no cover
     try:
-        logger.info(event)
-        logger.info(context)
-        
         # Parse the HTTP event
         body = json.loads(event["body"])
         should_load_model = body.get("load_model", False)
         if should_load_model:
             global model
-            if model is None:
-                model = download_model()
+            model.load()
             return {
                 "statusCode": 200,
                 "body": json.dumps({"model_status": True})
             }
-
+        is_text = True
         payload = body["payload"]
 
-        embedding = createEmbed(payload)
+        embedding = createEmbed(is_text, payload)
 
         return {
             "statusCode": 200,
@@ -60,7 +51,6 @@ def handler(event, context):  # pragma: no cover
         }
     except:
         logger.error(traceback.format_exc())
-        assert False, traceback.format_exc()
         return {
             "statusCode": 500,
             "body": json.dumps({"embedding": []})
@@ -69,9 +59,8 @@ def handler(event, context):  # pragma: no cover
 if __name__ == "__main__":  # pragma: no cover
     
     # Download the model
-    download_model()
+    _ = model.forward(Data(text="hello world"))
     
-    logging.basicConfig(level=10)
     result = handler(
             json.loads(
                 get_descr_test_data()
