@@ -1,4 +1,4 @@
-import asyncio
+import threading
 import logging
 import numpy as np
 import time
@@ -21,6 +21,7 @@ class BaseModel(IModel):
         self.config = config
         self.model = None
         self.load_task = None
+        self.load_event = threading.Event()
     
     
     def forward(self, data: Data) -> np.ndarray:
@@ -29,25 +30,10 @@ class BaseModel(IModel):
         Returns:
             np.ndarray: The embedding of the data.
         """
-        try:
-            # Try to get the running loop
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            # If no loop is running, create a new one
-            result = asyncio.run(self._fwd(data))
-        except Exception as e:
-            logger.error(f"forward Error: {e}")
-        else:
-            # If a loop is running, use it
-            result = loop.run_until_complete(self._fwd(data))
-        return result
-        
-    async def _fwd(self, data: Data) -> np.ndarray:
         if self.load_task is None:
             self.load()
         
-        if not self.load_task.done():
-            await self.load_task
+        self.load_event.wait()
         
         start = time.time()
         if data.text:
@@ -62,13 +48,16 @@ class BaseModel(IModel):
     def load(self) -> None:
         """Load the model."""
         if self.load_task is None:
-            self.load_task = asyncio.create_task(self._load_model())
+            self.load_task = threading.Thread(target=self._load_model)
+            self.load_task.start()
+        return None
     
-    async def _load_model(self) -> bool:
+    def _load_model(self) -> bool:
         start = time.time()
         self.model = models.model_factory(**self.config)
         end = time.time()
         logger.info(f"Model loaded in {end-start:.2f} seconds")
+        self.load_event.set()
         return True
     
     

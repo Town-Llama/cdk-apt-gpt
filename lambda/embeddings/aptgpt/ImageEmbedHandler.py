@@ -9,7 +9,7 @@ from aptgpt.image_model import ImageModel
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s'
 )
 logger = logging.getLogger("ImageEmbedHandler")
 model = ImageModel()
@@ -35,7 +35,7 @@ def handler(event, context):  # pragma: no cover
         should_load_model = body.get("load_model", False)
         if should_load_model:
             global model
-            _ = model.forward(Data(text="hello world"))
+            model.load()
             return {
                 "statusCode": 200,
                 "body": json.dumps({"model_status": True})
