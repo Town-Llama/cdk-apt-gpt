@@ -65,7 +65,7 @@ export class LambdaStack extends cdk.Stack {
           ),
           timeout: cdk.Duration.seconds(90),
           memorySize: 3008,
-          loggingFormat: lambda.LogFormat.JSON,
+          logFormat: lambda.LogFormat.JSON,
           applicationLogLevelV2: lambda.ApplicationLogLevel.INFO
         }
       ),
@@ -83,7 +83,7 @@ export class LambdaStack extends cdk.Stack {
           ),
           timeout: cdk.Duration.seconds(90),
           memorySize: 3008,
-          loggingFormat: lambda.LogFormat.JSON,
+          logFormat: lambda.LogFormat.JSON,
           applicationLogLevelV2: lambda.ApplicationLogLevel.INFO
         }
       ),
@@ -161,7 +161,7 @@ export class LambdaStack extends cdk.Stack {
             OPEN_AI_KEY: process.env.OPEN_AI_KEY!,
             OUTSCRAPER_API_KEY: process.env.OUTSCRAPER_API_KEY!
           },
-          loggingFormat: lambda.LogFormat.JSON,
+          logFormat: lambda.LogFormat.JSON,
           applicationLogLevelV2: lambda.ApplicationLogLevel.INFO
         }
       ),
