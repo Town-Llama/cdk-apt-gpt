@@ -70,7 +70,7 @@ export class FrontendStack extends cdk.Stack {
       ],
     });
 
-    distribution.addBehavior('/blog', new origins.HttpOrigin(`${apiGatewayStack.api.restApiId}.execute-api.${this.region}.${this.urlSuffix}`, {
+    distribution.addBehavior('/blog/*', new origins.HttpOrigin(`${apiGatewayStack.api.restApiId}.execute-api.${this.region}.${this.urlSuffix}`, {
       originPath: `/${apiGatewayStack.api.deploymentStage.stageName}`,
     }), {
       allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,

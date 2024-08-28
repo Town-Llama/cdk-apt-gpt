@@ -2,13 +2,9 @@ const { dbCall } = require('db');
 
 exports.handler = async (event) => {
     try {
-        // Parse the request body
-        const body = JSON.parse(event.body);
-        const { id } = body;
-
         // Query the database to check if the user is on the waitlist
-        let query = "SELECT title, description, content, keywords FROM blog WHERE id = $1";
-        let values = [id];
+        let query = "SELECT id FROM blog";
+        let values = [];
         const entries = await dbCall(query, values);
 
         // Return the response
