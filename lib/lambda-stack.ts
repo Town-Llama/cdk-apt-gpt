@@ -65,7 +65,7 @@ export class LambdaStack extends cdk.Stack {
           ),
           timeout: cdk.Duration.seconds(90),
           memorySize: 3008,
-          applicationLogLevelV2: lambda.ApplicationLogLevel.INFO
+          logFormat: lambda.LogFormat.JSON
         }
       ),
       datas_modelTwo: new lambda.DockerImageFunction(
@@ -82,7 +82,7 @@ export class LambdaStack extends cdk.Stack {
           ),
           timeout: cdk.Duration.seconds(90),
           memorySize: 3008,
-          applicationLogLevelV2: lambda.ApplicationLogLevel.INFO
+          logFormat: lambda.LogFormat.JSON
         }
       ),
       blog: createNodeLambdaFunction(
@@ -159,7 +159,7 @@ export class LambdaStack extends cdk.Stack {
             OPEN_AI_KEY: process.env.OPEN_AI_KEY!,
             OUTSCRAPER_API_KEY: process.env.OUTSCRAPER_API_KEY!
           },
-          applicationLogLevelV2: lambda.ApplicationLogLevel.INFO
+          logFormat: lambda.LogFormat.JSON
         }
       ),
     };
