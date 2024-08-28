@@ -83,9 +83,13 @@ export class LambdaStack extends cdk.Stack {
           memorySize: 3008,
         }
       ),
-      blog: createNodeLambdaFunction(
-        "Lambda-blog",
-        "/blog"
+      blog_entry: createNodeLambdaFunction(
+        "Lambda-blog-entry",
+        "/blog/entry"
+      ),
+      blog_all: createNodeLambdaFunction(
+        "Lambda-blog-all",
+        "/blog/all"
       ),
       datas_route: createNodeLambdaFunction(
         "Lambda-datas-route",

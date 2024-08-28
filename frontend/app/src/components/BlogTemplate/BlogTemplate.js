@@ -3,18 +3,21 @@ import remarkGfm from 'remark-gfm';
 import ReactMarkdown from 'react-markdown';
 import AptGptUtility from '../utils/API/AptGptUtility';
 import SEOComponent from '../SEOComponent/SEOComponent';
+import { Buffer } from 'buffer';
+
 
 const BlogTemplate = ({ id, showLoading }) => {
     const [blogData, setBlogData] = useState({
         title: "",
         content: "",
         description: "",
-        keywords: ""
+        keywords: "",
+        image: ""
     });
 
     const fetchBlogData = useCallback(async () => {
         const client = new AptGptUtility();
-        const data = await client.blog(id);
+        const data = await client.blog_entry(id);
         setBlogData(data);
     }, [id]);
 
@@ -33,7 +36,9 @@ const BlogTemplate = ({ id, showLoading }) => {
         blockquote: ({ children }) => <blockquote className="border-l-4 border-blue-500 pl-4 italic my-6 text-gray-600">{children}</blockquote>,
     };
 
-    const { title, content, description, keywords } = blogData;
+    const { title, content, description, keywords, image } = blogData;
+
+    const imgSrc = image === "" ? "/parks.webp" : "data:image/webp;base64," + Buffer.from(image.data).toString('base64');
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -44,7 +49,7 @@ const BlogTemplate = ({ id, showLoading }) => {
             />
             <div className="container mx-auto px-4 py-8">
                 <div style={{ textAlign: "left" }} className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-                    <img src="/parks.webp" alt="Blog header" className="w-full object-cover object-center" />
+                    <img src={imgSrc} alt="Blog header" className="w-full object-cover object-center" />
                     <div className="p-8">
                         <h1 className="text-4xl font-bold text-gray-900 mb-6">{title}</h1>
                         <div className="prose max-w-none">

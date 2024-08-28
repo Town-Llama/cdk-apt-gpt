@@ -29,6 +29,7 @@ export class MainStack extends cdk.Stack {
 
     // Add the Lambda functions to the API Gateway
     Object.entries(lambdaStack.functions).forEach(([name, fn]) => {
+      console.log(!name.includes("blog"))
       const resourcePath = name.replace(/_/g, "/");
       const resource = apiGatewayStack.api.root.resourceForPath(resourcePath);
       const method = name.includes("cities") ? "GET" : "POST";
@@ -37,7 +38,7 @@ export class MainStack extends cdk.Stack {
         fn,
         method,
         apiGatewayStack.authorizer,
-        name !== "blog" //determines if we protect the route (if true, then we do)
+        !name.includes("blog") //determines if we protect the route (if true, then we do)
       );
     });
 

@@ -13,12 +13,18 @@ class AptGptUtility {
     this.user = user;
   }
 
-  async blog(id) {
-    const res = await this.post_unauthorized("blog", {
+  async blog_entry(id) {
+    const res = await this.post_unauthorized("blog/entry", {
       id
     });
     console.log(res, "res");
     return res.data[0];
+  }
+
+  async blog_all() {
+    const res = await this.post_unauthorized("blog/all", {});
+    console.log(res, "res");
+    return res.data;
   }
 
   async datas_modelOne() {
