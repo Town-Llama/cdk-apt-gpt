@@ -21,6 +21,6 @@ WORKDIR /opt/app/apts-gpt
 COPY frontend .
 WORKDIR /opt/app/apts-gpt/app
 # Install dependencies
-RUN npm install
+# RUN npm install && yarn && yarn build
 # Define the command to run your app
-CMD ["npm", "start"]
+# CMD ["npm", "start"]
