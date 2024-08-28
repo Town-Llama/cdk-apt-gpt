@@ -7,10 +7,6 @@ from aptgpt.data import Data
 from aptgpt.image_model import ImageModel
 
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s'
-)
 logger = logging.getLogger("ImageEmbedHandler")
 model = ImageModel()
 logger.info("hit")

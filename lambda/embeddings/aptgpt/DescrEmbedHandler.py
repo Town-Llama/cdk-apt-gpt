@@ -7,11 +7,7 @@ from aptgpt.data import Data
 from aptgpt.descr_model import DescrModel
 
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s'
-)
-logger = logging.getLogger("DescriptionEmbedHandler")
+logger = logging.getLogger("DescrEmbedHandler")
 model = DescrModel()
 logger.info("hit")
 

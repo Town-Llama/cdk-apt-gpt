@@ -65,6 +65,8 @@ export class LambdaStack extends cdk.Stack {
           ),
           timeout: cdk.Duration.seconds(90),
           memorySize: 3008,
+          loggingFormat: lambda.LogFormat.JSON,
+          applicationLogLevelV2: lambda.ApplicationLogLevel.INFO
         }
       ),
       datas_modelTwo: new lambda.DockerImageFunction(
@@ -81,6 +83,8 @@ export class LambdaStack extends cdk.Stack {
           ),
           timeout: cdk.Duration.seconds(90),
           memorySize: 3008,
+          loggingFormat: lambda.LogFormat.JSON,
+          applicationLogLevelV2: lambda.ApplicationLogLevel.INFO
         }
       ),
       blog: createNodeLambdaFunction(
@@ -153,10 +157,12 @@ export class LambdaStack extends cdk.Stack {
           timeout: cdk.Duration.seconds(90),
           memorySize: 128,
           environment: {
-            GOOGLE_API_KEY: process.env.GOOGLE_API_KEY! ? process.env.GOOGLE_API_KEY : (() => { throw new Error("GOOGLE_API_KEY is missing from the environment variables") })(),
-            OPEN_AI_KEY: process.env.OPEN_AI_KEY! ? process.env.OPEN_AI_KEY : (() => { throw new Error("OPEN_AI_KEY is missing from the environment variables") })(),
-            OUTSCRAPER_API_KEY: process.env.OUTSCRAPER_API_KEY! ? process.env.OUTSCRAPER_API_KEY : (() => { throw new Error("OUTSCRAPER_API_KEY is missing from the environment variables") })()
+            GOOGLE_API_KEY: process.env.GOOGLE_API_KEY!,
+            OPEN_AI_KEY: process.env.OPEN_AI_KEY!,
+            OUTSCRAPER_API_KEY: process.env.OUTSCRAPER_API_KEY!
           },
+          loggingFormat: lambda.LogFormat.JSON,
+          applicationLogLevelV2: lambda.ApplicationLogLevel.INFO
         }
       ),
     };
