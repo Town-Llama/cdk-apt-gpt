@@ -28,17 +28,43 @@ class AptGptUtility {
   }
 
   async datas_modelOne() {
-    const res = await this.post("datas/modelOne", {
-      'load_model': true,
-    });
-    console.log(res, "res");
-    return res.data;
+    try {
+      const res = await this.post("datas/modelOne", {
+        'load_model': true,
+      });
+      return res;
+    } catch (error) {
+      console.error("AptGptUtility.datas_modelOne error: ", error);
+      this.cloudWatchMetrics.emitErrorMetric(
+        "AptGptUtility",
+        "datas_modelOne"
+      );
+      await this.cloudWatchMetrics.writeLog(
+        "Error in AptGptUtility.datas_modelOne" +
+        " user {" + JSON.stringify(this.user) + "}"
+      );
+      throw error;
+    };
   }
 
   async datas_modelTwo() {
-    const res = await this.post("datas/modelTwo", {
-      'load_model': true,
-    });
+    try {
+      const res = await this.post("datas/modelTwo", {
+        'load_model': true,
+      });
+      return res;
+    } catch (error) {
+      console.error("AptGptUtility.datas_modelTwo error: ", error);
+      this.cloudWatchMetrics.emitErrorMetric(
+        "AptGptUtility",
+        "datas_modelTwo"
+      );
+      await this.cloudWatchMetrics.writeLog(
+        "Error in AptGptUtility.datas_modelTwo" +
+        " user {" + JSON.stringify(this.user) + "}"
+      );
+      throw error;
+    };
   }
 
   async datas_fetch_apt(apt_id) {

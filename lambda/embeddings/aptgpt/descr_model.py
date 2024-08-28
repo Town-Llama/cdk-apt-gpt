@@ -4,9 +4,7 @@ import logging
 
 
 model_cfg = {
-    'path': 'sentence-transformers/all-MiniLM-L6-v2', 
-    'method': 'sentence-transformers',
-    'content': False
+    'model': 'all-MiniLM-L6-v2'
 }
 logger = logging.getLogger(__name__)
 

@@ -13,8 +13,7 @@ RUN yum update -y && \
 # Install txtai dependencies
 RUN pip3 install --no-cache-dir torch==2.3.1 \
     torchvision==0.18.1 --index-url https://download.pytorch.org/whl/cpu \
-    --target "${LAMBDA_TASK_ROOT}" && \
-    pip3 install --no-cache-dir txtai[similarity] --target "${LAMBDA_TASK_ROOT}"
+    --target "${LAMBDA_TASK_ROOT}"
 # Remove gcc and clean up cache to reduce image size
 RUN yum remove -y gcc gcc-c++ && yum clean all && rm -rf /var/cache/yum
 

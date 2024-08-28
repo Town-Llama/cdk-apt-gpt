@@ -9,7 +9,7 @@
 		"dockerfile": "../../lambda/embeddings/Dockerfile",
 		"target": "dev"
 	},
-	"workspaceFolder": "/workspaces/cdk-apt-gpt/lambda/embeddings/aptgpt",
+	"workspaceFolder": "/workspaces/cdk-apt-gpt/lambda/embeddings",
 	"runArgs": [
 		// Initialize environment variables.
 		"--env-file",

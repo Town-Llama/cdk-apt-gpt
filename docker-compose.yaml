@@ -12,7 +12,7 @@ services:
     build:
       context: .
       target: frontend
-    entrypoint: [ "npm", "start" ]
+    command: [ "npm", "start" ]
     environment:
       # SERVICE_HOST is the hostname of the backend service
       - SERVICE_HOST=localhost

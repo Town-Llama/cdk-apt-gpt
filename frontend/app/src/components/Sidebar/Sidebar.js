@@ -89,34 +89,7 @@ const Sidebar = ({ isOpen, handleDrawerToggle }) => {
     process();
   }, [isAuthenticated, chat]);
 
-  const loadImageEmbeddingModel = async () => {
-    const client = new AptGptUtility(
-      getAccessTokenSilently,
-      isAuthenticated,
-      user
-    );
-
-    const model_status = await client.datas_modelTwo();
-    console.log(`Loading Image Model status: {model_status}`)
-    return model_status;
-  }
-
-  const loadDescrEmbeddingModel = async () => {
-    const client = new AptGptUtility(
-      getAccessTokenSilently,
-      isAuthenticated,
-      user
-    );
-
-    const model_status = await client.datas_modelOne();
-    console.log(`Loading Descr Model status: {model_status}`)
-    return model_status;
-  }
-
   const click = () => {
-
-    loadDescrEmbeddingModel();
-    loadImageEmbeddingModel();
     trackButtonClick("Sidebar_newSearch", user.sub);
     handleDrawerToggle();
     isOpen();

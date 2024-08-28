@@ -1,9 +1,10 @@
-import asyncio
+import threading
 import logging
 import numpy as np
 import time
 from aptgpt.data import Data
 from aptgpt.imodel import IModel
+from aptgpt import models
 
 
 logger = logging.getLogger(__name__)
@@ -20,6 +21,7 @@ class BaseModel(IModel):
         self.config = config
         self.model = None
         self.load_task = None
+        self.load_event = threading.Event()
     
     
     def forward(self, data: Data) -> np.ndarray:
@@ -28,16 +30,16 @@ class BaseModel(IModel):
         Returns:
             np.ndarray: The embedding of the data.
         """
-        return asyncio.run(self._fwd(data))
-        
-    async def _fwd(self, data: Data) -> np.ndarray:
         if self.load_task is None:
             self.load()
         
-        await self.load_task
-        data_obj = data.text if data.text else data.image
+        self.load_event.wait()
+        
         start = time.time()
-        embedding = self.model.encode(data_obj)
+        if data.text:
+            embedding = self.model.encode_text(data.text)
+        else:
+            embedding = self.model.encode_image(data.image)
         end = time.time()
         logger.info(f"Embedding computed in {end-start:.2f} seconds")
         return embedding
@@ -46,14 +48,16 @@ class BaseModel(IModel):
     def load(self) -> None:
         """Load the model."""
         if self.load_task is None:
-            self.load_task = asyncio.create_task(self._load_model())
+            self.load_task = threading.Thread(target=self._load_model)
+            self.load_task.start()
+        return None
     
-    async def _load_model(self) -> bool:
+    def _load_model(self) -> bool:
         start = time.time()
-        from txtai.vectors import VectorsFactory
-        self.model = VectorsFactory.create(self.config)
+        self.model = models.model_factory(**self.config)
         end = time.time()
         logger.info(f"Model loaded in {end-start:.2f} seconds")
+        self.load_event.set()
         return True
     
     
