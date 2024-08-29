@@ -5,8 +5,8 @@ import logging
 import requests
 import openai
 from outscraper import ApiClient
-import os
 import traceback
+import os
 
 
 logging.basicConfig(
@@ -33,10 +33,47 @@ def lambda_handler(event, context):
         body = json.loads(event['body'])
         apt = body.get('apt')
         
-        address_fields = ['buildingname', 'addresscity', 'addressstate', 'addressstreet', 'addresszipcode']
+        address_fields = ['buildingname', 'addressstreet', 'addresscity', 'addressstate', 'addresszipcode']
 
         if not apt or any([field not in apt for field in address_fields]):
-            return {
+            raise KeyError("Invalid event.body.apt")
+    except Exception as ex:
+        logger.error(
+            "Invalid event.body.apt", 
+            extra={
+                "error": str(ex),
+                "traceback": traceback.format_exc()
+                })
+        return {
+            'statusCode': 400,
+            'headers': {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                "Access-Control-Allow-Methods": "*"
+            },
+            'body': json.dumps({'error': 'Apartment Building Required'})
+        }
+
+    # remove building name if it is equal to the `addressstreet`
+    if apt[address_fields[0]] == apt[address_fields[1]]:
+        address_fields = address_fields[1:]
+    else:
+        # combine building name, city, state, and zipcode
+        _ = address_fields.pop(1)
+    address = ", ".join([apt[field] for field in address_fields])
+    try:
+        place_id = get_place_id(address, g_api_key)
+    except Exception as ex:
+        logger.error(
+            f"get_place_id failed for address: {address}", 
+            extra={
+                "apt": apt, 
+                "error": str(ex),
+                "traceback": traceback.format_exc()
+            }
+        )
+        return {
                 'statusCode': 400,
                 'headers': {
                     "Content-Type": "application/json",
@@ -44,24 +81,34 @@ def lambda_handler(event, context):
                     "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
                     "Access-Control-Allow-Methods": "*"
                 },
-                'body': json.dumps({'error': 'Apartment Building Required'})
+                'body': json.dumps({'error': 'Address Not Found'})
             }
-
-        # building name
-        address = ", ".join([apt[field] for field in address_fields[1:]])
-        building_name = apt[address_fields[0]]
-        if not address.startswith(building_name):
-            address = ", ".join([building_name, address])
-        place_id = get_place_id(address, g_api_key)
+    try:
         reviews = get_reviews(place_id, outscraper_api_key, reviews_limit=10)
         if len(reviews) == 0:
             raise Exception("No Reviews Found")
+    except Exception as ex:
+        logger.error(
+            f"get_reviews failed for address: {address}", 
+            extra={
+                "apt": apt, 
+                "error": str(ex),
+                "traceback": traceback.format_exc()
+            }
+        )
+        return {
+            'statusCode': 200,
+            'headers': {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                "Access-Control-Allow-Methods": "*"
+            },
+            'body': json.dumps({'data': 'Not Enough Information to Summarize Reviews'})
+        }
         
+    try:
         summary = summarize_reviews(reviews=reviews, api_key=oai_api_key)
-
-        # Log the review summary
-        logger.info(f"{summary} OK")
-
         # Return the review summary
         return {
             'statusCode': 201,
@@ -73,19 +120,25 @@ def lambda_handler(event, context):
             },
             'body': json.dumps({'data': summary})
         }
-    except Exception as e:
-        print(f"ERROR in reviews: {e}")
-        traceback.print_exc()
-
+    except Exception as ex:
+        logger.error(
+            f"summarize_reviews failed for address: {address}", 
+            extra={
+                "apt": apt, 
+                "error": str(ex),
+                "reviews": reviews,
+                "traceback": traceback.format_exc()
+            }
+        )
         return {
-            'statusCode': 200,
+            'statusCode': 400,
             'headers': {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
                 "Access-Control-Allow-Methods": "*"
             },
-            'body': json.dumps({'data': 'Not Enough Information to Summarize Reviews'})
+            'body': json.dumps({'error': 'Failed to Summarize Reviews'})
         }
 
 def search_nearby(latitude, longitude, g_api_key, radius=10):
