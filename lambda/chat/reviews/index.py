@@ -109,15 +109,6 @@ def lambda_handler(event, context):
         
     try:
         summary = summarize_reviews(reviews=reviews, api_key=oai_api_key)
-    except Exception as ex:
-        logger.error(
-            f"summarize_reviews failed for address: {address}", 
-            extra={
-                "apt": apt, 
-                "error": str(ex),
-                "traceback": traceback.format_exc()
-            }
-        )
         # Return the review summary
         return {
             'statusCode': 201,
@@ -128,6 +119,26 @@ def lambda_handler(event, context):
                 "Access-Control-Allow-Methods": "*"
             },
             'body': json.dumps({'data': summary})
+        }
+    except Exception as ex:
+        logger.error(
+            f"summarize_reviews failed for address: {address}", 
+            extra={
+                "apt": apt, 
+                "error": str(ex),
+                "reviews": reviews,
+                "traceback": traceback.format_exc()
+            }
+        )
+        return {
+            'statusCode': 400,
+            'headers': {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                "Access-Control-Allow-Methods": "*"
+            },
+            'body': json.dumps({'error': 'Failed to Summarize Reviews'})
         }
 
 def search_nearby(latitude, longitude, g_api_key, radius=10):
