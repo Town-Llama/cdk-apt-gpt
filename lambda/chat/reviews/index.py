@@ -55,9 +55,12 @@ def lambda_handler(event, context):
             'body': json.dumps({'error': 'Apartment Building Required'})
         }
 
-    # building name
+    # remove building name if it is equal to the `addressstreet`
     if apt[address_fields[0]] == apt[address_fields[1]]:
         address_fields = address_fields[1:]
+    else:
+        # combine building name, city, state, and zipcode
+        _ = address_fields.pop(1)
     address = ", ".join([apt[field] for field in address_fields])
     try:
         place_id = get_place_id(address, g_api_key)
