@@ -33,7 +33,7 @@ def lambda_handler(event, context):
         body = json.loads(event['body'])
         apt = body.get('apt')
         
-        address_fields = ['buildingname', 'addresscity', 'addressstate', 'addressstreet', 'addresszipcode']
+        address_fields = ['buildingname', 'addressstreet', 'addresscity', 'addressstate', 'addresszipcode']
 
         if not apt or any([field not in apt for field in address_fields]):
             raise KeyError("Invalid event.body.apt")
@@ -56,10 +56,9 @@ def lambda_handler(event, context):
         }
 
     # building name
-    address = ", ".join([apt[field] for field in address_fields[1:]])
-    building_name = apt[address_fields[0]]
-    if not address.startswith(building_name):
-        address = ", ".join([building_name, address])
+    if apt[address_fields[0]] == apt[address_fields[1]]:
+        address_fields = address_fields[1:]
+    address = ", ".join([apt[field] for field in address_fields])
     try:
         place_id = get_place_id(address, g_api_key)
     except Exception as ex:
