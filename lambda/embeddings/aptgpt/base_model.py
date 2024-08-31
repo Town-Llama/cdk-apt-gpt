@@ -55,8 +55,8 @@ class BaseModel(IModel):
         to be loaded or until the specified wait time has elapsed.
 
         Args:
-            wait (float): The maximum time to wait for the model to load, in seconds. 
-                Default is 15.0 seconds.
+            wait_sec (float): The maximum time to wait for the model to load,
+                in seconds. Default is 15.0 seconds.
 
         Returns:
             None
@@ -72,7 +72,7 @@ class BaseModel(IModel):
             start = time.time()
             while not self.load_event.is_set():
                 time.sleep(0.5)
-                if time.time()-start < wait_sec:
+                if time.time()-start >= wait_sec:
                     logger.warn(
                         f"Model loading took longer than {wait_sec:.1f} sec.",
                         extra={"config": self.config}
