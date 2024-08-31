@@ -27,7 +27,19 @@ class IModel(abc.ABC):
     
     
     @abc.abstractmethod
-    def load(self) -> None:
-        """Load the model."""
+    def load(self, wait_sec: float = 15.0) -> None:
+        """Load the model asynchronously.
+
+        This method starts a new thread to load the model if it is not already 
+        being loaded. It starts of the model loading process and waits for the model
+        to be loaded or until the specified wait time has elapsed.
+
+        Args:
+            wait_sec (float): The maximum time to wait for the model to load,
+                in seconds. Default is 15.0 seconds.
+
+        Returns:
+            None
+        """
         
         pass
