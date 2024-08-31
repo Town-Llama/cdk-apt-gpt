@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useParams } from 'react-router-dom';
-import { Loader, Dimmer } from 'semantic-ui-react';
+import { Dimmer, Loader } from 'semantic-ui-react';
 
 import ChatV2 from "./components/ChatV2/ChatV2";
-import ErrorBoundary from './components/utils/ErrorBoundary';
 import SEOComponent from './components/SEOComponent/SEOComponent';
+import ErrorBoundary from './components/utils/ErrorBoundary';
 
-import './App.css';
 import 'semantic-ui-css/semantic.min.css';
+import './App.css';
 import BlogTemplate from './components/BlogTemplate/BlogTemplate';
 
 // Home component with its own SEO
@@ -65,6 +65,20 @@ function App() {
 
       return () => clearInterval(interval);
     }
+
+    const fn = async () => {
+      return await (await fetch("/datas/foobar.txt")).text();
+    };
+    fn().then((data) => {
+      console.log("GOT DATA" + data)
+    })
+
+    const fn2 = async () => {
+      return await (await fetch("/api/health_check")).text();
+    };
+    fn2().then((data) => {
+      console.log("GOT API" + data)
+    })
   }, [loading]);
 
   return (

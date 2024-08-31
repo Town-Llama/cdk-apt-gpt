@@ -32,6 +32,7 @@
     "fs": "^0.0.1-security",
     "groq-sdk": "^0.3.3",
     "history": "^5.3.0",
+    "http-proxy-middleware": "^3.0.0",
     "leaflet": "^1.9.4",
     "leaflet-routing-machine": "^3.2.12",
     "lucide-react": "^0.400.0",

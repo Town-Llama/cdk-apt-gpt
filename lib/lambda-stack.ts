@@ -1,13 +1,13 @@
 import * as cdk from "aws-cdk-lib";
+import * as apigateway from "aws-cdk-lib/aws-apigateway";
+import * as certificatemanager from "aws-cdk-lib/aws-certificatemanager";
 import { Platform } from "aws-cdk-lib/aws-ecr-assets";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as route53 from "aws-cdk-lib/aws-route53";
+import * as ses from "aws-cdk-lib/aws-ses";
 import { Construct } from "constructs";
 import * as path from "path";
-import * as ses from 'aws-cdk-lib/aws-ses';
-import * as apigateway from "aws-cdk-lib/aws-apigateway";
-import * as certificatemanager from "aws-cdk-lib/aws-certificatemanager";
-import * as route53 from "aws-cdk-lib/aws-route53";
 
 interface LambdaProps extends cdk.StackProps {
   domainName: string;
@@ -59,7 +59,7 @@ export class LambdaStack extends cdk.Stack {
       description: "A layer for LLM operations",
     });
 
-    const loadBalancerDns = cdk.Fn.importValue('LoadBalancerDNS');
+    const loadBalancerDns = cdk.Fn.importValue("LoadBalancerDNS");
 
     const createNodeLambdaFunction = (name: string, handlerPath: string) =>
       new lambda.Function(this, name, {
@@ -81,21 +81,54 @@ export class LambdaStack extends cdk.Stack {
           OPEN_AI_KEY: process.env.OPEN_AI_KEY!,
           GOOGLE_API_KEY: process.env.GOOGLE_API_KEY!,
           OUTSCRAPER_API_KEY: process.env.OUTSCRAPER_API_KEY!,
-          LOAD_BALANCER_DNS: loadBalancerDns
+          LOAD_BALANCER_DNS: loadBalancerDns,
         },
         layers: [dbLayer, llmLayer],
         timeout: cdk.Duration.seconds(90),
       });
 
     this.functions = {
-      blog_entry: createNodeLambdaFunction(
-        "Lambda-blog-entry",
-        "/blog/entry"
-      ),
-      blog_all: createNodeLambdaFunction(
-        "Lambda-blog-all",
-        "/blog/all"
-      ),
+      blog_entry: createNodeLambdaFunction("Lambda-blog-entry", "/blog/entry"),
+      blog_all: createNodeLambdaFunction("Lambda-blog-all", "/blog/all"),
+      api: new lambda.Function(this, "api", {
+        runtime: lambda.Runtime.NODEJS_20_X,
+        handler: "src/lambdaServer.handler",
+        code: lambda.AssetCode.fromAsset("./backend", {
+          bundling: {
+            image: lambda.Runtime.NODEJS_20_X.bundlingImage,
+            command: [
+              "bash",
+              "-c",
+              `
+            export npm_config_cache=/tmp/.npm &&
+            npm install && 
+            npm run build &&
+            cp -au node_modules /asset-output &&
+            cp -au build/* /asset-output
+            `,
+            ],
+            //environment: props.bundleEnvironment,
+          },
+        }),
+        environment: {
+          MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN!,
+          GROQ_API_KEY: process.env.GROQ_API_KEY!,
+          AUTH0_DOMAIN: process.env.AUTH0_DOMAIN!,
+          AUTH0_AUDIENCE: process.env.AUTH0_AUDIENCE!,
+          DB_USER: process.env.DB_USER!,
+          DB_HOST: process.env.DB_HOST!,
+          DB_PORT: process.env.DB_PORT!,
+          DB_DATABASE: process.env.DB_DATABASE!,
+          DB_PW: process.env.DB_PW!,
+          DB_SSL: process.env.DB_SSL!,
+          FIREWORKS_API_KEY: process.env.FIREWORKS_API_KEY!,
+          OPEN_AI_KEY: process.env.OPEN_AI_KEY!,
+          GOOGLE_API_KEY: process.env.GOOGLE_API_KEY!,
+          OUTSCRAPER_API_KEY: process.env.OUTSCRAPER_API_KEY!,
+        },
+        layers: [dbLayer, llmLayer],
+        timeout: cdk.Duration.seconds(90),
+      }),
       datas_route: createNodeLambdaFunction(
         "Lambda-datas-route",
         "/datas/route"
@@ -156,7 +189,7 @@ export class LambdaStack extends cdk.Stack {
             path.join(__dirname, "../lambda/chat/reviews"),
             {
               platform: Platform.LINUX_AMD64,
-              target: "deploy"
+              target: "deploy",
             }
           ),
           timeout: cdk.Duration.seconds(90),
@@ -164,31 +197,32 @@ export class LambdaStack extends cdk.Stack {
           environment: {
             GOOGLE_API_KEY: process.env.GOOGLE_API_KEY!,
             OPEN_AI_KEY: process.env.OPEN_AI_KEY!,
-            OUTSCRAPER_API_KEY: process.env.OUTSCRAPER_API_KEY!
-          }
+            OUTSCRAPER_API_KEY: process.env.OUTSCRAPER_API_KEY!,
+          },
         }
       ),
     };
 
     // Special cases
-    const ses_identity = new ses.CfnEmailIdentity(this, 'EmailIdentity', {
-      emailIdentity: 'seaholmdataco@gmail.com', // Replace with your email address
+    const ses_identity = new ses.CfnEmailIdentity(this, "EmailIdentity", {
+      emailIdentity: "seaholmdataco@gmail.com", // Replace with your email address
     });
     const sesIdentityArn = `arn:aws:ses:${this.region}:${this.account}:identity/${ses_identity.emailIdentity}`;
 
     this.functions.datas_book.addToRolePolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
-        actions: ['ses:SendEmail', 'ses:SendRawEmail'],
+        actions: ["ses:SendEmail", "ses:SendRawEmail"],
         resources: [sesIdentityArn], // Replace with your SES identity ARN
       })
     );
 
-    this.functions.datas_search.addToRolePolicy(new iam.PolicyStatement({
-      actions: ['elasticloadbalancing:DescribeLoadBalancers'],
-      resources: ['*']
-    }));
-
+    this.functions.datas_search.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ["elasticloadbalancing:DescribeLoadBalancers"],
+        resources: ["*"],
+      })
+    );
 
     // now make API gaeteway
     const domainTld = "townllama.ai";
@@ -263,10 +297,9 @@ export class LambdaStack extends cdk.Stack {
       }
     );
 
-
     /** tie the functions to our api gateway */
     Object.entries(this.functions).forEach(([name, fn]) => {
-      console.log(!name.includes("blog"))
+      console.log(!name.includes("blog"));
       const resourcePath = name.replace(/_/g, "/");
       const resource = this.api.root.resourceForPath(resourcePath);
       const method = name.includes("cities") ? "GET" : "POST";
@@ -279,7 +312,6 @@ export class LambdaStack extends cdk.Stack {
       );
     });
   }
-
 
   // Helper functions
   createLambdaIntegration = (
@@ -337,23 +369,19 @@ export class LambdaStack extends cdk.Stack {
         methodResponses: [
           {
             statusCode: "200",
-            responseParameters:
-              LambdaStack.methodResponse.responseParameters,
+            responseParameters: LambdaStack.methodResponse.responseParameters,
           },
           {
             statusCode: "201",
-            responseParameters:
-              LambdaStack.methodResponse.responseParameters,
+            responseParameters: LambdaStack.methodResponse.responseParameters,
           },
           {
             statusCode: "400",
-            responseParameters:
-              LambdaStack.methodResponse.responseParameters,
+            responseParameters: LambdaStack.methodResponse.responseParameters,
           },
           {
             statusCode: "500",
-            responseParameters:
-              LambdaStack.methodResponse.responseParameters,
+            responseParameters: LambdaStack.methodResponse.responseParameters,
           },
         ],
       }
