@@ -368,57 +368,60 @@ const ApartmentTableV2 = () => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
-  const tableData = (
-    <table {...getTableProps()} className={styles.table}>
-      <thead>
-        {headerGroups.map((headerGroup) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column, colIndex) => (
-              <th
-                {...column.getHeaderProps()}
-                className={`${styles.th} ${colIndex === 0 ? styles.firstColumn : styles.fixedWidth
-                  }`}
-              >
-                {colIndex == 0 ? (
-                  null
-                ) : (
-                  column.render("Header")
-                )}
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row, rowIndex) => {
-          prepareRow(row);
-          return (
-            <tr
-              {...row.getRowProps()}
-              className={`${rowIndex % 2 === 0 ? styles.evenRow : ""} 
+  const tableData = useMemo(() => {
+    if (isSmallScreen) return null;
+    return (
+      <table {...getTableProps()} className={styles.table}>
+        <thead>
+          {headerGroups.map((headerGroup) => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column, colIndex) => (
+                <th
+                  {...column.getHeaderProps()}
+                  className={`${styles.th} ${colIndex === 0 ? styles.firstColumn : styles.fixedWidth
+                    }`}
+                >
+                  {colIndex == 0 ? (
+                    null
+                  ) : (
+                    column.render("Header")
+                  )}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody {...getTableBodyProps()}>
+          {rows.map((row, rowIndex) => {
+            prepareRow(row);
+            return (
+              <tr
+                {...row.getRowProps()}
+                className={`${rowIndex % 2 === 0 ? styles.evenRow : ""} 
             ${rowIndex == 1 ? styles.alignTop : ""}
             `}
-            >
-              {row.cells.map((cell, colIndex) => {
-                const cellProps = cell.getCellProps();
-                const cellContent = cell.render("Cell");
+              >
+                {row.cells.map((cell, colIndex) => {
+                  const cellProps = cell.getCellProps();
+                  const cellContent = cell.render("Cell");
 
-                const colSpan =
-                  cell.column.id === "properties[0].value" &&
-                  cell.row.original.properties[0].colSpan;
+                  const colSpan =
+                    cell.column.id === "properties[0].value" &&
+                    cell.row.original.properties[0].colSpan;
 
-                return (
-                  <td {...cellProps} colSpan={colSpan}>
-                    {cellContent}
-                  </td>
-                );
-              })}
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  );
+                  return (
+                    <td {...cellProps} colSpan={colSpan}>
+                      {cellContent}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    );
+  });
 
   const blogData = useMemo(() => {
     if (!isSmallScreen) return null;

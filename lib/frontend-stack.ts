@@ -8,14 +8,14 @@ import * as route53_targets from 'aws-cdk-lib/aws-route53-targets';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
-import { ApiGatewayStack } from './api-gateway-stack';
+import { LambdaStack } from './lambda-stack';
 
 interface FrontendStackProps extends cdk.StackProps {
   domainName: string;
 }
 
 export class FrontendStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, apiGatewayStack: ApiGatewayStack, props: FrontendStackProps) {
+  constructor(scope: Construct, id: string, apiGatewayStack: LambdaStack, props: FrontendStackProps) {
     super(scope, id, props);
 
     const domainName = props.domainName;

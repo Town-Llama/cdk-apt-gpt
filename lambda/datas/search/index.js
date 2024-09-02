@@ -1,8 +1,7 @@
 const AWS = require('aws-sdk');
-const lambda = new AWS.Lambda();
 const { dbCall } = require('db');
 const pgvector = require('pgvector/pg');
-
+const axios = require('axios');
 
 exports.handler = async (event) => {
   try {
@@ -126,37 +125,37 @@ function filterDuplicateUnits(results) {
 }
 
 const callImageEmbeddingModel = async (data, isText) => {
-  const params = {
-    FunctionName: 'Lambda-image-embedding-model', // The name of the Lambda function to invoke
-    InvocationType: 'RequestResponse', // Synchronous invocation
-    Payload: JSON.stringify({
-      body: JSON.stringify({
-        'isText': isText,
-        'payload': data
-      })
-    }), // Pass the event received by this Lambda function to the other Lambda function
-  };
-  //allow it to take longer than 3 seconds on cold start
-  const result = await lambda.invoke(params).promise();
-  const a = JSON.parse(result.Payload);
-  const b = JSON.parse(a.body);
-  return b.embedding;
+  try {
+    const response = await axios.post(`http://${process.env.LOAD_BALANCER_DNS}/image`, {
+      isText: isText,
+      payload: data
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    return response.data.embedding;
+  } catch (error) {
+    console.error('Error calling image embedding service:', error);
+    throw error;
+  }
 }
 
 const callDescrEmbeddingModel = async (data, isText) => {
-  const params = {
-    FunctionName: 'Lambda-descr-embedding-model', // The name of the Lambda function to invoke
-    InvocationType: 'RequestResponse', // Synchronous invocation
-    Payload: JSON.stringify({
-      body: JSON.stringify({
-        'isText': isText,
-        'payload': data
-      })
-    }), // Pass the event received by this Lambda function to the other Lambda function
-  };
-  //allow it to take longer than 3 seconds on cold start
-  const result = await lambda.invoke(params).promise();
-  const a = JSON.parse(result.Payload);
-  const b = JSON.parse(a.body);
-  return b.embedding;
+  try {
+    const response = await axios.post(`http://${process.env.LOAD_BALANCER_DNS}/text`, {
+      isText: isText,
+      payload: data
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    return response.data.embedding;
+  } catch (error) {
+    console.error('Error calling description embedding service:', error);
+    throw error;
+  }
 }

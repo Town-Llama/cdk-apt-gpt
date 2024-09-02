@@ -1,8 +1,8 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
-import { ApiGatewayStack } from "./api-gateway-stack";
 import { FrontendStack } from "./frontend-stack";
 import { LambdaStack } from "./lambda-stack";
+import { EcsStack } from "./ecs-stack";
 
 export class MainStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -11,13 +11,12 @@ export class MainStack extends cdk.Stack {
     const isProd = props?.env?.account === "021891618047";
     const domainName = isProd ? "townllama.ai" : "beta.townllama.ai";
 
-    // Create the Lambda Stack
-    const lambdaStack = new LambdaStack(this, "LambdaStack", {
-      env: props?.env,
-    });
+    const ecsStack = new EcsStack(this, "ECSStack", {
+      env: props?.env
+    })
 
-    // Create the API Gateway Stack
-    const apiGatewayStack = new ApiGatewayStack(this, "ApiGatewayStack", {
+    // Create the Lambda Stack & API Gateway stack
+    const lambdaStack = new LambdaStack(this, "LambdaStack", {
       env: props?.env,
       domainName: domainName,
       authorizerProps: {
@@ -27,28 +26,15 @@ export class MainStack extends cdk.Stack {
       },
     });
 
-    // Add the Lambda functions to the API Gateway
-    Object.entries(lambdaStack.functions).forEach(([name, fn]) => {
-      console.log(!name.includes("blog"))
-      const resourcePath = name.replace(/_/g, "/");
-      const resource = apiGatewayStack.api.root.resourceForPath(resourcePath);
-      const method = name.includes("cities") ? "GET" : "POST";
-      apiGatewayStack.createLambdaIntegration(
-        resource,
-        fn,
-        method,
-        apiGatewayStack.authorizer,
-        !name.includes("blog") //determines if we protect the route (if true, then we do)
-      );
-    });
-
     // Add any necessary dependencies between stacks
-    apiGatewayStack.addDependency(lambdaStack);
+    lambdaStack.addDependency(ecsStack);
 
     // Create the Frontend Stack
-    const frontendStack = new FrontendStack(this, "FrontendStack", apiGatewayStack, {
+    const frontendStack = new FrontendStack(this, "FrontendStack", lambdaStack, {
       domainName,
       env: props?.env,
     });
+
+    frontendStack.addDependency(lambdaStack);
   }
 }

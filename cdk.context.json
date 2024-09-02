@@ -2,5 +2,10 @@
   "hosted-zone:account=021891618047:domainName=townllama.ai:region=us-east-2": {
     "Id": "/hostedzone/Z05427421AEA2J4SVCTGG",
     "Name": "townllama.ai."
-  }
+  },
+  "availability-zones:account=021891618047:region=us-east-2": [
+    "us-east-2a",
+    "us-east-2b",
+    "us-east-2c"
+  ]
 }
