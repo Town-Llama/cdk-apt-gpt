@@ -100,11 +100,17 @@ export class LambdaStack extends cdk.Stack {
               "bash",
               "-c",
               `
+            export HOME=./ &&
             export npm_config_cache=/tmp/.npm &&
-            npm install && 
-            npm run build &&
-            cp -au node_modules /asset-output &&
-            cp -au build/* /asset-output
+            mkdir /tmp/yarn && pushd /tmp/yarn &&
+            npm install yarn &&
+            popd &&
+            rm -r -f node_modules &&
+            /tmp/yarn/node_modules/.bin/yarn &&
+            /tmp/yarn/node_modules/.bin/yarn build &&
+            cp -rf node_modules /asset-output &&
+            cp -rf build/* /asset-output &&
+            find /asset-output -name ".*" | grep .bin$ | xargs -I repme rm -rf repme
             `,
             ],
             //environment: props.bundleEnvironment,
