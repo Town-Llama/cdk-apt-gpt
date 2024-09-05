@@ -30,7 +30,7 @@ const Blog = ({ showLoading }) => {
   return (
     <div className="blog-container bg-gray-50 min-h-screen px-4">
       <h1 className="message-bubble fixed top-0 left-0 right-0 bg-gray-900 text-white text-3xl font-bold p-4 z-50 shadow-md">
-        <a href="https://townllama.ai" className="no-underline text-white">🦙 Town Llama Blog</a>
+        <a href="/blog" className="no-underline text-white">🦙 Town Llama Blog</a>
       </h1>
       <div className="pt-20"> {/* Add padding to account for the fixed header */}
         <BlogTemplate id={blogId} showLoading={showLoading} />

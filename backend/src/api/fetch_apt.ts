@@ -1,17 +1,10 @@
 import { Router } from "express";
-const { dbCall } = require("db");
+import { dbCall } from "../lib/db";
 
 const router = Router();
 
-router.get("/health_check", (req, res) => {
-  console.debug("health check running");
-  res.status(200).json({ message: "ok" });
-});
-
 router.get("/fetch_apt/:address", async (req, res) => {
-  console.log("QUERY", req.params);
   const address = req.params.address;
-  console.log("ADDRESS", address);
 
   const query = `SELECT u.id AS unit_id, u.property_id, u.property_ts, u.available, u.name, u.baths, u.beds, u.area, u.ts,
              u.rent_12_month_monthly, u.rent_11_month_monthly, u.rent_10_month_monthly, u.rent_9_month_monthly,
@@ -27,8 +20,6 @@ router.get("/fetch_apt/:address", async (req, res) => {
   const values = [address];
 
   const responses = await dbCall(query, values);
-
-  console.log(responses, "res");
 
   res.status(200).json({ data: responses });
 });

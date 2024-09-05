@@ -1,51 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Town Llama: Easily Find Your Next Apartment"
+    />
+    <link rel="manifest" href="/manifest.json" />
 
-<head>
-  <meta charset="utf-8" />
-  <link rel="icon" href="https://townllama.ai/favicon.ico" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#000000" />
-  <meta name="description" content="Town Llama: Easily Find Your Next Apartment" />
-  <link rel="manifest" href="https://townllama.ai/manifest.json" />
+    <title>Town Llama</title>
 
-  <title>Town Llama</title>
+    <!-- Leaflet -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
 
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Town Llama" />
+    <meta
+      property="og:description"
+      content="Town Llama: Easily Find Your Next Apartment"
+    />
+    <meta property="og:image" content="/imessage.png" />
+    <meta property="og:url" content="https://townllama.ai" />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:site_name"
+      content="Town Llama: Easily Find Your Next Apartment"
+    />
 
-  <!-- Open Graph Meta Tags -->
-  <meta property="og:title" content="Town Llama" />
-  <meta property="og:description" content="Town Llama: Easily Find Your Next Apartment" />
-  <meta property="og:image" content="https://townllama.ai/imessage.png" />
-  <meta property="og:url" content="https://townllama.ai" />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Town Llama: Easily Find Your Next Apartment" />
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Town Llama" />
+    <meta
+      name="twitter:description"
+      content="Town Llama: Easily Find Your Next Apartment"
+    />
+    <meta name="twitter:image" content="/imessage.png" />
+    <meta name="twitter:url" content="https://townllama.ai" />
+    <meta name="twitter:site" content="@townllama_ai" />
 
-  <!-- Twitter Card Meta Tags -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Town Llama" />
-  <meta name="twitter:description" content="Town Llama: Easily Find Your Next Apartment" />
-  <meta name="twitter:image" content="https://townllama.ai/imessage.png" />
-  <meta name="twitter:url" content="https://townllama.ai" />
-  <meta name="twitter:site" content="@townllama_ai" />
+    <!-- Apple Specific Meta Tags for iMessage -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="format-detection" content="telephone=no" />
+    <meta
+      name="apple-mobile-web-app-title"
+      content="Town Llama: Easily Find Your Next Apartment"
+    />
+    <link rel="apple-touch-icon-precomposed" href="/imessage.png" />
+    <link rel="apple-touch-icon" href="/imessage.png" />
+  </head>
 
-  <!-- Apple Specific Meta Tags for iMessage -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="format-detection" content="telephone=no" />
-  <meta name="apple-mobile-web-app-title" content="Town Llama: Easily Find Your Next Apartment" />
-  <link rel="apple-touch-icon-precomposed" href="https://townllama.ai/imessage.png" />
-  <link rel="apple-touch-icon" href="https://townllama.ai/imessage.png" />
-
-</head>
-
-<body>
-  <noscript>You need to enable JavaScript to run this app.</noscript>
-  <div id="root"></div>
-</body>
-
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
 </html>

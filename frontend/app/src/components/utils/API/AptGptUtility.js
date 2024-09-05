@@ -3,7 +3,7 @@ import globalRequestManager from "./RequestManager"; // Import the global reques
 const auth_config = require("../../../auth/auth_config.json");
 
 class AptGptUtility {
-  static BASE_URL = "https://townllama.ai"; // if beta
+  static BASE_URL = "";//"https://townllama.ai"; // if beta
   //static BASE_URL = 'https://api.beta.townllama.ai'; // if beta
 
   constructor(getAccessTokenSilently = null, isAuthenticated = false, user = null) {
@@ -29,7 +29,7 @@ class AptGptUtility {
 
   async datas_modelOne() {
     try {
-      const res = await this.post("datas/modelOne", {
+      const res = await this.post("api/modelOne", {
         'load_model': true,
       });
       return res;
@@ -49,7 +49,7 @@ class AptGptUtility {
 
   async datas_modelTwo() {
     try {
-      const res = await this.post("datas/modelTwo", {
+      const res = await this.post("api/modelTwo", {
         'load_model': true,
       });
       return res;
@@ -69,8 +69,7 @@ class AptGptUtility {
 
   async datas_fetch_apt(apt_id) {
     const res = await globalRequestManager.enqueueRequest(() =>
-      this.post("datas/fetch_apt", {
-        apt_id,
+      this.get(`api/fetch_apt/${apt_id}`, {
       })
     );
     return res.data;
@@ -78,7 +77,7 @@ class AptGptUtility {
 
   async datas_previouschat(conversationid) {
     const res = await globalRequestManager.enqueueRequest(() =>
-      this.post("datas/previouschat", {
+      this.post("api/previouschat", {
         conversationid,
         userid: this.user.email,
       })
@@ -88,7 +87,7 @@ class AptGptUtility {
 
   async datas_route(start, end) {
     const res = await globalRequestManager.enqueueRequest(() =>
-      this.post("datas/route", {
+      this.post("api/route", {
         start,
         end,
       })
@@ -98,28 +97,28 @@ class AptGptUtility {
 
   async datas_neighborhoods(city) {
     const res = await globalRequestManager.enqueueRequest(() =>
-      this.post("datas/neighborhoods", { city })
+      this.post("api/neighborhoods", { city })
     );
     return res.data;
   }
 
   async datas_cities() {
     const res = await globalRequestManager.enqueueRequest(() =>
-      this.get("datas/cities")
+      this.get("api/cities")
     );
     return res.data;
   }
 
   async datas_search(form_data) {
     const res = await globalRequestManager.enqueueRequest(() =>
-      this.post("datas/search", { ...form_data, user: this.user.email })
+      this.post("api/search", { ...form_data, user: this.user.email })
     );
     return res.data;
   }
 
   async datas_waitlist() {
     const res = await globalRequestManager.enqueueRequest(() =>
-      this.post("datas/waitlist", {
+      this.post("api/waitlist", {
         userid: this.user.email,
       })
     );
@@ -128,7 +127,7 @@ class AptGptUtility {
 
   async datas_chats() {
     const res = await globalRequestManager.enqueueRequest(() =>
-      this.post("datas/chats", {
+      this.post("api/chats", {
         userid: this.user.email,
       })
     );
@@ -145,7 +144,7 @@ class AptGptUtility {
     aptIdArr
   ) {
     const res = await globalRequestManager.enqueueRequest(() =>
-      this.post("datas/chats/record", {
+      this.post("api/chats/record", {
         user: this.user.email,
         ask,
         conversationid,
@@ -207,7 +206,7 @@ class AptGptUtility {
   }
 
   async datas_book(ask, conversationid, aptId) {
-    const res = await this.post("datas/book", {
+    const res = await this.post("api/book", {
       userid: this.user.email,
       ask,
       conversationid,

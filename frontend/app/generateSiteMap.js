@@ -13,7 +13,7 @@ async function getApartmentPages() {
     const headers = {
         "Content-Type": "application/json",
     };
-    const url = domain + "/blog/all"; // Construct the full URL
+    const url = "/blog/all"; // Construct the full URL
     try {
         const response = await fetch(url, {
             method: "POST",
