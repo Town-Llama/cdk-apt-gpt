@@ -69,6 +69,17 @@ export class FrontendStack extends cdk.Stack {
       }
     );
 
+    const cachePolicyNoAuth = new cloudfront.CachePolicy(
+      this,
+      "CachePolicyNoAuth",
+      {
+        cachePolicyName: "CachePolicyNoAuth",
+        defaultTtl: cdk.Duration.minutes(5),
+        minTtl: cdk.Duration.seconds(0),
+        maxTtl: cdk.Duration.minutes(10),
+      }
+    );
+
     const distribution = new cloudfront.Distribution(
       this,
       "WebsiteDistribution",
@@ -123,7 +134,7 @@ export class FrontendStack extends cdk.Stack {
       ),
       {
         allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
-        cachePolicy: cachePolicy,
+        cachePolicy: cachePolicyNoAuth,
       }
     );
 

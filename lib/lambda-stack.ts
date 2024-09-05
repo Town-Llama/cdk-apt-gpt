@@ -300,15 +300,18 @@ export class LambdaStack extends cdk.Stack {
     /** tie the functions to our api gateway */
     Object.entries(this.functions).forEach(([name, fn]) => {
       console.log(!name.includes("blog"));
-      const resourcePath = name.replace(/_/g, "/");
+      var resourcePath = name.replace(/_/g, "/");
+      if (resourcePath === "api") {
+        resourcePath = "api/{proxy+}";
+      }
       const resource = this.api.root.resourceForPath(resourcePath);
-      const method = name.includes("cities") ? "GET" : "POST";
+      const method = "ANY";
       this.createLambdaIntegration(
         resource,
         fn,
         method,
         this.authorizer,
-        !name.includes("blog") //determines if we protect the route (if true, then we do)
+        !name.includes("blog") && !name.includes("api") //determines if we protect the route (if true, then we do)
       );
     });
   }

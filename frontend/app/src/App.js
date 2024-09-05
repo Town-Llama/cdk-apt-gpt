@@ -65,20 +65,6 @@ function App() {
 
       return () => clearInterval(interval);
     }
-
-    const fn = async () => {
-      return await (await fetch("/datas/foobar.txt")).text();
-    };
-    fn().then((data) => {
-      console.log("GOT DATA" + data)
-    })
-
-    const fn2 = async () => {
-      return await (await fetch("/api/health_check")).text();
-    };
-    fn2().then((data) => {
-      console.log("GOT API" + data)
-    })
   }, [loading]);
 
   return (
