@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { dbCall } from "../lib/db";
+import routeHelper from "../lib/route_helper";
 
 const router = Router();
+export default router;
 
 router.post("/waitlist", async (req, res) => {
   try {
@@ -47,4 +49,41 @@ router.post("/waitlist", async (req, res) => {
   }
 });
 
-export default router;
+router.post("/waitlist/record", async (req, res) => {
+  routeHelper(req, res, async () => {
+    // Parse the request body
+    const body = req.body;
+    const { userid, recommendeduser } = body;
+
+    if (!userid) {
+      res.status(400).json({ error: "User ID is required" });
+      return;
+    }
+
+    // Insert the recommendation if it doesn't already exist
+    let query = `
+        INSERT INTO recommendations (recommendation_id, userid, recommendeduser, recommendationtime)
+        SELECT 
+            gen_random_uuid(), 
+            $1, 
+            $2, 
+            NOW()
+        WHERE 
+            NOT EXISTS (
+                SELECT 1 
+                FROM recommendations 
+                WHERE recommendeduser = $2
+            );
+        `;
+    let values = [userid, recommendeduser];
+
+    // Execute the query
+    const result = await dbCall(query, values);
+
+    // Check if a row was inserted
+    const entryAdded = result.length > 0;
+
+    // Return the response
+    res.status(200).json({ data: entryAdded });
+  });
+});

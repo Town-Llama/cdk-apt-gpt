@@ -13,7 +13,7 @@ async function getApartmentPages() {
     const headers = {
         "Content-Type": "application/json",
     };
-    const url = "/blog/all"; // Construct the full URL
+    const url = "/api/blog/all"; // Construct the full URL
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -41,7 +41,7 @@ async function generateSitemap() {
 
     const pages = [
         ...staticPages.map(page => ({ url: page, lastmod: new Date().toISOString() })),
-        ...apartments.map(apt => ({ url: `/blog/${apt.slug}`, lastmod: apt.lastmod })),
+        ...apartments.map(apt => ({ url: `/api/blog/posts/${apt.slug}`, lastmod: apt.lastmod })),
     ];
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

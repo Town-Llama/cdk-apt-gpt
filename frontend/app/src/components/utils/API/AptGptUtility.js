@@ -14,15 +14,13 @@ class AptGptUtility {
   }
 
   async blog_entry(id) {
-    const res = await this.post_unauthorized("blog/entry", {
-      id
-    });
+    const res = await this.post_unauthorized("api/blog/posts/" + id);
     console.log(res, "res");
     return res.data[0];
   }
 
   async blog_all() {
-    const res = await this.post_unauthorized("blog/all", {});
+    const res = await this.post_unauthorized("api/blog/all", {});
     console.log(res, "res");
     return res.data;
   }
@@ -144,7 +142,7 @@ class AptGptUtility {
     aptIdArr
   ) {
     const res = await globalRequestManager.enqueueRequest(() =>
-      this.post("api/chats/record", {
+      this.post("api/chat/record", {
         user: this.user.email,
         ask,
         conversationid,
@@ -160,7 +158,7 @@ class AptGptUtility {
 
   async chat_reviews(apt) {
     const res = await globalRequestManager.enqueueRequest(() =>
-      this.post("chat/reviews", {
+      this.post("api/chat/reviews", {
         apt,
         user: this.user.email,
       })
@@ -170,7 +168,7 @@ class AptGptUtility {
 
   async chat_pois(msg) {
     const res = await globalRequestManager.enqueueRequest(() =>
-      this.post("chat/pois", {
+      this.post("api/chat/pois", {
         msg,
       })
     );
@@ -179,7 +177,7 @@ class AptGptUtility {
 
   async chat_next(msgs, conversation_id) {
     const res = await globalRequestManager.enqueueRequest(() =>
-      this.post("chat/next", {
+      this.post("api/chat/next", {
         msgs,
         conversation_id,
         user_id: this.user.email,
@@ -190,7 +188,7 @@ class AptGptUtility {
 
   async chat_suggestion(rec, formdata) {
     const res = await globalRequestManager.enqueueRequest(() =>
-      this.post("chat/suggestion", {
+      this.post("api/chat/suggestion", {
         rec,
         formdata,
       })
@@ -200,7 +198,7 @@ class AptGptUtility {
 
   async chat_suggestion_short(rec, formdata) {
     const res = await globalRequestManager.enqueueRequest(() =>
-      this.post("chat/suggestion/short", { rec, formdata })
+      this.post("api/chat/suggestion/short", { rec, formdata })
     );
     return res.data;
   }

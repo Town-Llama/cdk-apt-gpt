@@ -88,8 +88,6 @@ export class LambdaStack extends cdk.Stack {
       });
 
     this.functions = {
-      blog_entry: createNodeLambdaFunction("Lambda-blog-entry", "/blog/entry"),
-      blog_all: createNodeLambdaFunction("Lambda-blog-all", "/blog/all"),
       api: new lambda.Function(this, "api", {
         runtime: lambda.Runtime.NODEJS_20_X,
         handler: "src/lambdaServer.handler",
@@ -105,10 +103,12 @@ export class LambdaStack extends cdk.Stack {
             mkdir /tmp/yarn && pushd /tmp/yarn &&
             npm install yarn &&
             popd &&
-            rm -r -f node_modules &&
+            mkdir -p node_modules &&
+            mv node_modules /tmp/ &&
             /tmp/yarn/node_modules/.bin/yarn &&
             /tmp/yarn/node_modules/.bin/yarn build &&
-            cp -rf node_modules /asset-output &&
+            mv node_modules /asset-output &&
+            mv /tmp/node_modules ./ &&
             cp -rf build/* /asset-output &&
             find /asset-output -name ".*" | grep .bin$ | xargs -I repme rm -rf repme
             `,
@@ -132,60 +132,9 @@ export class LambdaStack extends cdk.Stack {
           GOOGLE_API_KEY: process.env.GOOGLE_API_KEY!,
           OUTSCRAPER_API_KEY: process.env.OUTSCRAPER_API_KEY!,
         },
-        layers: [dbLayer, llmLayer],
+        layers: [],
         timeout: cdk.Duration.seconds(90),
       }),
-      datas_route: createNodeLambdaFunction(
-        "Lambda-datas-route",
-        "/datas/route"
-      ),
-      datas_neighborhoods: createNodeLambdaFunction(
-        "Lambda-datas-neighborhoods",
-        "/datas/neighborhood"
-      ),
-      datas_chats: createNodeLambdaFunction(
-        "Lambda-datas-chats",
-        "/datas/chats"
-      ),
-      datas_chats_record: createNodeLambdaFunction(
-        "Lambda-datas-chats_record",
-        "/datas/chats_record"
-      ),
-      datas_cities: createNodeLambdaFunction(
-        "Lambda-datas-cities",
-        "/datas/cities"
-      ),
-      datas_waitlist: createNodeLambdaFunction(
-        "Lambda-datas-waitlist",
-        "/datas/waitlist"
-      ),
-      datas_waitlist_record: createNodeLambdaFunction(
-        "Lambda-datas-waitlist-record",
-        "/datas/waitlist_record"
-      ),
-      datas_book: createNodeLambdaFunction("Lambda-datas-book", "/datas/book"),
-      datas_previouschat: createNodeLambdaFunction(
-        "Lambda-datas-previouschat",
-        "/datas/previouschat"
-      ),
-      datas_search: createNodeLambdaFunction(
-        "Lambda-datas-search",
-        "/datas/search"
-      ),
-      fetch_apt: createNodeLambdaFunction(
-        "Lambda-fetch-apt",
-        "/datas/fetch_apt"
-      ),
-      chat_next: createNodeLambdaFunction("Lambda-chat-next", "/chat/next"),
-      chat_pois: createNodeLambdaFunction("Lambda-chat-pois", "/chat/pois"),
-      chat_suggestion: createNodeLambdaFunction(
-        "Lambda-chat-suggestion",
-        "/chat/suggestion"
-      ),
-      chat_suggestion_short: createNodeLambdaFunction(
-        "Lambda-chat-suggestion_short",
-        "/chat/suggestion_short"
-      ),
       chat_reviews: new lambda.DockerImageFunction(
         this,
         "Lambda-chat-reviews",
@@ -213,22 +162,6 @@ export class LambdaStack extends cdk.Stack {
     const ses_identity = new ses.CfnEmailIdentity(this, "EmailIdentity", {
       emailIdentity: "seaholmdataco@gmail.com", // Replace with your email address
     });
-    const sesIdentityArn = `arn:aws:ses:${this.region}:${this.account}:identity/${ses_identity.emailIdentity}`;
-
-    this.functions.datas_book.addToRolePolicy(
-      new iam.PolicyStatement({
-        effect: iam.Effect.ALLOW,
-        actions: ["ses:SendEmail", "ses:SendRawEmail"],
-        resources: [sesIdentityArn], // Replace with your SES identity ARN
-      })
-    );
-
-    this.functions.datas_search.addToRolePolicy(
-      new iam.PolicyStatement({
-        actions: ["elasticloadbalancing:DescribeLoadBalancers"],
-        resources: ["*"],
-      })
-    );
 
     // now make API gaeteway
     const domainTld = "townllama.ai";
@@ -258,13 +191,6 @@ export class LambdaStack extends cdk.Stack {
       },
     });
 
-    /*
-    new route53.ARecord(this, 'ApiAliasRecord', {
-      zone: zone,
-      target: route53.RecordTarget.fromAlias(new route53_targets.ApiGateway(this.api)),
-      recordName: domainTld,
-    });
-    */
     this.myRole = new iam.Role(this, "MyRole", {
       assumedBy: new iam.CompositePrincipal(
         new iam.ServicePrincipal("apigateway.amazonaws.com"),
@@ -305,9 +231,10 @@ export class LambdaStack extends cdk.Stack {
 
     /** tie the functions to our api gateway */
     Object.entries(this.functions).forEach(([name, fn]) => {
-      console.log(!name.includes("blog"));
       var resourcePath = name.replace(/_/g, "/");
+      console.log("Resource path: ", resourcePath);
       if (resourcePath === "api") {
+        console.log("Got api path");
         resourcePath = "api/{proxy+}";
       }
       const resource = this.api.root.resourceForPath(resourcePath);
@@ -317,7 +244,7 @@ export class LambdaStack extends cdk.Stack {
         fn,
         method,
         this.authorizer,
-        !name.includes("blog") && !name.includes("api") //determines if we protect the route (if true, then we do)
+        !name.includes("api") //determines if we protect the route (if true, then we do)
       );
     });
   }
