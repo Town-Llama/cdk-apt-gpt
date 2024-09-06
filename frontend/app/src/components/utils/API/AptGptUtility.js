@@ -129,7 +129,7 @@ class AptGptUtility {
         userid: this.user.email,
       })
     );
-    return res.data;
+    return res.data || [];
   }
 
   async datas_chats_record(
