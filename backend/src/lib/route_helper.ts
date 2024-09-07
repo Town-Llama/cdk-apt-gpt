@@ -6,8 +6,7 @@ export default async function routeHelper(
   cb: (req: Request, res: Response) => Promise<any>
 ) {
   try {
-    const result = await cb(req, res);
-    res.status(200).json(result);
+    await cb(req, res);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: `Internal Server Error: ${error}` });

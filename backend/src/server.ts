@@ -1,7 +1,9 @@
 import * as dotenv from "dotenv";
-import { app } from "./app";
 
 dotenv.config();
+
+import { app } from "./app";
+
 const port = 4000;
 
 app.listen(port, () => {
