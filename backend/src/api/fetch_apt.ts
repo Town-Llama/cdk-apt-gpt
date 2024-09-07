@@ -6,7 +6,7 @@ const router = Router();
 export default router;
 
 router.get("/fetch_apt/:address", async (req, res) => {
-  routeHelper(req, res, async () => {
+  await routeHelper(req, res, async () => {
     const address = req.params.address;
 
     const query = `SELECT u.id AS unit_id, u.property_id, u.property_ts, u.available, u.name, u.baths, u.beds, u.area, u.ts,

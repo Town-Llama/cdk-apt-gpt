@@ -6,7 +6,7 @@ const router = Router();
 export default router;
 
 router.post("/route", async (req, res) => {
-  routeHelper(req, res, async () => {
+  await routeHelper(req, res, async () => {
     // Parse the request body
     const body = req.body;
     const { start, end } = body;

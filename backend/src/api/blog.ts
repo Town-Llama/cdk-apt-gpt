@@ -6,7 +6,7 @@ const router = Router();
 export default router;
 
 router.get("/blog/all", async (req, res) => {
-  routeHelper(req, res, async () => {
+  await routeHelper(req, res, async () => {
     // Query the database to check if the user is on the waitlist
     let query = "SELECT id FROM blog";
     let values: string[] = [];
@@ -17,7 +17,7 @@ router.get("/blog/all", async (req, res) => {
 });
 
 router.get("/blog/posts/:entry", async (req, res) => {
-  routeHelper(req, res, async () => {
+  await routeHelper(req, res, async () => {
     // Parse the request body
     const id = req.params.entry;
 

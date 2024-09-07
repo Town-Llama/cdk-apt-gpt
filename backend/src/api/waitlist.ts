@@ -6,7 +6,7 @@ const router = Router();
 export default router;
 
 router.post("/waitlist", async (req, res) => {
-  try {
+  await routeHelper(req, res, async () => {
     // Parse the request body
     const body = req.body;
     const { userid } = body;
@@ -41,16 +41,11 @@ router.post("/waitlist", async (req, res) => {
 
     // Return the response
     res.status(200).json({ authenticated: isApproved });
-    return;
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: `Internal Server Error: ${error}` });
-    return;
-  }
+  });
 });
 
 router.post("/waitlist/record", async (req, res) => {
-  routeHelper(req, res, async () => {
+  await routeHelper(req, res, async () => {
     // Parse the request body
     const body = req.body;
     const { userid, recommendeduser } = body;

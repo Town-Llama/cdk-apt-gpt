@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 
-export default function routeHelper(
+export default async function routeHelper(
   req: Request,
   res: Response,
-  cb: (req: Request, res: Response) => any
+  cb: (req: Request, res: Response) => Promise<any>
 ) {
   try {
-    const result = cb(req, res);
+    const result = await cb(req, res);
     res.status(200).json(result);
   } catch (error) {
     console.error(error);

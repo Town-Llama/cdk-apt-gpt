@@ -18,14 +18,14 @@ const router = Router();
 export default router;
 
 router.get("/cities", async (req, res) => {
-  routeHelper(req, res, async () => {
+  await routeHelper(req, res, async () => {
     const cities = Object.keys(NEIGHBORS);
     res.status(200).json({ data: cities });
   });
 });
 
 router.post("/neighborhoods", async (req, res) => {
-  routeHelper(req, res, async () => {
+  await routeHelper(req, res, async () => {
     const body = req.body;
     const city = body.city;
     res.status(200).json({ data: NEIGHBORS[city] });

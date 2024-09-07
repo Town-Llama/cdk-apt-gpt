@@ -8,7 +8,7 @@ const router = Router();
 export default router;
 
 router.post("/chats", async (req, res) => {
-  routeHelper(req, res, async () => {
+  await routeHelper(req, res, async () => {
     // Parse the request body
     const body = req.body;
     const { userid } = body;
@@ -30,7 +30,7 @@ router.post("/chats", async (req, res) => {
 });
 
 router.post("/previouschat", async (req, res) => {
-  routeHelper(req, res, async () => {
+  await routeHelper(req, res, async () => {
     // Parse the request body
     const body = req.body;
     const { userid, conversationid } = body;
@@ -52,7 +52,7 @@ router.post("/previouschat", async (req, res) => {
 });
 
 router.post("/chat/next", async (req, res) => {
-  routeHelper(req, res, async () => {
+  await routeHelper(req, res, async () => {
     // Parse the request body
     const body = req.body;
     let { msgs, conversation_id, user_id } = body;
@@ -106,7 +106,7 @@ router.post("/chat/next", async (req, res) => {
 });
 
 router.post("/chat/pois", async (req, res) => {
-  routeHelper(req, res, async () => {
+  await routeHelper(req, res, async () => {
     const body = req.body;
     const { msg } = body;
 
@@ -130,7 +130,7 @@ router.post("/chat/pois", async (req, res) => {
 });
 
 router.post("/chat/suggestion", async (req, res) => {
-  routeHelper(req, res, async () => {
+  await routeHelper(req, res, async () => {
     const body = req.body;
     let { rec, formdata } = body;
 
@@ -163,7 +163,7 @@ router.post("/chat/suggestion", async (req, res) => {
 });
 
 router.post("/chat/suggestion_short", async (req, res) => {
-  routeHelper(req, res, async () => {
+  await routeHelper(req, res, async () => {
     const body = req.body;
     let { rec, formdata } = body;
 
@@ -196,7 +196,7 @@ router.post("/chat/suggestion_short", async (req, res) => {
 });
 
 router.post("/chat/record", async (req, res) => {
-  routeHelper(req, res, async () => {
+  await routeHelper(req, res, async () => {
     // Parse the request body
     const body = req.body;
     const {

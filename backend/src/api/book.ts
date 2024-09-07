@@ -8,7 +8,7 @@ const router = Router();
 export default router;
 
 router.post("/book", async (req, res) => {
-  routeHelper(req, res, async () => {
+  await routeHelper(req, res, async () => {
     const body = req.body;
     const { userid, ask, conversationid, aptId } = body;
 
