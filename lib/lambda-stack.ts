@@ -16,6 +16,7 @@ interface LambdaProps extends cdk.StackProps {
     AUTH0_AUDIENCE: string;
     AUTH0_TOKEN_ISSUER: string;
   };
+
 }
 
 export class LambdaStack extends cdk.Stack {
@@ -61,32 +62,6 @@ export class LambdaStack extends cdk.Stack {
 
     const loadBalancerDns = cdk.Fn.importValue("LoadBalancerDNS");
 
-    const createNodeLambdaFunction = (name: string, handlerPath: string) =>
-      new lambda.Function(this, name, {
-        runtime: lambda.Runtime.NODEJS_20_X,
-        handler: "index.handler",
-        code: lambda.Code.fromAsset(`lambda/${handlerPath}`),
-        environment: {
-          MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN!,
-          GROQ_API_KEY: process.env.GROQ_API_KEY!,
-          AUTH0_DOMAIN: process.env.AUTH0_DOMAIN!,
-          AUTH0_AUDIENCE: process.env.AUTH0_AUDIENCE!,
-          DB_USER: process.env.DB_USER!,
-          DB_HOST: process.env.DB_HOST!,
-          DB_PORT: process.env.DB_PORT!,
-          DB_DATABASE: process.env.DB_DATABASE!,
-          DB_PW: process.env.DB_PW!,
-          DB_SSL: process.env.DB_SSL!,
-          FIREWORKS_API_KEY: process.env.FIREWORKS_API_KEY!,
-          OPEN_AI_KEY: process.env.OPEN_AI_KEY!,
-          GOOGLE_API_KEY: process.env.GOOGLE_API_KEY!,
-          OUTSCRAPER_API_KEY: process.env.OUTSCRAPER_API_KEY!,
-          LOAD_BALANCER_DNS: loadBalancerDns,
-        },
-        layers: [dbLayer, llmLayer],
-        timeout: cdk.Duration.seconds(90),
-      });
-
     this.functions = {
       api: new lambda.Function(this, "api", {
         runtime: lambda.Runtime.NODEJS_20_X,
@@ -131,6 +106,7 @@ export class LambdaStack extends cdk.Stack {
           OPEN_AI_KEY: process.env.OPEN_AI_KEY!,
           GOOGLE_API_KEY: process.env.GOOGLE_API_KEY!,
           OUTSCRAPER_API_KEY: process.env.OUTSCRAPER_API_KEY!,
+          LOAD_BALANCER_DNS: loadBalancerDns,
         },
         layers: [],
         timeout: cdk.Duration.seconds(90),
