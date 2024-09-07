@@ -57,7 +57,7 @@ export class EcsStack extends cdk.Stack {
         this.imageService = new ecs.FargateService(this, 'ImageService', {
             cluster: this.cluster,
             taskDefinition: imageServiceTaskDefinition,
-            desiredCount: 1,
+            desiredCount: 0,
             assignPublicIp: false,
             vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
             serviceName: 'image-service',

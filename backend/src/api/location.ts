@@ -4,9 +4,7 @@ import routeHelper from "../lib/route_helper";
 // Add this type definition at the top of the file
 type Neighborhood = {
   name: string;
-  street: string;
-  city: string;
-  zip_code: string;
+  coordinates: number[];
 };
 type NeighborhoodData = { [city: string]: Neighborhood[] };
 
