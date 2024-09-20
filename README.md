@@ -1,3 +1,10 @@
+# manual tests:
+- `test`
+- `casual bar to meet new friends`
+- `bored and single`
+- `where to go on a friday night with my girlfriend`
+
+
 # Welcome to your CDK TypeScript project
 
 This is a blank project for CDK development with TypeScript.

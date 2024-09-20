@@ -34,31 +34,31 @@ const ChatV2 = ({ showLoading }) => {
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => setModalIsOpen(false);
 
-  useEffect(() => {
-    const saveChat = async () => {
-      const client = new AptGptUtility(
-        getAccessTokenSilently,
-        isAuthenticated,
-        user
-      );
-      const aptIdArr = [];
-      for (let i = 0; i < df.comparingIndices.length; i++) {
-        aptIdArr.push(df.payload[df.comparingIndices[i]].unit_id);
-      }
-      await client.datas_chats_record(
-        formData.ask,
-        chat.conversationId,
-        chat.commuteAddress,
-        chat.poiArr,
-        chat.poiData,
-        chat.chatState,
-        aptIdArr
-      );
-    };
-    if (isAuthenticated && chat.conversationId !== null) {
-      saveChat();
-    }
-  }, [chat, formData, df, isAuthenticated]);
+  // useEffect(() => {
+  //   const saveChat = async () => {
+  //     const client = new AptGptUtility(
+  //       getAccessTokenSilently,
+  //       isAuthenticated,
+  //       user
+  //     );
+  //     const aptIdArr = [];
+  //     for (let i = 0; i < df.comparingIndices.length; i++) {
+  //       aptIdArr.push(df.payload[df.comparingIndices[i]].unit_id);
+  //     }
+  //     await client.datas_chats_record(
+  //       formData.ask,
+  //       chat.conversationId,
+  //       chat.commuteAddress,
+  //       chat.poiArr,
+  //       chat.poiData,
+  //       chat.chatState,
+  //       aptIdArr
+  //     );
+  //   };
+  //   if (isAuthenticated && chat.conversationId !== null) {
+  //     saveChat();
+  //   }
+  // }, [chat, formData, df, isAuthenticated]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -105,7 +105,7 @@ const ChatV2 = ({ showLoading }) => {
     <Box sx={{ display: "flex", height: "100vh" }} className="bg-gray-100">
       <Box
         component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: drawerWidth } }}
         aria-label="mailbox folders"
       >
         <Drawer

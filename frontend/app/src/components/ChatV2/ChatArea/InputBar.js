@@ -114,7 +114,7 @@ const InputBar = ({ onSend, setMessage, showLoading, message }) => {
                     <SendHorizonal />
                 </button>
             </div>
-            {message.length == 0 && Object.keys(chat.commuteAddress).length > 0 && Object.keys(chat.poiArr).length > 0 && (
+            {/* {message.length == 0 && Object.keys(chat.commuteAddress).length > 0 && Object.keys(chat.poiArr).length > 0 && (
                 <div className="absolute bottom-full left-0 right-0 mb-4 flex justify-center space-x-2">
                     <button
                         onClick={() => handleButtonClick("commute", changeToPOI_SEARCH)}
@@ -153,7 +153,7 @@ const InputBar = ({ onSend, setMessage, showLoading, message }) => {
                         )}
                     </button>
                 </div>
-            )}
+            )} */}
         </div>
     );
 };

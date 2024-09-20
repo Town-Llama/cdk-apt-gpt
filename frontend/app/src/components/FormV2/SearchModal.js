@@ -10,7 +10,7 @@ import RestaurantSearch from './RestaurantSearch';
 Modal.setAppElement('#root');
 
 const SearchModal = ({ isOpen, onRequestClose, showLoading }) => {
-    const [stage, setStage] = useState('apartment'); // 'initial', 'apartment', 'restaurant'
+    const [stage, setStage] = useState('restaurant'); // 'initial', 'apartment', 'restaurant'
 
     const customStyles = {
         overlay: {
@@ -36,7 +36,7 @@ const SearchModal = ({ isOpen, onRequestClose, showLoading }) => {
                     className="message-bubble text-white rounded-full py-2 px-4"
                 >
                     <ApartmentIcon />
-                    <br/>
+                    <br />
                     Apartment
                 </button>
                 <button
@@ -44,7 +44,7 @@ const SearchModal = ({ isOpen, onRequestClose, showLoading }) => {
                     className="message-bubble text-white rounded-full py-2 px-4"
                 >
                     <StorefrontIcon />
-                    <br/>
+                    <br />
                     Restaurant
                 </button>
             </div>
@@ -62,7 +62,7 @@ const SearchModal = ({ isOpen, onRequestClose, showLoading }) => {
             <ArrowBackIcon />
         </button>
     );
-    
+
     return (
         <Modal
             isOpen={isOpen}
@@ -75,8 +75,8 @@ const SearchModal = ({ isOpen, onRequestClose, showLoading }) => {
             <div className="relative">
                 {/* {stage !== 'initial' && renderResetButton()} */}
                 {/* {stage === 'initial' && renderInitialStage()} */}
-                {stage === 'apartment' && <ApartmentSearch onRequestClose={onRequestClose} showLoading={showLoading} />}
-                {/* {stage === 'restaurant' && <RestaurantSearch onBack={() => setStage('initial')} />} */}
+                {/* {stage === 'apartment' && <ApartmentSearch onRequestClose={onRequestClose} showLoading={showLoading} />} */}
+                {stage === 'restaurant' && <RestaurantSearch onRequestClose={onRequestClose} showLoading={showLoading} />}
             </div>
         </Modal>
     );

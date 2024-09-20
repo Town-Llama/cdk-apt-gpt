@@ -9,7 +9,6 @@ import { updateDescState, updateImgState } from "../../../store/actions/modelAct
 
 const ChatArea = ({ showLoading }) => {
   const dispatch = useDispatch();
-  const df = useSelector((state) => state.df);
   const chat = useSelector((state) => state.chat);
   const form_data = useSelector((state) => state.formData);
 
@@ -52,7 +51,7 @@ const ChatArea = ({ showLoading }) => {
       // THIS moment
       // the key then is making sure all the relevant data is in the chat object
     }
-    dispatch(advance(message, df, chat.chatState, data));
+    dispatch(advance(message, chat.df, chat.chatState, data));
     setMessage("");
   };
 
@@ -75,7 +74,7 @@ const ChatArea = ({ showLoading }) => {
   useEffect(() => {
     //this is happening multiple times >> fix this
     if (chat.chatState === "BEGIN") {
-      dispatch(advance(null, df, chat.chatState));
+      dispatch(advance(null, chat.df, chat.chatState));
     }
   }, []);
 

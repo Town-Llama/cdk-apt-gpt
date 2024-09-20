@@ -40,4 +40,6 @@ app.use(search);
 //
 import waitlist from "./api/waitlist";
 app.use(waitlist);
-//
+
+import short from "./api/short";
+app.use(short);

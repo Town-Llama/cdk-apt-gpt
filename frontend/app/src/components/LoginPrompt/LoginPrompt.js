@@ -38,7 +38,7 @@ const LoginPrompt = ({ isAuthenticated, waitlistApproved, isLoading }) => {
             </button>
             <h4 className="text-lg font-medium text-gray-700 mt-6 mb-3">What We Do</h4>
             <ul className="space-y-2">
-              {['See Only the Best Apartments For You', 'Compare Commute Times for Each Place', 'Compare nearby places of interest'].map((item, index) => (
+              {['Discover bars that fit exactly what you want', 'Compare bars directly', 'Find cool stuff around you'].map((item, index) => (
                 <li key={index} className="flex items-center text-gray-600">
                   <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Router } from "express";
+import { response, Router } from "express";
 import pgvector from "pgvector/pg";
 import { dbCall } from "../lib/db";
 
@@ -10,101 +10,48 @@ router.post("/search", async (req, res) => {
   try {
     const body = req.body;
     const {
-      user,
+      query,
       max_distance,
-      min_rent,
-      max_rent,
-      coordinates,
-      ask,
-      bedrooms,
-      image,
-      semantic,
+      coordinates
     } = body;
-    console.log(coordinates, max_distance, min_rent, max_rent, bedrooms);
 
-    let responses;
-    if (image !== null) {
-      console.log("image", image);
-      console.time("datas.search:EmbeddingGeneration");
-      const query_embedding = await callImageEmbeddingModel(image, false);
-      console.timeEnd("datas.search:EmbeddingGeneration");
-      // console.log("image_query_embedding", query_embedding);
-      const query =
-        "SELECT * FROM search_properties_with_clip_large_embeddings($1, $2, $3, $4, $5, $6, $7);"; // $6 is lease length for now we use default of 12
-      const values = [
-        min_rent,
-        max_rent,
-        bedrooms,
-        coordinates.lat,
-        coordinates.lng,
-        max_distance,
-        pgvector.toSql(query_embedding),
-      ];
-      console.log(pgvector.toSql(query_embedding));
-      console.time("datas.search:dbCall");
-      responses = await dbCall(query, values);
-      console.timeEnd("datas.search:dbCall");
-    } else if (semantic !== null && semantic !== "") {
-      let saveQuery =
-        "INSERT INTO queries (userid, time, query, type) VALUES ($1, NOW(), $2, 'semantic') ON CONFLICT DO NOTHING;";
-      let saveValues = [user, semantic];
-      await dbCall(saveQuery, saveValues); // as long it saves we don't care
-      console.log("semantic", semantic);
-      console.time("datas.search:EmbeddingGeneration");
-      const query_embedding = await callImageEmbeddingModel(semantic, true);
-      console.timeEnd("datas.search:EmbeddingGeneration");
-      // console.log("semantic_query_embedding", query_embedding);
-      const query =
-        "SELECT * FROM search_properties_with_clip_large_embeddings($1, $2, $3, $4, $5, $6, $7);"; // $6 is lease length for now we use default of 12
-      const values = [
-        min_rent,
-        max_rent,
-        bedrooms,
-        coordinates.lat,
-        coordinates.lng,
-        max_distance,
-        pgvector.toSql(query_embedding),
-      ];
-      console.log(pgvector.toSql(query_embedding));
-      console.time("datas.search:dbCall");
-      responses = await dbCall(query, values);
-      console.timeEnd("datas.search:dbCall");
-    } else {
-      //descriptions
-      console.log("ask", ask);
-      let saveQuery =
-        "INSERT INTO queries (userid, time, query, type) VALUES ($1, NOW(), $2, 'description') ON CONFLICT DO NOTHING;";
-      let saveValues = [user, ask];
-      await dbCall(saveQuery, saveValues); // as long it saves we don't care
-      console.time("datas.search:EmbeddingGeneration");
-      const query_embedding = await callDescrEmbeddingModel(ask, true);
-      console.timeEnd("datas.search:EmbeddingGeneration");
-      // console.log("text_query_embedding", query_embedding);
-      const query =
-        "SELECT * FROM search_properties_with_desc_embeddings($1, $2, $3, $4, $5, $6, $7);"; // $6 is lease length for now we use default of 12
-      const values = [
-        min_rent,
-        max_rent,
-        bedrooms,
-        coordinates.lat,
-        coordinates.lng,
-        max_distance,
-        pgvector.toSql(query_embedding),
-      ];
-      console.log(pgvector.toSql(query_embedding));
-      console.time("datas.search:dbCall");
-      responses = await dbCall(query, values);
-      console.timeEnd("datas.search:dbCall");
+    console.log(query, max_distance, coordinates);
+
+    //call embeddings
+    console.time("datas.search:EmbeddingGeneration");
+    const embedding = await callDescrEmbeddingModel(query, true);
+    console.timeEnd("datas.search:EmbeddingGeneration");
+
+    //call db
+    const db_query =
+      "SELECT * FROM find_top_bars_and_menu_items($1, $2, $3);"; // $6 is lease length for now we use default of 12
+    const values = [
+      coordinates.lat,
+      coordinates.lng,
+      pgvector.toSql(embedding),
+    ];
+
+    console.time("datas.search:dbCall");
+    const responses = await dbCall(db_query, values);
+    console.timeEnd("datas.search:dbCall");
+
+    //bad form but lets us ship faster
+    const data = [];
+    for (let i = 0; i < responses.length; i++) {
+      let followup_query
+      if (responses[i].item_type === "menu_item") {
+        followup_query = "select bmi.name as itemName, bmi.description as itemDescription, price, isdrink, category, b.name as barName, address, b.description as barDescription,latitude, longitude from bar_menu_item bmi inner join bar b on b.id = bmi.barid where bmi.id=$1";
+      } else {
+        followup_query = "select name as barname, description as bardescription, address, latitude, longitude from bar where id=$1";
+      }
+      const followup_response = await dbCall(followup_query, [responses[i].id]);
+      data.push(followup_response[0]);
     }
 
-    console.log(responses, "res");
-    const result = filterDuplicateUnits(responses);
-    console.log(result, "rest");
-
-    res.status(200).json({ data: result });
+    return res.status(200).json({ data: data });
   } catch (error) {
     console.error("Error invoking Lambda function", error);
-    res.status(500).json({ error: `Internal Server Error: ${error}` });
+    return res.status(500).json({ error: `Internal Server Error: ${error}` });
   }
 });
 
@@ -155,10 +102,10 @@ const callImageEmbeddingModel = async (data: any, isText: boolean) => {
 const callDescrEmbeddingModel = async (data: any, isText: boolean) => {
   try {
     const response = await axios.post(
-      `http://${process.env.LOAD_BALANCER_DNS}/text`,
+      'http://localhost:80/text',
       {
-        isText: isText,
-        payload: data,
+        payload: data,    // Ensure the key matches the expected key in Flask
+        load_model: false // Optional: Include this if you want to handle model loading conditionally
       },
       {
         headers: {

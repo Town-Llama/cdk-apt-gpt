@@ -1,15 +1,16 @@
 // src/reducers/recReducer.js
-import { initialChatState, 
-    UPDATE_MESSAGES, 
-    CLEAR_MESSAGES, 
-    ADD_OPENAI_NOTATION,
-    ADD_REACT_NOTATION,
-    SET_CONVERSATION_ID,
-    SET_COMMUTE_ADDRESS,
-    SET_CHAT_STATE, 
-    SET_POI_ARR,
-    SET_POI_DATA
- } from '../states/chatState';
+import {
+  initialChatState,
+  UPDATE_MESSAGES,
+  CLEAR_MESSAGES,
+  ADD_OPENAI_NOTATION,
+  ADD_REACT_NOTATION,
+  SET_CONVERSATION_ID,
+  SET_DF,
+  UPDATE_QUERY,
+  SET_CHAT_STATE,
+  UPDATE_COMPARING_INDICES
+} from '../states/chatState';
 
 const chatReducer = (state = initialChatState, action) => {
   switch (action.type) {
@@ -19,6 +20,11 @@ const chatReducer = (state = initialChatState, action) => {
         openAINotation: [...state.openAINotation, action.payload.userMessage, action.payload.assistantMessage],
         reactNotation: [...state.reactNotation, action.payload.userReactComponent, action.payload.assistantReactComponent]
       };
+    case UPDATE_COMPARING_INDICES:
+      return {
+        ...state,
+        comparingIndices: action.payload
+      };
     case CLEAR_MESSAGES:
       return {
         ...state,
@@ -27,39 +33,34 @@ const chatReducer = (state = initialChatState, action) => {
         conversationId: null
       }
     case ADD_OPENAI_NOTATION:
-        return {
-            ...state,
-            openAINotation: [...state.openAINotation, action.payload]
-        }
+      return {
+        ...state,
+        openAINotation: [...state.openAINotation, action.payload]
+      }
     case ADD_REACT_NOTATION:
-        return {
-            ...state,
-            reactNotation: [...state.reactNotation, action.payload]
-        }
+      return {
+        ...state,
+        reactNotation: [...state.reactNotation, action.payload]
+      }
     case SET_CONVERSATION_ID:
       return {
         ...state,
         conversationId: action.payload
       }
-    case SET_COMMUTE_ADDRESS:
+    case SET_DF:
       return {
         ...state,
-        commuteAddress: action.payload
+        df: action.payload
       }
     case SET_CHAT_STATE:
       return {
         ...state,
         chatState: action.payload
       }
-    case SET_POI_ARR:
+    case UPDATE_QUERY:
       return {
         ...state,
-        poiArr: action.payload
-      }
-    case SET_POI_DATA:
-      return {
-        ...state,
-        poiData: action.payload
+        query: action.payload
       }
     default:
       return state;

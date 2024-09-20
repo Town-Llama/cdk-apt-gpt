@@ -28,6 +28,7 @@ def createEmbed(
 @app.route('/text', methods=['POST'])
 def process_request():
     try:
+        print("hit")
         # Parse the incoming JSON request
         body = request.get_json()
         should_load_model = body.get("load_model", False)

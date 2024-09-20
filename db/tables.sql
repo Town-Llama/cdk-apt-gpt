@@ -108,3 +108,39 @@ CREATE TABLE blog (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+
+-- embeddings: name, menu, reviews, descriptions
+CREATE TABLE bar (
+    id VARCHAR(60) PRIMARY KEY,
+    name text,
+    address TEXT,
+    description TEXT,
+    latitude DECIMAL(9,6),
+    longitude DECIMAL(9,6)
+);
+
+CREATE TABLE bar_menu_item (
+    id SERIAL PRIMARY KEY,
+    barid VARCHAR(60),
+    name TEXT,
+    description TEXT,
+    price DECIMAL(10, 2),
+    isDrink BOOLEAN,
+    category TEXT,
+    FOREIGN KEY (barid) REFERENCES bar(id)
+);
+
+# alex >> week 3
+create table bar_reviews ( 
+    id varchar(),
+    user text,
+)
+
+# week 3
+create table bar_images (
+    id varchar(),
+    data bytea,
+)
+
+# week 4 >> embedding model to hugging face

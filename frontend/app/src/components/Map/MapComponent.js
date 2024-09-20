@@ -1,8 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
-import ReactDOM from 'react-dom';
-import PropertyPreview from '../PropertyPreview/PropertyPreview'; // Adjust the path as necessary
-
 /**
  * MapComponent
  * 
@@ -29,6 +26,7 @@ const MapComponent = ({ apts }) => {
         center: [-97.733330, 30.266666], // default starting position [lng, lat]
         zoom: 10 // initial zoom, will be adjusted later
       });
+      console.log(apts, "<<");
 
       // Add markers
       const colors = ['#ff69b4', '#33cc33', '#6666ff', '#ff9966', '#cc33cc'];
@@ -38,16 +36,16 @@ const MapComponent = ({ apts }) => {
           draggable: false,
           scale: 1.5, // make markers larger
         })
-          .setLngLat([a.longitude, a.latitude])
+          .setLngLat([parseFloat(a.longitude), parseFloat(a.latitude)])
           .addTo(map);
 
         // Add popup on marker click
         marker.getElement().addEventListener('click', (e) => {
           const popup = new mapboxgl.Popup()
             .setLngLat([a.longitude, a.latitude])
-            .setHTML(a.buildingname) // Use setDOMContent to attach the React component
+            .setHTML(a.barname) // Use setDOMContent to attach the React component
             .addTo(map);
-            e.stopPropagation();
+          e.stopPropagation();
         });
       });
 

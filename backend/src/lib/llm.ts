@@ -8,8 +8,10 @@ export async function callLLM(msgs: any) {
     try {
       attempts++;
       console.log("Attempt", attempts);
-      return callOpenAI(msgs);
-      // return callGroq(msgs);
+      // return callOpenAI(msgs);
+      const res = await callGroq(msgs);
+      console.log("HIT", res);
+      return res;
     } catch (e) {
       console.log(e);
       await randomWait();
@@ -49,12 +51,14 @@ export async function callGroq(msgs: any) {
     const client = new Groq({
       apiKey: process.env["GROQ_API_KEY"], // This is the default and can be omitted
     });
+    console.log("REACHED");
     const chatCompletion = await client.chat.completions.create({
       messages: msgs,
       model: "mixtral-8x7b-32768",
       max_tokens: 1024,
       stream: false,
     });
+    console.log("REACHE2D");
     return chatCompletion.choices[0].message.content;
   } catch (error) {
     console.error(error);
@@ -88,48 +92,17 @@ export async function randomWait() {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export function buildJsonPromptData(data: any, address: any) {
-  let prompt = "";
-  const columnMapping = {
-    price: "Monthly Rent",
-    description: "Description from Building Management",
-    availabilityCount: "Number of units like this available in building",
-    bedrooms: "Bedrooms in Unit",
-    distance: "Distance in miles from neighborhood",
-    addressstreet: "address",
-    buildingname: "Building Name",
-    "transit.transit_score": "transportation score out of 100",
-    "walkability.walkscore": "walkability score out of 100",
-    id: "id",
-  };
+export const buildJsonPromptData = (arr: Array<Object>) => {
 
-  const getColumnValue = (obj: any, key: any) => {
-    const keys = key.split(".");
-    let value = obj;
-    for (const k of keys) {
-      if (value && typeof value === "object") {
-        value = value[k];
-      } else {
-        return undefined;
-      }
+  const translatedData: any = [];
+  for (let i = 0; i < arr.length; i++) {
+    let data = arr[i];
+    console.log("HERE WE GO", data, Object.keys(data).includes("isdrink"));
+    translatedData[i] = data;
+    if (translatedData[i].price == "-1.00") {
+      translatedData[i].price = "Not Given";
     }
-    return value;
-  };
+  }
 
-  prompt += "{";
-  const elements = Object.keys(columnMapping)
-    .map((columnName) => {
-      const value = getColumnValue(data, columnName);
-      if (value !== undefined) {
-        const description =
-          columnMapping[columnName as keyof typeof columnMapping] || columnName;
-        return `"${description}": "${String(value).replace(/"/g, '\\"')}"`;
-      }
-      return null;
-    })
-    .filter((element) => element !== null);
-  prompt += elements.join(", ");
-  prompt += "}, ";
-
-  return prompt.slice(0, -2);
-}
+  return JSON.stringify(translatedData);
+};

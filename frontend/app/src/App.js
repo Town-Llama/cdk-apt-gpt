@@ -69,24 +69,22 @@ function App() {
 
   return (
     <div className="App">
-      <ErrorBoundary>
-        <Dimmer active={loading} page>
-          <Loader active={loading} inline='centered'>
-            🦙
-            <br />
-            {loadingText}
-          </Loader>
-        </Dimmer>
-        <Routes>
-          <Route path="/" element={<Home showLoading={showLoading} />} />
-          <Route
-            path="/blogs/:id"
-            element={<Blog showLoading={showLoading} />}
-          />
-          <Route path="/blogs" element={<Blog showLoading={showLoading} />} />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </ErrorBoundary>
+      <Dimmer active={loading} page>
+        <Loader active={loading} inline='centered'>
+          🦙
+          <br />
+          {loadingText}
+        </Loader>
+      </Dimmer>
+      <Routes>
+        <Route path="/" element={<Home showLoading={showLoading} />} />
+        <Route
+          path="/blogs/:id"
+          element={<Blog showLoading={showLoading} />}
+        />
+        <Route path="/blogs" element={<Blog showLoading={showLoading} />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
     </div>
   );
 }

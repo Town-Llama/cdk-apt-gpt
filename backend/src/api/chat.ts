@@ -129,71 +129,71 @@ router.post("/chat/pois", async (req, res) => {
   });
 });
 
-router.post("/chat/suggestion", async (req, res) => {
-  await routeHelper(req, res, async () => {
-    const body = req.body;
-    let { rec, formdata } = body;
+// router.post("/chat/suggestion", async (req, res) => {
+//   await routeHelper(req, res, async () => {
+//     const body = req.body;
+//     let { rec, formdata } = body;
 
-    let recommendedPlace =
-      rec.buildingname !== null ? rec.buildingname : rec.addressstreet;
+//     let recommendedPlace =
+//       rec.buildingname !== null ? rec.buildingname : rec.addressstreet;
 
-    console.log(rec, formdata, "OK");
+//     console.log(rec, formdata, "OK");
 
-    let updatedMsgs = [];
-    const prompt =
-      "Taking into account the data above, make the case for why " +
-      recommendedPlace +
-      " is the best choice for the user. Give the top 5 reasons in bullet points";
-    updatedMsgs = [
-      {
-        role: "system",
-        content:
-          "[Inst]You are helping me pick an apartment. The following is a description of what I want <what_i_want>" +
-          formdata.ask +
-          "</what_i_want>. The user is going to give you some JSON data for each apartment. Read it closely[/Inst]",
-      },
-      { role: "user", content: buildJsonPromptData(rec, formdata) },
-      { role: "system", content: prompt },
-    ];
+//     let updatedMsgs = [];
+//     const prompt =
+//       "Taking into account the data above, make the case for why " +
+//       recommendedPlace +
+//       " is the best choice for the user. Give the top 5 reasons in bullet points";
+//     updatedMsgs = [
+//       {
+//         role: "system",
+//         content:
+//           "[Inst]You are helping me pick an apartment. The following is a description of what I want <what_i_want>" +
+//           formdata.ask +
+//           "</what_i_want>. The user is going to give you some JSON data for each apartment. Read it closely[/Inst]",
+//       },
+//       { role: "user", content: buildJsonPromptData(rec, formdata) },
+//       { role: "system", content: prompt },
+//     ];
 
-    const response = await callLLM(updatedMsgs);
+//     const response = await callLLM(updatedMsgs);
 
-    res.status(201).json({ data: response });
-  });
-});
+//     res.status(201).json({ data: response });
+//   });
+// });
 
-router.post("/chat/suggestion_short", async (req, res) => {
-  await routeHelper(req, res, async () => {
-    const body = req.body;
-    let { rec, formdata } = body;
+// router.post("/chat/suggestion_short", async (req, res) => {
+//   await routeHelper(req, res, async () => {
+//     const body = req.body;
+//     let { rec, formdata } = body;
 
-    let recommendedPlace =
-      rec.buildingname !== null ? rec.buildingname : rec.addressstreet;
+//     let recommendedPlace =
+//       rec.buildingname !== null ? rec.buildingname : rec.addressstreet;
 
-    console.log(rec, formdata, "OK");
+//     console.log(rec, formdata, "OK");
 
-    let updatedMsgs = [];
-    const prompt =
-      "Taking into account the data above, make the case for why " +
-      recommendedPlace +
-      " is the best choice for the user. Give me the best reason only in 1 sentence";
-    updatedMsgs = [
-      {
-        role: "system",
-        content:
-          "[Inst]You are helping me pick an apartment. The following is a description of what I want <what_i_want>" +
-          formdata.ask +
-          "</what_i_want>. The user is going to give you some JSON data for each apartment. Read it closely[/Inst]",
-      },
-      { role: "user", content: buildJsonPromptData(rec, formdata) },
-      { role: "system", content: prompt },
-    ];
+//     let updatedMsgs = [];
+//     const prompt =
+//       "Taking into account the data above, make the case for why " +
+//       recommendedPlace +
+//       " is the best choice for the user. Give me the best reason only in 1 sentence";
+//     updatedMsgs = [
+//       {
+//         role: "system",
+//         content:
+//           "[Inst]You are helping me pick an apartment. The following is a description of what I want <what_i_want>" +
+//           formdata.ask +
+//           "</what_i_want>. The user is going to give you some JSON data for each apartment. Read it closely[/Inst]",
+//       },
+//       { role: "user", content: buildJsonPromptData(rec, formdata) },
+//       { role: "system", content: prompt },
+//     ];
 
-    const response = await callLLM(updatedMsgs);
+//     const response = await callLLM(updatedMsgs);
 
-    res.status(201).json({ data: response });
-  });
-});
+//     res.status(201).json({ data: response });
+//   });
+// });
 
 router.post("/chat/record", async (req, res) => {
   await routeHelper(req, res, async () => {

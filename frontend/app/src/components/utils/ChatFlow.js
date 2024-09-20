@@ -1,9 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
-import { addOpenAINotation, addReactNotation, clearChat, dialogue, setChatState, setCommuteAddress, setConversationId, setPoiArr } from '../../store/actions/chatActions';
-import { updateComparingIndices } from '../../store/actions/dfActions';
-import ApartmentTableV2 from '../ApartmentTable/ApartmentTableV2';
+import { addOpenAINotation, setDf, addReactNotation, clearChat, dialogue, setChatState, setConversationId, updateQuery, updateComparingIndices } from '../../store/actions/chatActions';
 import AssistantMessage from '../ChatV2/Messages/AssistantMessage';
 import UserMessage from '../ChatV2/Messages/UserMessage';
+import POITable from '../POITable/POITable';
 
 export const advance = (msg, df, chatState, response = null) => async (dispatch) => {
 
@@ -13,7 +12,7 @@ export const advance = (msg, df, chatState, response = null) => async (dispatch)
       dispatch(addReactNotation(
         <AssistantMessage
           key="welcome-am"
-          msg={"Hi! I'm Town Llama! I'm here to help you find an apartment you'll love! Open the sidebar and click 'new search' to start looking!"}
+          msg={"Hi! I'm Town Llama! I'm here to help you find the best bars in Austin! Open the sidebar and click 'new search' to start looking!"}
           image={`/tl_${randomNumber}.webp`}
         />
       ));
@@ -24,129 +23,48 @@ export const advance = (msg, df, chatState, response = null) => async (dispatch)
       chatState = "BEGIN";
       dispatch(setChatState(chatState));
       break;
-    case "ANYTHING":
-      const displayProperties = [];
-      for (let i = 0; i < df.comparingIndices.length; i++) {
-        let name = df.payload[df.comparingIndices[i]].buildingname.toLowerCase();
-        if (response.data.toLowerCase().includes(name)) {
-          displayProperties.push({
-            ...df.payload[df.comparingIndices[i]],
-            index: df.comparingIndices[i]
-          });
-        }
-      }
-
-      dispatch(dialogue(
-        { role: "user", content: msg },
-        <UserMessage msg={msg} />,
-        { role: "assistant", content: response.data },
-        <AssistantMessage key="response-am" msg={response.data} displayProperties={displayProperties} />
-      ))
-      dispatch(setConversationId(response.conversation_id));
-      // State remains as ANYTHING
-      break;
-    case "COMMUTE":
+    case "SEARCH":
+      console.log(msg, df, response, "SEARCH");
       dispatch(clearChat());
-      let index = 0;
-      const chosenIndices = [];
-
-      //handling when the df is == 0
-      if (df.length == 0) {
-        dispatch(addReactNotation(
-          <AssistantMessage
-            key="no-results-am"
-            msg={"Based on your criteria, I didn't see anything that was a good match, let's try again"}
-            image={`/maps.webp`}
-          />
-        ));
-        return;
-      }
-
-      while (chosenIndices.length < 4) {
-        let possibleApt = df[index];
-        let matched = false;
-        for (let i = 0; i < chosenIndices.length; i++) {
-          let indexedLat = parseFloat(df[chosenIndices[i]].latitude);
-          let indexedLng = parseFloat(df[chosenIndices[i]].longitude);
-          let possibleLat = parseFloat(possibleApt.latitude);
-          let possibleLng = parseFloat(possibleApt.longitude);
-          if (indexedLat === possibleLat && indexedLng === possibleLng) {
-            matched = true;
-          }
-        }
-        if (!matched) {
-          chosenIndices.push(index);
-        }
-        index++;
-      }
-      dispatch(updateComparingIndices(chosenIndices)); // Show the top 4
+      dispatch(updateQuery(msg));
       dispatch(addOpenAINotation({
         role: "system",
-        content: "[Inst]You are a helpful AI Assistant. You are helping the user find an apartment. Give your responses in markdown. Below is data about the ones they're considering.[/Inst]"
+        content: "[Inst]You are a helpful AI Assistant. You are helping the user find what they're looking for in Austin, Texas USA. Give your responses in **markdown**. System prompt has data about the options you're recommending to them[/Inst]"
       }));
       dispatch(addOpenAINotation({
         role: "system",
         content: buildJsonPromptData(df.slice(0, 4))
       }));
+      dispatch(updateComparingIndices([0, 1, 2, 3]));
+      dispatch(setDf(df));
       dispatch(addReactNotation(
         <AssistantMessage
           key="report-am"
-          msg={"Based on your criteria, I generated the below report with some recommendations."}
-          component={<ApartmentTableV2 />}
+          msg={"What do you think of these?"}
+          component={<POITable />}
         />
       ));
-      dispatch(addReactNotation(
-        <AssistantMessage
-          key="commute-am"
-          msg={"Let's estimate your commute. Give me a street address to compare the commute times."}
-          shouldPreview={false}
-        />
-      ));
-      chatState = "POI_SEARCH";
-      dispatch(setChatState(chatState));
-      const uniqueId = uuidv4();
-      dispatch(setConversationId(uniqueId));
+      dispatch(setChatState("ANYTHING"));
       break;
-    case "POI_SEARCH":
-      dispatch(setCommuteAddress(response)); // response is [lat, lng]
-      dispatch(addReactNotation(
-        <UserMessage msg={msg} />
-      ));
-      if (df !== null) {
-        dispatch(addReactNotation(
-          <AssistantMessage
-            key="nearby-am"
-            msg={"Let's find interesting places nearby. What types of stores and places of interest would you like to?"}
-            shouldPreview={false}
-          />
-        ));
-        chatState = "REPORT_FOLLOWUP";
-      } else {
-        dispatch(addReactNotation(
-          <AssistantMessage
-            key="got-it-am"
-            msg={"You got it! Updated to show commute to " + msg}
-            shouldPreview={false}
-          />
-        ));
-        chatState = "ANYTHING";
-      }
-      dispatch(setChatState(chatState));
-      break;
-    case "REPORT_FOLLOWUP":
-      dispatch(addReactNotation(
-        <UserMessage msg={msg} />
-      ));
-      dispatch(setPoiArr(response))
-      dispatch(addReactNotation(
-        <AssistantMessage
-          key="thanks-am"
-          msg={"Great! Added those to your report! We can talk more here or you can click on an apartment to get more in-depth information"}
-          shouldPreview={true}
-        />
-      ));
-      chatState = "ANYTHING";
-      dispatch(setChatState(chatState));
+    case "ANYTHING":
+      const displayProperties = [];
+      // for (let i = 0; i < .comparingIndices.length; i++) {
+      //   let name = df.payload[df.comparingIndices[i]].buildingname.toLowerCase();
+      //   if (response.data.toLowerCase().includes(name)) {
+      //     displayProperties.push({
+      //       ...df.payload[df.comparingIndices[i]],
+      //       index: df.comparingIndices[i]
+      //     });
+      //   }
+      // }
+      dispatch(dialogue(
+        { role: "user", content: msg },
+        <UserMessage msg={msg} />,
+        { role: "assistant", content: response.data },
+        <AssistantMessage key="response-am" msg={response.data} />
+      ))
+      dispatch(setConversationId(response.conversation_id));
+      // State remains as ANYTHING
       break;
     default:
       // Handle unknown states
@@ -155,26 +73,15 @@ export const advance = (msg, df, chatState, response = null) => async (dispatch)
 };
 
 const buildJsonPromptData = (arr) => {
-  const columnMapping = {
-    rent_12_month_monthly: "rent",
-    description: "property_description",
-    buildingname: "buildingname",
-    distance: "Distance from Neighborhood",
-    area: "square_feet",
-    beds: "beds",
-    baths: "baths",
-  };
 
   const translatedData = [];
   for (let i = 0; i < arr.length; i++) {
-    const mappedData = {};
     let data = arr[i];
-    for (const key in data) {
-      if (columnMapping[key]) {
-        mappedData[columnMapping[key]] = data[key];
-      }
+    console.log("HERE WE GO", data, Object.keys(data).includes("isdrink"));
+    translatedData[i] = data;
+    if (translatedData[i].price == "-1.00") {
+      translatedData[i].price = "Not Given";
     }
-    translatedData[i] = mappedData;
   }
 
   return JSON.stringify(translatedData);

@@ -16,12 +16,12 @@ const PropertyPreview = ({ apt, preferredName = null }) => {
   const price = apt.price ? parseFloat(apt.price) : parseFloat(apt.rent_12_month_monthly);
   const image = apt.photosarray === undefined ? apt.image : JSON.parse(apt.photosarray)[0].url;
 
-  const displayName = preferredName === null ? apt.buildingname : preferredName;
+  const displayName = preferredName === null ? apt.barname : preferredName;
 
   return (
     <div key={apt.index} className="bg-white rounded-lg overflow-hidden transition-all duration-300 ease-in-out hover:shadow-lg group relative" onClick={() => showDetails(apt.index)}>
       <div className="relative">
-        <img src={image} alt={displayName} className="w-full h-32 object-cover" />
+        {/* <img src={image} alt={displayName} className="w-full h-32 object-cover" /> */}
         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-40 transition-opacity duration-300"></div>
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div className="message-bubble p-2 rounded-full">
@@ -34,7 +34,10 @@ const PropertyPreview = ({ apt, preferredName = null }) => {
       <div className="p-2">
         <h3 className="font-semibold text-left">{displayName}</h3>
         <p className="gradient-text text-sm">
-          Monthly pricing: ${price.toFixed(2)}
+          {
+            price > 0 ? (`Price: ${price.toFixed(2)}`) : (`Price not on Menu`)
+
+          }
         </p>
       </div>
     </div>

@@ -200,7 +200,7 @@ const ApartmentTableV2 = () => {
           })
         );
         setPoiDataState(allPoiData);
-        dispatch(setPoiData(allPoiData));
+        // dispatch(setPoiData(allPoiData));
       } catch (error) {
         console.error("Error fetching POI data:", error);
       }

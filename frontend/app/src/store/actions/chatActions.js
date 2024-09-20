@@ -1,46 +1,49 @@
-import { UPDATE_MESSAGES, 
-    CLEAR_MESSAGES,
-    ADD_OPENAI_NOTATION,
-    ADD_REACT_NOTATION,
-    SET_CONVERSATION_ID,
-    SET_COMMUTE_ADDRESS,
-    SET_CHAT_STATE,
-    SET_POI_ARR,
-    SET_POI_DATA
- } from '../states/chatState';
+import {
+  initialChatState,
+  UPDATE_MESSAGES,
+  CLEAR_MESSAGES,
+  ADD_OPENAI_NOTATION,
+  ADD_REACT_NOTATION,
+  SET_CONVERSATION_ID,
+  SET_DF,
+  UPDATE_QUERY,
+  SET_CHAT_STATE,
+  UPDATE_COMPARING_INDICES
+} from '../states/chatState';
 
 export const dialogue = (
-    userMessage, 
-    userReactComponent, 
-    assistantMessage,
-    assistantReactComponent
+  userMessage,
+  userReactComponent,
+  assistantMessage,
+  assistantReactComponent
 ) => ({
   type: UPDATE_MESSAGES,
   payload: {
-    userMessage, 
-    userReactComponent, 
+    userMessage,
+    userReactComponent,
     assistantMessage,
     assistantReactComponent
   },
 });
 
-export const setPoiData = (obj) => ({
-  type: SET_POI_DATA,
+export const updateComparingIndices = (obj) => ({
+  type: UPDATE_COMPARING_INDICES,
   payload: obj
 })
-export const setPoiArr = (obj) => ({
-  type: SET_POI_ARR,
+
+export const updateQuery = (obj) => ({
+  type: UPDATE_QUERY,
   payload: obj
 })
 
 export const addOpenAINotation = (obj) => ({
-    type: ADD_OPENAI_NOTATION,
-    payload: obj
+  type: ADD_OPENAI_NOTATION,
+  payload: obj
 })
 
 export const addReactNotation = (obj) => ({
-    type: ADD_REACT_NOTATION,
-    payload: obj
+  type: ADD_REACT_NOTATION,
+  payload: obj
 })
 
 export const clearChat = () => ({
@@ -53,8 +56,8 @@ export const setConversationId = (cid) => ({
   payload: cid
 });
 
-export const setCommuteAddress = (cid) => ({
-  type: SET_COMMUTE_ADDRESS,
+export const setDf = (cid) => ({
+  type: SET_DF,
   payload: cid
 });
 
