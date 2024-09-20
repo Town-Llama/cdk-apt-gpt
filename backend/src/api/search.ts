@@ -102,7 +102,8 @@ const callImageEmbeddingModel = async (data: any, isText: boolean) => {
 const callDescrEmbeddingModel = async (data: any, isText: boolean) => {
   try {
     const response = await axios.post(
-      'http://localhost:80/text',
+      // 'http://localhost:80/text',
+      `http://${process.env.LOAD_BALANCER_DNS}/text`,
       {
         payload: data,    // Ensure the key matches the expected key in Flask
         load_model: false // Optional: Include this if you want to handle model loading conditionally
