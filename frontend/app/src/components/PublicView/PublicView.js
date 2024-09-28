@@ -39,8 +39,12 @@ const PublicView = ({ id }) => {
     }, []);
 
     const goBack = () => {
-        window.location.href = "https://townllama.ai";
-    }
+        if (window.location.pathname === "/") {
+            dispatch(updateDFIndex(i));
+        } else {
+            window.location.href = "/";
+        }
+    };
 
     const calculatePriceRange = () => {
         if (menu.length === 0) return 'N/A';
