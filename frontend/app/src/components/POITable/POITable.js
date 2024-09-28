@@ -134,7 +134,7 @@ const POITable = () => {
                         </Box>
                     </Box>
                 ))}
-                <Box
+                {/* <Box
                     key="Apartment_none"
                     sx={{
                         minWidth: '0vw',
@@ -149,7 +149,7 @@ const POITable = () => {
                     }}
                 >
                     <button onClick={clickMore}><span className="gradient-text">See Other Options</span></button>
-                </Box>
+                </Box> */}
             </Box>
         );
     }, [suggestedOptions, isSmallScreen]);

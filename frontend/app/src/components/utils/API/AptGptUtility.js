@@ -13,6 +13,10 @@ class AptGptUtility {
     this.user = user;
   }
 
+  drop_all_previous_requests() {
+    globalRequestManager.dropQueue();
+  }
+
   async blog_entry(id) {
     const res = await this.post_unauthorized("api/blog/posts/" + id);
     console.log(res, "res");
@@ -67,9 +71,9 @@ class AptGptUtility {
 
   async datas_fetch_apt(apt_id) {
     const res = await globalRequestManager.enqueueRequest(() =>
-      this.get(`api/fetch_apt/${apt_id}`, {
-      })
+      this.post_unauthorized(`api/fetch_apt/${apt_id}`)
     );
+    console.log(res, "res");
     return res.data;
   }
 
@@ -215,9 +219,10 @@ class AptGptUtility {
 
   async get(endpoint) {
     const accessToken = await this.fetchAccessToken(); // Fetch access token
+    console.log("HIT");
 
     if (!accessToken) {
-      console.warn("User is not authenticated. Exiting request early.");
+      console.log("User is not authenticated. Exiting request early.");
       return null;
     }
 

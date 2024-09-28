@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
 import styles from './RestaurantSearch.module.css';
 import { useAuth0 } from '@auth0/auth0-react';
 import AptGptUtility from '../utils/API/AptGptUtility';
 import { useDispatch } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
-import { updateDFPayload } from '../../store/actions/dfActions';
-import { updateFormDataPayload } from '../../store/actions/formDataActions';
-import { setRecHash } from "../../store/actions/recActions";
-import { clearChat } from '../../store/actions/chatActions';
 import { advance } from '../utils/ChatFlow';
 import { trackButtonClick, trackFilledInput } from '../utils/analytics';
 
@@ -19,8 +14,12 @@ const RestaurantSearch = ({ onRequestClose, showLoading }) => {
         "Best value for money restaurants nearby",
         "Fun restaurants with outdoor seating"
     ]);
+    const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0)
     const [neighborhoods, setNeighborhoods] = useState([]);
-    const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
+    const [isGeolocationAvailable, setIsGeolocationAvailable] = useState(true);
+    const [showLocationAlert, setShowLocationAlert] = useState(false);
+    const [isInputFocused, setIsInputFocused] = useState(false);
+
 
     const { control, handleSubmit, watch, setValue } = useForm({
         defaultValues: {
@@ -32,28 +31,44 @@ const RestaurantSearch = ({ onRequestClose, showLoading }) => {
     const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
     const dispatch = useDispatch();
 
+    const queryValue = watch("query");
+
     useEffect(() => {
         const interval = setInterval(() => {
-            setPlaceholders(prevPlaceholders => {
-                const [first, ...rest] = prevPlaceholders;
-                return [...rest, first];
-            });
+            if (!isInputFocused && !queryValue) {
+                setCurrentPlaceholderIndex((prevIndex) => (prevIndex + 1) % placeholders.length);
+            }
         }, 3000);
         return () => clearInterval(interval);
-    }, []);
+    }, [placeholders.length, isInputFocused, queryValue]);
 
     useEffect(() => {
         const fetchNeighborhoods = async () => {
             const client = new AptGptUtility(getAccessTokenSilently, isAuthenticated, user);
             const neighborhoodsList = await client.datas_neighborhoods("Austin");
-            setNeighborhoods([{ name: "Use My Current Location" }, ...neighborhoodsList]);
+            setNeighborhoods(neighborhoodsList);
         };
         fetchNeighborhoods();
+        checkGeolocationAvailability();
     }, [getAccessTokenSilently, isAuthenticated, user]);
 
-    useEffect(() => {
-        getUserCoordinates();
-    }, []);
+    const checkGeolocationAvailability = () => {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                () => {
+                    setIsGeolocationAvailable(true);
+                    setNeighborhoods(prev => [{ name: "Use My Current Location" }, ...prev]);
+                },
+                () => {
+                    setIsGeolocationAvailable(false);
+                    setShowLocationAlert(true);
+                }
+            );
+        } else {
+            setIsGeolocationAvailable(false);
+            setShowLocationAlert(true);
+        }
+    };
 
     const getUserCoordinates = () => {
         return new Promise((resolve, reject) => {
@@ -86,7 +101,7 @@ const RestaurantSearch = ({ onRequestClose, showLoading }) => {
     const onSubmit = async (formData) => {
         console.log(formData, neighborhoods[formData.neighborhood]);
         let coordinatesArr;
-        if (formData.neighborhood == 0) {
+        if (formData.neighborhood == 0 && isGeolocationAvailable) {
             coordinatesArr = await getUserCoordinates();
         } else {
             coordinatesArr = neighborhoods[parseInt(formData.neighborhood)].coordinates;
@@ -102,8 +117,6 @@ const RestaurantSearch = ({ onRequestClose, showLoading }) => {
 
         console.log(matches, 'df');
         dispatch(advance(formData.query, matches, "SEARCH"));
-        //we have the data, let's get the information!
-
         onRequestClose();
     };
 
@@ -116,19 +129,30 @@ const RestaurantSearch = ({ onRequestClose, showLoading }) => {
     return (
         <div className="text-center">
             <h2 className="text-2xl font-bold gradient-text mb-4">Town Llama help me find...</h2>
+            {showLocationAlert && (
+                <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
+                    <p className="font-bold">Location Unavailable</p>
+                    <p>We couldn't access your location. Please select a neighborhood from the list.</p>
+                </div>
+            )}
             <form onSubmit={handleSubmit(onSubmit)} className="mb-4">
                 <div className="relative">
-                    <div className={`${styles['placeholder-container']} h-12`}>
-                        {placeholders.map((placeholder, index) => (
-                            <div
-                                key={placeholder}
-                                className={styles['placeholder-item']}
-                                style={{ transform: `translateY(-${index * 100}%)` }}
-                            >
-                                {placeholder}
-                            </div>
-                        ))}
-                    </div>
+                    {!isInputFocused && !queryValue && (
+                        <div className={`${styles['placeholder-container']} h-12 overflow-hidden absolute top-0 left-0 w-full pointer-events-none`}>
+                            {placeholders.map((placeholder, index) => (
+                                <div
+                                    key={placeholder}
+                                    className={`${styles['placeholder-item']} absolute w-full transition-transform duration-300 ease-in-out`}
+                                    style={{
+                                        transform: `translateY(${(index - currentPlaceholderIndex) * 100}%)`,
+                                        opacity: index === currentPlaceholderIndex ? 1 : 0
+                                    }}
+                                >
+                                    {placeholder}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                     <Controller
                         name="query"
                         control={control}
@@ -137,8 +161,9 @@ const RestaurantSearch = ({ onRequestClose, showLoading }) => {
                             <input
                                 {...field}
                                 type="text"
-                                placeholder={placeholders[0]}
                                 className={`${styles.input} w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                onFocus={() => setIsInputFocused(true)}
+                                onBlur={() => setIsInputFocused(false)}
                             />
                         )}
                     />

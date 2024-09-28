@@ -4,7 +4,7 @@ import { Dimmer, Loader } from 'semantic-ui-react';
 
 import ChatV2 from "./components/ChatV2/ChatV2";
 import SEOComponent from './components/SEOComponent/SEOComponent';
-import ErrorBoundary from './components/utils/ErrorBoundary';
+import PublicView from './components/PublicView/PublicView';
 
 import 'semantic-ui-css/semantic.min.css';
 import './App.css';
@@ -38,6 +38,14 @@ const Blog = ({ showLoading }) => {
     </div>
   );
 };
+
+const PublicViewWrapper = ({ showLoading }) => {
+  const { id } = useParams();  // Use useParams to get the id from the URL
+  const blogId = id;
+  return (
+    <PublicView id={blogId} />
+  );
+}
 
 function App() {
   const [loading, setLoading] = useState(false);
@@ -81,6 +89,10 @@ function App() {
         <Route
           path="/blogs/:id"
           element={<Blog showLoading={showLoading} />}
+        />
+        <Route
+          path="/place/:id"
+          element={<PublicViewWrapper showLoading={showLoading} />}
         />
         <Route path="/blogs" element={<Blog showLoading={showLoading} />} />
         <Route path="*" element={<Navigate to="/" />} />

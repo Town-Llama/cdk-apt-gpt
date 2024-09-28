@@ -3,6 +3,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useSelector } from 'react-redux';
+import { motion } from 'framer-motion';
+import { MapPin, ArrowLeft, Star, Utensils, Clock, Phone } from 'lucide-react';
 
 import AptGptUtility from '../utils/API/AptGptUtility';
 
@@ -20,17 +22,9 @@ const ReviewAggregation = ({ apt }) => {
     } = useAuth0();
 
     useEffect(() => {
-        get();
+        setMsg(apt.reviewsMessage.review_text);
+        setReviews(apt.reviews);
     }, []);
-
-    const get = async () => {
-        const client = new AptGptUtility(getAccessTokenSilently, isAuthenticated, user);
-        let response = await client.chat_reviews(apt);
-        setMsg(response);
-        // Assuming the API also returns individual reviews
-        // If not, you'd need to modify the API to fetch individual reviews
-        setReviews(response.individualReviews || []);
-    };
 
     const handleClick = () => {
         setIsModalOpen(true);
@@ -38,19 +32,20 @@ const ReviewAggregation = ({ apt }) => {
 
     return (
         <>
-            <div 
+            <div
                 style={{
                     borderTop: "1px solid #a4a5a6"
                 }}
                 className="cursor-pointer transition-colors duration-300 hover:text-blue-600"
                 onClick={handleClick}
             >
-                <ReactMarkdown 
+                <p>What did Town Llama Think of the Reviews:</p>
+                <ReactMarkdown
                     className="list-disc list-inside"
                     remarkPlugins={[remarkGfm]}
                     components={{
-                        ul: ({node, ...props}) => <ul className="list-disc list-inside" {...props} />,
-                        li: ({node, ...props}) => <li className="mb-2 hover:text-blue-600" {...props} />
+                        ul: ({ node, ...props }) => <ul className="list-disc list-inside" {...props} />,
+                        li: ({ node, ...props }) => <li className="mb-2 hover:text-blue-600" {...props} />
                     }}
                 >
                     {msg}
@@ -62,7 +57,7 @@ const ReviewAggregation = ({ apt }) => {
                     <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-2xl font-bold">Individual Reviews</h2>
-                            <button 
+                            <button
                                 onClick={() => setIsModalOpen(false)}
                                 className="text-gray-500 hover:text-gray-700"
                             >
@@ -73,10 +68,21 @@ const ReviewAggregation = ({ apt }) => {
                         </div>
                         <div className="space-y-4">
                             {reviews.map((review, index) => (
-                                <div key={index} className="border-b pb-4 last:border-b-0">
-                                    <p className="text-gray-700 mb-2">{review.text}</p>
-                                    <p className="text-sm text-gray-500">- {review.author}</p>
-                                </div>
+                                <motion.div
+                                    key={index}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                                    className="bg-[#0062ff] bg-opacity-50 p-4 rounded-lg mb-4"
+                                >
+                                    <div className="flex items-center mb-2">
+                                        {[...Array(5)].map((_, i) => (
+                                            <Star key={i} className={`${i < review.rating ? 'text-blue-200' : 'text-blue-800'} mr-1`} size={16} />
+                                        ))}
+                                        <span className="font-bold ml-2">{review.rating}/5</span>
+                                    </div>
+                                    <p className="text-sm mb-2">{review.review_text}</p>
+                                </motion.div>
                             ))}
                         </div>
                     </div>

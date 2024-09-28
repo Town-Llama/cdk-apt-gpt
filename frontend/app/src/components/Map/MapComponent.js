@@ -66,7 +66,7 @@ const MapComponent = ({ apts }) => {
 
   return (
     <div ref={mapContainerRef} style={{
-      height: '400px', // adjust to your desired height
+      height: '200px', // adjust to your desired height
       width: '100%', // adjust to your desired width
       border: '1px solid black' // add a border to contain the map
     }} />

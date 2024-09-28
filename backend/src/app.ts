@@ -43,3 +43,6 @@ app.use(waitlist);
 
 import short from "./api/short";
 app.use(short);
+
+import review from "./api/review";
+app.use(review);

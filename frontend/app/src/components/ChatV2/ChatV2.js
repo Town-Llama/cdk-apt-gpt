@@ -5,7 +5,8 @@ import { useSelector } from "react-redux";
 import LoginPrompt from "../LoginPrompt/LoginPrompt";
 import Sidebar from '../Sidebar/Sidebar';
 import AptGptUtility from "../utils/API/AptGptUtility";
-import ViewV2 from "../ViewV2/ViewV2";
+import PublicView from "../PublicView/PublicView";
+import ViewV2 from "../ViewV2/ViewV2"
 import ChatArea from "./ChatArea/ChatArea";
 import "./ChatV2.css";
 
@@ -25,44 +26,28 @@ const ChatV2 = ({ showLoading }) => {
   const formData = useSelector((state) => state.formData.payload);
   const { isAuthenticated, getAccessTokenSilently, user } = useAuth0();
 
-  const [modalIsOpen, setModalIsOpen] = useState(isAuthenticated);
+  console.log("CHat state: ", chat);
+  console.log("df state: ", df);
+
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   const [waitlistApproved, setWaitlistApproved] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
+  const [isFirstLogin, setIsFirstLogin] = useState(true);
 
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => setModalIsOpen(false);
 
-  // useEffect(() => {
-  //   const saveChat = async () => {
-  //     const client = new AptGptUtility(
-  //       getAccessTokenSilently,
-  //       isAuthenticated,
-  //       user
-  //     );
-  //     const aptIdArr = [];
-  //     for (let i = 0; i < df.comparingIndices.length; i++) {
-  //       aptIdArr.push(df.payload[df.comparingIndices[i]].unit_id);
-  //     }
-  //     await client.datas_chats_record(
-  //       formData.ask,
-  //       chat.conversationId,
-  //       chat.commuteAddress,
-  //       chat.poiArr,
-  //       chat.poiData,
-  //       chat.chatState,
-  //       aptIdArr
-  //     );
-  //   };
-  //   if (isAuthenticated && chat.conversationId !== null) {
-  //     saveChat();
-  //   }
-  // }, [chat, formData, df, isAuthenticated]);
-
   useEffect(() => {
     if (isAuthenticated) {
       process();
+      if (isFirstLogin) {
+        setModalIsOpen(true);
+        setIsFirstLogin(false);
+      }
+    } else {
+      setIsFirstLogin(true);
     }
   }, [isAuthenticated]);
 
@@ -75,16 +60,11 @@ const ChatV2 = ({ showLoading }) => {
     let approved = await client.datas_waitlist();
     setIsLoading(false);
     setWaitlistApproved(approved);
-
-    let apt = await client.datas_fetch_apt("2810 Salado St #31218E285");
-    console.log("APT");
-    console.log(apt);
-    console.dir(apt);
   };
 
   const handleDrawerClose = () => {
     setIsClosing(true);
-    setMobileOpen(false);
+    setDrawerOpen(false);
   };
 
   const handleDrawerTransitionEnd = () => {
@@ -93,7 +73,7 @@ const ChatV2 = ({ showLoading }) => {
 
   const handleDrawerToggle = () => {
     if (!isClosing) {
-      setMobileOpen(!mobileOpen);
+      setDrawerOpen(!drawerOpen);
     }
   };
 
@@ -103,53 +83,33 @@ const ChatV2 = ({ showLoading }) => {
 
   return (
     <Box sx={{ display: "flex", height: "100vh" }} className="bg-gray-100">
-      <Box
-        component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: drawerWidth } }}
-        aria-label="mailbox folders"
+      <Drawer
+        variant="temporary"
+        open={drawerOpen}
+        onTransitionEnd={handleDrawerTransitionEnd}
+        onClose={handleDrawerClose}
+        ModalProps={{
+          keepMounted: true,
+        }}
+        sx={{
+          "& .MuiDrawer-paper": {
+            boxSizing: "border-box",
+            width: drawerWidth,
+          },
+        }}
       >
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onTransitionEnd={handleDrawerTransitionEnd}
-          onClose={handleDrawerClose}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: "block", sm: "none" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: drawerWidth,
-            },
-          }}
-        >
-          {drawer}
-        </Drawer>
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: "none", sm: "block" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: drawerWidth,
-            },
-          }}
-          open
-        >
-          {drawer}
-        </Drawer>
-      </Box>
+        {drawer}
+      </Drawer>
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          width: "100%",
           display: "flex",
           flexDirection: "column",
         }}
       >
-        <div className="flex-shrink-0 h-16 bg-[#121826] flex items-center px-4 sm:hidden">
+        <div className="flex-shrink-0 h-16 bg-[#121826] flex items-center px-4">
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -177,7 +137,7 @@ const ChatV2 = ({ showLoading }) => {
           {df.index === null ? (
             <ChatArea showLoading={showLoading} />
           ) : (
-            <ViewV2 showLoading={showLoading} />
+            <PublicView id={chat.df[df.index].barid} />
           )}
           {(!isAuthenticated || !waitlistApproved) && (
             <LoginPrompt

@@ -58,19 +58,23 @@ const AIExplanation = ({ showOnLoad = false, apt, short = false }) => {
         <div>
             {!getSuggestion ? (
                 <button onClick={get}>
-                    Why Should I Live Here?
+                    Why should I check this out?
                 </button>
             ) : (
-                <ReactMarkdown
-                    className={styles.list}
-                    remarkPlugins={remarkGfm}
-                    components={{
-                        ul: ({ node, ...props }) => <ul className={styles.list} {...props} />,
-                        li: ({ node, ...props }) => <li className={styles['list-item']} {...props} />
-                    }}
-                >
-                    {msg}
-                </ReactMarkdown>
+                <>
+                    <p>Why Did Town Llama pick this for you:</p>
+                    <ReactMarkdown
+                        className={styles.list}
+                        remarkPlugins={remarkGfm}
+                        components={{
+                            ul: ({ node, ...props }) => <ul className={styles.list} {...props} />,
+                            li: ({ node, ...props }) => <li className={styles['list-item']} {...props} />
+                        }}
+                    >
+                        {msg}
+                    </ReactMarkdown>
+                </>
+
             )}
         </div>
     );

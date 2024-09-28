@@ -2,28 +2,57 @@ import { Router } from "express";
 import { dbCall } from "../lib/db";
 import routeHelper from "../lib/route_helper";
 
+const Outscraper = require('outscraper');
+
+let outscraper_client = new Outscraper(process.env.OUTSCRAPER_API_KEY);
+
 const router = Router();
 export default router;
 
-router.get("/fetch_apt/:address", async (req, res) => {
+router.post("/fetch_apt/:id", async (req, res) => {
   await routeHelper(req, res, async () => {
-    const address = req.params.address;
+    const id = req.params.id;
 
-    const query = `SELECT u.id AS unit_id, u.property_id, u.property_ts, u.available, u.name, u.baths, u.beds, u.area, u.ts,
-             u.rent_12_month_monthly, u.rent_11_month_monthly, u.rent_10_month_monthly, u.rent_9_month_monthly,
-             u.rent_8_month_monthly, u.rent_7_month_monthly, u.rent_6_month_monthly, u.rent_5_month_monthly,
-             u.rent_4_month_monthly, u.rent_3_month_monthly, u.rent_2_month_monthly, u.rent_1_month_monthly,
-             p.timestamp AS property_timestamp, p.addressStreet, p.addressCity, p.addressState, p.addressZipCode,
-             p.latitude, p.longitude, p.photosArray, p.description, p.transitScore, p.transitDescription,
-             p.walkScore, p.walkDescription, p.buildingName
-      FROM Unit u
-      JOIN Properties p ON u.property_id = p.id AND u.property_ts = p.timestamp
-      WHERE u.property_id = $1::varchar`;
+    const barquery = `select name as barname, address, description as bardescription, latitude, longitude from bar where id=$1`;
+    const values = [id];
 
-    const values = [address];
+    const menuquery = `select name as itemname, description as itemdescription, price, category from bar_menu_item bmi where barid = $1`;
 
-    const responses = await dbCall(query, values);
+    const bar = await dbCall(barquery, values);
+    const menu = await dbCall(menuquery, values);
 
-    res.status(200).json({ data: responses });
+    const lookupquery = "select rating, review_text from bar_reviews where barid=$1";
+    const value = [id];
+    let followup_response = await dbCall(lookupquery, value);
+    console.log(followup_response, "FR")
+    if (followup_response.length == 0) {
+      //look up outscraper
+      const barquery = "select name as barname from bar where id=$1";
+      const barvalue = [id];
+      let bar = await dbCall(barquery, barvalue);
+
+      console.log(bar, "bar");
+
+      const reviews = await outscraper_client.googleMapsReviews([bar[0].barname + ' Austin TX, USA'], 5);
+      console.log("REVIEWS", reviews);
+      //then save to DB
+      for (let j = 0; j < reviews[0].reviews_data.length; j++) {
+        let review = reviews[0].reviews_data[j];
+        console.log("review", review);
+        const insertquery = "INSERT INTO bar_reviews (rating, review_text, review_date, barid) VALUES ($1, $2, $3, $4)";
+        const insertvalues = [review.review_rating, review.review_text, review.review_datetime_utc, id];
+        await dbCall(insertquery, insertvalues);
+        followup_response.push({
+          review_text: review.review_text,
+          rating: review.rating
+        })
+      }
+    }
+
+    const imagequery = `select image_data, filetype from images where bar_id=$1`;
+    const image = await dbCall(imagequery, values);
+
+
+    return res.status(200).json({ data: { menu, bar, reviews: followup_response, image } });
   });
 });
