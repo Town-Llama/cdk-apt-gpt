@@ -1,6 +1,13 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 
+/**
+ * using react helmet this sets our meta tags so that the page
+ * has the right SEO tags. 
+ * Still waiting to confirm this works
+ * @param {*} param0 
+ * @returns 
+ */
 const SEOComponent = ({ title, description, keywords, img = null }) => {
     return (
         <Helmet>

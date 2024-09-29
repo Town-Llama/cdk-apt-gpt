@@ -1,15 +1,14 @@
-// import CloudWatchMetrics from "../AWS/CloudWatchMetrics";
+import CloudWatchMetrics from "../AWS/CloudWatchMetrics";
 import globalRequestManager from "./RequestManager"; // Import the global request manager
 const auth_config = require("../../../auth/auth_config.json");
 
 class AptGptUtility {
-  static BASE_URL = "";//"https://townllama.ai"; // if beta
-  //static BASE_URL = 'https://api.beta.townllama.ai'; // if beta
+  static BASE_URL = "";
 
   constructor(getAccessTokenSilently = null, isAuthenticated = false, user = null) {
     this.getAccessTokenSilently = getAccessTokenSilently;
     this.isAuthenticated = isAuthenticated;
-    // this.cloudWatchMetrics = new CloudWatchMetrics("YourAppNamespace");
+    this.cloudWatchMetrics = new CloudWatchMetrics("TownLlama");
     this.user = user;
   }
 
@@ -30,43 +29,17 @@ class AptGptUtility {
   }
 
   async datas_modelOne() {
-    try {
-      const res = await this.post("api/modelOne", {
-        'load_model': true,
-      });
-      return res;
-    } catch (error) {
-      console.error("AptGptUtility.datas_modelOne error: ", error);
-      // this.cloudWatchMetrics.emitErrorMetric(
-      //   "AptGptUtility",
-      //   "datas_modelOne"
-      // );
-      // await this.cloudWatchMetrics.writeLog(
-      //   "Error in AptGptUtility.datas_modelOne" +
-      //   " user {" + JSON.stringify(this.user) + "}"
-      // );
-      throw error;
-    };
+    const res = await this.post("api/modelOne", {
+      'load_model': true,
+    });
+    return res;
   }
 
   async datas_modelTwo() {
-    try {
-      const res = await this.post("api/modelTwo", {
-        'load_model': true,
-      });
-      return res;
-    } catch (error) {
-      console.error("AptGptUtility.datas_modelTwo error: ", error);
-      // this.cloudWatchMetrics.emitErrorMetric(
-      //   "AptGptUtility",
-      //   "datas_modelTwo"
-      // );
-      // await this.cloudWatchMetrics.writeLog(
-      //   "Error in AptGptUtility.datas_modelTwo" +
-      //   " user {" + JSON.stringify(this.user) + "}"
-      // );
-      throw error;
-    };
+    const res = await this.post("api/modelTwo", {
+      'load_model': true,
+    });
+    return res;
   }
 
   async datas_fetch_apt(apt_id) {
@@ -241,17 +214,17 @@ class AptGptUtility {
       }
       return response.json();
     } catch (error) {
-      // this.cloudWatchMetrics.emitErrorMetric(
-      //   "AptGptUtility",
-      //   "get/" + endpoint
-      // );
-      // await this.cloudWatchMetrics.writeLog(
-      //   "Error in AptGptUtility.get/" +
-      //   endpoint +
-      //   " user {" +
-      //   JSON.stringify(this.user) +
-      //   "}"
-      // );
+      await this.cloudWatchMetrics.emitErrorMetric(
+        "AptGptUtility",
+        "get/" + endpoint
+      );
+      await this.cloudWatchMetrics.writeLog(
+        "Error in AptGptUtility.get/" +
+        endpoint +
+        " user {" +
+        JSON.stringify(this.user) +
+        "}"
+      );
       throw error;
     }
   }
@@ -274,19 +247,19 @@ class AptGptUtility {
       }
       return response.json();
     } catch (error) {
-      // this.cloudWatchMetrics.emitErrorMetric(
-      //   "AptGptUtility",
-      //   "post/" + endpoint
-      // );
-      // await this.cloudWatchMetrics.writeLog(
-      //   "Error in AptGptUtility.post/" +
-      //   endpoint +
-      //   " user {" +
-      //   JSON.stringify(this.user) +
-      //   "} with data {" +
-      //   JSON.stringify(data) +
-      //   "}"
-      // );
+      await this.cloudWatchMetrics.emitErrorMetric(
+        "AptGptUtility",
+        "post/" + endpoint
+      );
+      await this.cloudWatchMetrics.writeLog(
+        "Error in AptGptUtility.post/" +
+        endpoint +
+        " user {" +
+        JSON.stringify(this.user) +
+        "} with data {" +
+        JSON.stringify(data) +
+        "}"
+      );
       throw error;
     }
   }
@@ -319,19 +292,19 @@ class AptGptUtility {
       }
       return response.json();
     } catch (error) {
-      // this.cloudWatchMetrics.emitErrorMetric(
-      //   "AptGptUtility",
-      //   "post/" + endpoint
-      // );
-      // await this.cloudWatchMetrics.writeLog(
-      //   "Error in AptGptUtility.post/" +
-      //   endpoint +
-      //   " user {" +
-      //   JSON.stringify(this.user) +
-      //   "} with data {" +
-      //   JSON.stringify(data) +
-      //   "}"
-      // );
+      await this.cloudWatchMetrics.emitErrorMetric(
+        "AptGptUtility",
+        "post/" + endpoint
+      );
+      await this.cloudWatchMetrics.writeLog(
+        "Error in AptGptUtility.post/" +
+        endpoint +
+        " user {" +
+        JSON.stringify(this.user) +
+        "} with data {" +
+        JSON.stringify(data) +
+        "}"
+      );
       throw error;
     }
   }
@@ -350,15 +323,15 @@ class AptGptUtility {
       return accessToken;
     } catch (error) {
       console.error("Error fetching access token:", error);
-      // this.cloudWatchMetrics.emitErrorMetric(
-      //   "AptGptUtility",
-      //   "fetchAccessToken"
-      // );
-      // await this.cloudWatchMetrics.writeLog(
-      //   "Error in AptGptUtility.fetchAccessToken user {" +
-      //   JSON.stringify(this.user) +
-      //   "}"
-      // );
+      await this.cloudWatchMetrics.emitErrorMetric(
+        "AptGptUtility",
+        "fetchAccessToken"
+      );
+      await this.cloudWatchMetrics.writeLog(
+        "Error in AptGptUtility.fetchAccessToken user {" +
+        JSON.stringify(this.user) +
+        "}"
+      );
       throw error;
     }
   }

@@ -10,6 +10,13 @@ import { updateDFIndex } from '../../store/actions/dfActions';
 import AccordionItem from './AccordionItem/AccordionItem';
 import AptGptUtility from '../utils/API/AptGptUtility';
 
+/**
+ * class used to tell the user more about the place. This is accessible
+ * both directly from the internet (Google Links) and also when the 
+ * user goes through a chat and sees a recommendation
+ * @param {*} param0 
+ * @returns 
+ */
 const PublicView = ({ id }) => {
     const dispatch = useDispatch();
     const { getAccessTokenSilently, isAuthenticated, user } = useAuth0();
@@ -23,6 +30,12 @@ const PublicView = ({ id }) => {
     const [showGallery, setShowGallery] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+    /**
+     * fetching information from the fetch_apt api route
+     * we are dropping all previous routes so we do not
+     * wait for calls that will no longer appear on the 
+     * page to load
+     */
     useEffect(() => {
         const fetchData = async () => {
             console.log("INSIDE");
@@ -38,9 +51,16 @@ const PublicView = ({ id }) => {
         fetchData();
     }, []);
 
+    /**
+    * handles the logic for the back button
+    * if the user is NOT on the "/" url then we
+    * assume they got here from google & are not logged in
+    * otherwise we will update the DF and send them back
+    * to the chat
+     */
     const goBack = () => {
         if (window.location.pathname === "/") {
-            dispatch(updateDFIndex(i));
+            dispatch(updateDFIndex(null));
         } else {
             window.location.href = "/";
         }

@@ -6,6 +6,13 @@ import SEOComponent from '../SEOComponent/SEOComponent';
 import { Buffer } from 'buffer';
 
 
+/**
+ * class that will display our blog for SEO engagement
+ * has to make a call to our backend to get the data (in markdown)
+ * and the image to display
+ * @param {*} param0 
+ * @returns 
+ */
 const BlogTemplate = ({ id, showLoading }) => {
     const [blogData, setBlogData] = useState({
         title: "",

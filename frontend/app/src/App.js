@@ -10,7 +10,12 @@ import 'semantic-ui-css/semantic.min.css';
 import './App.css';
 import BlogTemplate from './components/BlogTemplate/BlogTemplate';
 
-// Home component with its own SEO
+
+/**
+ * main wrapper class that the user will interact with when talking to Town Llama
+ * @param {*} param0 
+ * @returns 
+ */
 const Home = ({ showLoading }) => (
   <>
     <SEOComponent
@@ -22,9 +27,14 @@ const Home = ({ showLoading }) => (
   </>
 );
 
-// Blog component with its own SEO
+
+/**
+ * wrapper class to render the blog
+ * we may want to change this so it loads faster for SEO
+ * @param {*} param0 
+ * @returns 
+ */
 const Blog = ({ showLoading }) => {
-  // If no id is provided, generate a random one
   const { id } = useParams();  // Use useParams to get the id from the URL
   const blogId = id;
   return (
@@ -39,6 +49,13 @@ const Blog = ({ showLoading }) => {
   );
 };
 
+/**
+ * wrapper class for when somebody googles a restaurant
+ * this will appear. We assume the link will be different & use that
+ * in the below
+ * @param {*} param0 
+ * @returns 
+ */
 const PublicViewWrapper = ({ showLoading }) => {
   const { id } = useParams();  // Use useParams to get the id from the URL
   const blogId = id;
@@ -47,6 +64,11 @@ const PublicViewWrapper = ({ showLoading }) => {
   );
 }
 
+/**
+ * this is our main loop. We have show loading to block the user's 
+ * path until loading finishes
+ * @returns 
+ */
 function App() {
   const [loading, setLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Loading...");
