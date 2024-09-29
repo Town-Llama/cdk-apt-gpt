@@ -13,7 +13,7 @@ async function getApartmentPages() {
     const headers = {
         "Content-Type": "application/json",
     };
-    const url = "/api/blog/all"; // Construct the full URL
+    const url = "https://townllama.ai/api/blog/all"; // Construct the full URL
     try {
         const response = await fetch(url, {
             method: "POST",
