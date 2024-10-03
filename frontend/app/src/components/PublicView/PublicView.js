@@ -45,7 +45,7 @@ const PublicView = ({ id }) => {
             setPlace(data.bar[0]);
             setMenu(data.menu);
             setReviews(data.reviews || []);
-            setImages(data.image || []);
+            setImages(data.image.length ? data.image : null);
         };
         console.log("HIT effect");
         fetchData();

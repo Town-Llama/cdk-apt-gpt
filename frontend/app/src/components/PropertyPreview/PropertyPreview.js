@@ -25,7 +25,7 @@ const PropertyPreview = ({ apt, preferredName = null }) => {
         user
       );
       const data = await client.datas_fetch_apt(apt.barid);
-      setImages(data.image);
+      setImages(data.image.length ? data.image : null);
     }
 
     process();
