@@ -16,9 +16,8 @@ async function getApartmentPages() {
     const url = "https://townllama.ai/api/blog/all"; // Construct the full URL
     try {
         const response = await fetch(url, {
-            method: "POST",
+            method: "GET",
             headers,
-            body: JSON.stringify(),
         });
         if (!response.ok) {
             throw new Error("Network response was not ok");
