@@ -9,6 +9,7 @@ import PublicView from './components/PublicView/PublicView';
 import 'semantic-ui-css/semantic.min.css';
 import './App.css';
 import BlogTemplate from './components/BlogTemplate/BlogTemplate';
+import ErrorBoundary from './components/utils/ErrorBoundary';
 
 
 /**
@@ -99,26 +100,28 @@ function App() {
 
   return (
     <div className="App">
-      <Dimmer active={loading} page>
-        <Loader active={loading} inline='centered'>
-          🦙
-          <br />
-          {loadingText}
-        </Loader>
-      </Dimmer>
-      <Routes>
-        <Route path="/" element={<Home showLoading={showLoading} />} />
-        <Route
-          path="/blogs/:id"
-          element={<Blog showLoading={showLoading} />}
-        />
-        <Route
-          path="/place/:id"
-          element={<PublicViewWrapper showLoading={showLoading} />}
-        />
-        <Route path="/blogs" element={<Blog showLoading={showLoading} />} />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+      <ErrorBoundary>
+        <Dimmer active={loading} page>
+          <Loader active={loading} inline='centered'>
+            🦙
+            <br />
+            {loadingText}
+          </Loader>
+        </Dimmer>
+        <Routes>
+          <Route path="/" element={<Home showLoading={showLoading} />} />
+          <Route
+            path="/blogs/:id"
+            element={<Blog showLoading={showLoading} />}
+          />
+          <Route
+            path="/place/:id"
+            element={<PublicViewWrapper showLoading={showLoading} />}
+          />
+          <Route path="/blogs" element={<Blog showLoading={showLoading} />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </ErrorBoundary>
     </div>
   );
 }
