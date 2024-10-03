@@ -92,12 +92,7 @@ class AptGptUtility {
   }
 
   async datas_waitlist() {
-    const res = await globalRequestManager.enqueueRequest(() =>
-      this.post("api/waitlist", {
-        userid: this.user.email,
-      })
-    );
-    return res.authenticated;
+    return true;//for now everyone gets access
   }
 
   async datas_chats() {
