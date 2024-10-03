@@ -16,7 +16,7 @@ const RestaurantSearch = ({ onRequestClose, showLoading }) => {
     ]);
     const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0)
     const [neighborhoods, setNeighborhoods] = useState([]);
-    const [isGeolocationAvailable, setIsGeolocationAvailable] = useState(true);
+    const [isGeolocationAvailable, setIsGeolocationAvailable] = useState(false);
     const [showLocationAlert, setShowLocationAlert] = useState(false);
     const [isInputFocused, setIsInputFocused] = useState(false);
 
@@ -49,7 +49,7 @@ const RestaurantSearch = ({ onRequestClose, showLoading }) => {
             setNeighborhoods(neighborhoodsList);
         };
         fetchNeighborhoods();
-        checkGeolocationAvailability();
+        // checkGeolocationAvailability();
     }, [getAccessTokenSilently, isAuthenticated, user]);
 
     const checkGeolocationAvailability = () => {
