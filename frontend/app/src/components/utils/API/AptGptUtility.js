@@ -17,7 +17,7 @@ class AptGptUtility {
   }
 
   async blog_entry(id) {
-    const res = await this.post_unauthorized("api/blog/posts/" + id);
+    const res = await this.get_unauthorized("api/blog/posts/" + id);
     console.log(res, "res");
     return res.data[0];
   }
@@ -188,6 +188,37 @@ class AptGptUtility {
       aptId,
     });
     return res.data;
+  }
+
+  async get_unauthorized(endpoint) {
+
+    const headers = {
+      "Content-Type": "application/json",
+    };
+
+    const url = `${AptGptUtility.BASE_URL}/${endpoint}`; // Construct the full URL
+    try {
+      const response = await fetch(url, {
+        headers,
+      });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    } catch (error) {
+      await this.cloudWatchMetrics.emitErrorMetric(
+        "AptGptUtility",
+        "get/" + endpoint
+      );
+      await this.cloudWatchMetrics.writeLog(
+        "Error in AptGptUtility.get/" +
+        endpoint +
+        " user {" +
+        JSON.stringify(this.user) +
+        "}"
+      );
+      throw error;
+    }
   }
 
   async get(endpoint) {
