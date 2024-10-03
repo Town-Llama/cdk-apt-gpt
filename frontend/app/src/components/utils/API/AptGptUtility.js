@@ -215,7 +215,7 @@ class AptGptUtility {
         endpoint +
         " user {" +
         JSON.stringify(this.user) +
-        "}"
+        "} and error: {" + error + "}"
       );
       throw error;
     }
@@ -254,7 +254,7 @@ class AptGptUtility {
         endpoint +
         " user {" +
         JSON.stringify(this.user) +
-        "}"
+        "} and error: {" + error + "}"
       );
       throw error;
     }
@@ -289,7 +289,7 @@ class AptGptUtility {
         JSON.stringify(this.user) +
         "} with data {" +
         JSON.stringify(data) +
-        "}"
+        "} and error: {" + error + "}"
       );
       throw error;
     }
@@ -334,7 +334,7 @@ class AptGptUtility {
         JSON.stringify(this.user) +
         "} with data {" +
         JSON.stringify(data) +
-        "}"
+        "} and error: {" + error + "}"
       );
       throw error;
     }
@@ -361,7 +361,7 @@ class AptGptUtility {
       await this.cloudWatchMetrics.writeLog(
         "Error in AptGptUtility.fetchAccessToken user {" +
         JSON.stringify(this.user) +
-        "}"
+        "} and error: {" + error + "}"
       );
       throw error;
     }

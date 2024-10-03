@@ -61,6 +61,7 @@ router.post("/search", async (req, res) => {
     console.timeEnd("datas.search:dbCall");
 
     //bad form but lets us ship faster
+    console.time("datas.search:getFullBarData");
     let data: Array<BarItem> = [];
     for (let i = 0; i < responses.length; i++) {
       let followup_query
@@ -72,9 +73,15 @@ router.post("/search", async (req, res) => {
       const followup_response = await dbCall(followup_query, [responses[i].id]);
       data.push(followup_response[0]);
     }
+    console.time("datas.search:getFullBarData");
 
+    console.time("datas.search:addReviews");
     await addReviews(data);
+    console.timeEnd("datas.search:addReviews");
+
+    console.time("datas.search:saveQuery");
     await saveQuery(query, user);
+    console.timeEnd("datas.search:saveQuery");
 
     return res.status(200).json({ data: data });
   } catch (error) {
@@ -92,63 +99,69 @@ async function saveQuery(query: string, userid: string) {
 }
 
 async function addReviews(data: Array<BarItem>) {
-  //check if there are any reviews in the db
-  for (let i = 0; i < data.length; i++) {
-    const lookupquery = "select rating, review_text from bar_reviews where barid=$1";
-    const value = [data[i].barid];
-    let followup_response = await dbCall(lookupquery, value);
-    if (followup_response.length == 0) {
-      //look up outscraper
-      const reviews = await outscraper_client.googleMapsReviews([data[i].barname + ' TX, USA'], 5);
-      //then save to DB
-      for (let j = 0; j < reviews[0].reviews_data.length; j++) {
-        let review = reviews[0].reviews_data[j];
-        const insertquery = "INSERT INTO bar_reviews (rating, review_text, review_date, barid) VALUES ($1, $2, $3, $4)";
-        const insertvalues = [review.review_rating, review.review_text, review.review_datetime_utc, data[i].barid];
-        await dbCall(insertquery, insertvalues);
-        followup_response.push({
-          review_text: review.review_text,
-          rating: review.rating
-        })
-      }
-    }
-    // add to object
-    data[i].reviews = followup_response;
+  return new Promise(async (resolve) => {
+    const timeout = setTimeout(() => {
+      console.log("Operation timed out after 5 seconds. Returning partial results.");
+      resolve(data);
+    }, 5000);
 
-    //get summaries
-    const summaryquery = "select rating, review_text from bar_reivew_summaries where barid=$1";
-    let raw_result = await dbCall(summaryquery, value);
-    let summary_res = raw_result[0];
-    if (raw_result.length == 0 && followup_response.length > 0) {
-      const response = await callLLM([
-        { role: "system", content: "Read the below reviews and summarize the key findings. Point out if anything seems important or unreasonable." },
-        { role: "user", content: formatReviews(followup_response) },
-      ]);
-
-      let average_rating = 0;
-      let ratings = 0;
-      for (let i = 0; i < followup_response.length; i++) {
-        let rating = parseFloat(followup_response[i].rating);;
-        if (Number.isNaN(rating)) {
-          continue;
+    try {
+      for (let i = 0; i < data.length; i++) {
+        const lookupquery = "select rating, review_text from bar_reviews where barid=$1";
+        const value = [data[i].barid];
+        let followup_response = await dbCall(lookupquery, value);
+        if (followup_response.length == 0) {
+          const reviews = await outscraper_client.googleMapsReviews([data[i].barname + ' TX, USA'], 5);
+          for (let j = 0; j < reviews[0].reviews_data.length; j++) {
+            let review = reviews[0].reviews_data[j];
+            const insertquery = "INSERT INTO bar_reviews (rating, review_text, review_date, barid) VALUES ($1, $2, $3, $4)";
+            const insertvalues = [review.review_rating, review.review_text, review.review_datetime_utc, data[i].barid];
+            await dbCall(insertquery, insertvalues);
+            followup_response.push({
+              review_text: review.review_text,
+              rating: review.rating
+            });
+          }
         }
-        average_rating += rating;
-        ratings++;
-      }
-      console.log(average_rating, "before division");
-      if (ratings > 0) {
-        average_rating /= ratings;
-        console.log(average_rating, "after division");
+        data[i].reviews = followup_response;
 
-        const insertquery = "INSERT INTO bar_reivew_summaries (rating, review_text, review_date, barid) VALUES ($1, $2, $3, $4)";
-        const insertvalues = [average_rating, response, new Date(), data[i].barid];
-        await dbCall(insertquery, insertvalues);
+        const summaryquery = "select rating, review_text from bar_reivew_summaries where barid=$1";
+        let raw_result = await dbCall(summaryquery, value);
+        let summary_res = raw_result[0];
+        if (raw_result.length == 0 && followup_response.length > 0) {
+          const response = await callLLM([
+            { role: "system", content: "Read the below reviews and summarize the key findings. Point out if anything seems important or unreasonable." },
+            { role: "user", content: formatReviews(followup_response) },
+          ]);
+
+          let average_rating = 0;
+          let ratings = 0;
+          for (let i = 0; i < followup_response.length; i++) {
+            let rating = parseFloat(followup_response[i].rating);
+            if (!Number.isNaN(rating)) {
+              average_rating += rating;
+              ratings++;
+            }
+          }
+          if (ratings > 0) {
+            average_rating /= ratings;
+            const insertquery = "INSERT INTO bar_reivew_summaries (rating, review_text, review_date, barid) VALUES ($1, $2, $3, $4)";
+            const insertvalues = [average_rating, response, new Date(), data[i].barid];
+            await dbCall(insertquery, insertvalues);
+          }
+          summary_res = response;
+        }
+        data[i].reviewsMessage = summary_res;
       }
-      summary_res = response;
+
+      clearTimeout(timeout);
+      resolve(data);
+    } catch (error) {
+      console.error("An error occurred:", error);
+      clearTimeout(timeout);
+      resolve(data);
     }
-    data[i].reviewsMessage = summary_res;
-  }
-
+  });
 }
 
 function formatReviews(reviews: Array<Review>) {
