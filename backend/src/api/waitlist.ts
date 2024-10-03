@@ -31,7 +31,7 @@ router.post("/waitlist", async (req, res) => {
       const count = parseInt(countResult[0].count, 10);
 
       // Determine if the user should be approved immediately
-      isApproved = count <= 0; // Approve if less than 100 users are approved
+      isApproved = count <= 1000; // Approve if less than 100 users are approved
 
       query =
         "INSERT INTO waitlist (userid, approved, time) VALUES ($1, $2, $3)";
