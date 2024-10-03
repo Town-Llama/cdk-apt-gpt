@@ -8,10 +8,10 @@ export async function callLLM(msgs: any) {
     try {
       attempts++;
       console.log("Attempt", attempts);
-      // return callOpenAI(msgs);
-      const res = await callGroq(msgs);
-      console.log("HIT", res);
-      return res;
+      return await callOpenAI(msgs);
+      // const res = await callGroq(msgs);
+      // console.log("HIT", res);
+      // return res;
     } catch (e) {
       console.log(e);
       await randomWait();
