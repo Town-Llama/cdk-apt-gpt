@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { Dimmer, Loader } from 'semantic-ui-react';
 
+import { setupLogger } from './components/utils/sessionId';
 import ChatV2 from "./components/ChatV2/ChatV2";
 import SEOComponent from './components/SEOComponent/SEOComponent';
 import PublicView from './components/PublicView/PublicView';
@@ -97,6 +98,12 @@ function App() {
       return () => clearInterval(interval);
     }
   }, [loading]);
+
+  useEffect(() => {
+    setupLogger();
+    // Now you can use sessionId for all future console logs
+    console.log('App loaded');
+  }, []);
 
   return (
     <div className="App">

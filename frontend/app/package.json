@@ -62,6 +62,7 @@
     "semantic-ui-react": "^2.1.5",
     "source-map-explorer": "^2.5.3",
     "styled-components": "^6.1.11",
+    "uuid": "^10.0.0",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
