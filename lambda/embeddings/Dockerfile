@@ -2,9 +2,11 @@ FROM --platform=linux/amd64 python:3.9-slim AS base
 
 ENV HF_HOME=/opt/hf_cache
 
+RUN echo "Acquire::http::Pipeline-Depth 0; \n Acquire::http::No-Cache true; \n Acquire::BrokenProxy    true;" > /etc/apt/apt.conf.d/99fixbadproxy
+
 # Update package lists and install dependencies
-RUN apt-get update -y && \
-    apt-get install -y \
+RUN apt-get update --fix-missing && \
+    apt-get install -y --no-install-recommends \
     gcc \
     libgomp1 \
     libsndfile1 \
@@ -13,6 +15,7 @@ RUN apt-get update -y && \
     tar && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
 
 # Install txtai dependencies
 RUN pip3 install --no-cache-dir torch==2.3.1 \
