@@ -20,6 +20,32 @@ export async function callLLM(msgs: any) {
   throw new Error("Call Failed after retries");
 }
 
+export async function callGrok(msgs: any) {
+  try {
+    const options = {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + process.env.GROK_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "grok-beta",
+        messages: msgs,
+      }),
+    };
+    const fetch = (await import("node-fetch")).default;
+    const response = await fetch(
+      "https://api.x.ai/v1/chat/completions",
+      options
+    );
+    const data: any = await response.json();
+    return data.choices[0].message.content;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
 export async function callFireworks(msgs: any) {
   try {
     const options = {
