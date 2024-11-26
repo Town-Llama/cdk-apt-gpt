@@ -13,6 +13,12 @@ cd backend
 npm install
 npm run start
 ```
+- in a separate terminal instance, to get the embedding model running:
+```
+cd lambda/embeddings
+docker build --target descr_embedding_handler -t descr_embedding_handler:latest .
+docker run -p 5000:5000 --rm descr_embedding_handler:latest
+```
 
 ## Running the frontend
 - frontend is a react app
