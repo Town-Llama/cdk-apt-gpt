@@ -24,6 +24,7 @@
     "express": "^4.19.2",
     "glob": "^11.0.0",
     "groq-sdk": "^0.7.0",
+    "morgan": "^1.10.0",
     "node-fetch": "^3.3.2",
     "openai": "^4.53.2",
     "outscraper": "^2.0.4",

@@ -1,27 +1,30 @@
-# manual tests:
-- `test`
-- `casual bar to meet new friends`
-- `bored and single`
-- `where to go on a friday night with my girlfriend`
+# Welcome to Town Llama -- helping you find your best apartment using AI!
 
+## Pre-requisite
+- create a .env file for both the backend & the frontend
+- your file should contain the keys for each one specified in our github/workflows/cdk.yml
 
-# Welcome to your CDK TypeScript project
+## Running the backend
+- our backend is designed to be deployed on a combination of 1 lambda (using serverless) and ECS instances to host the models
+- to launch locally, we will use 2 commands (one to launch an express server (the lmabda) and one to launch the ECS instances)
+- from the root directory
+```
+cd backend
+npm install
+npm run start
+```
 
-This is a blank project for CDK development with TypeScript.
+## Running the frontend
+- frontend is a react app
+- this is deployed via a S3 bucket connected to cloudfront
+- to launch locally, we will use npm
+- from the root directory:
+```
+cd frontend/app
+npm install
+npm run start
+```
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+## note our data scraping script is in a separate repo
+- if you'd like to take a look please email us
 
-## Useful commands
-
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
-
-
-- gmail creds to team
-- aws creds to team
-- poulimi
-- github org
